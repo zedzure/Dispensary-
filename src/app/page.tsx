@@ -1,3 +1,7 @@
+
+"use client";
+
+import { useState } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { StrainRecommenderForm } from "@/components/strain-recommender-form";
@@ -7,6 +11,8 @@ import { ArrowRight, Leaf, MapPin, Tag } from "lucide-react";
 import Image from 'next/image';
 import { CategoryCircles } from "@/components/category-circles";
 import { DealsSteals } from "@/components/deals-steals";
+import { ProductDetailModal } from "@/components/product-detail-modal";
+import type { Product } from "@/types/product";
 
 const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint' },
@@ -21,7 +27,37 @@ const categories = [
   { name: 'Deals', hint: 'sale tag' },
 ];
 
+const generateProducts = (category: { name: string, hint: string }, count: number): Product[] => {
+  return Array.from({ length: count }).map((_, i) => ({
+    id: `${category.name}-${i}`,
+    name: `${category.name} Product ${i + 1}`,
+    category: category.name,
+    type: i % 3 === 0 ? 'Sativa' : i % 3 === 1 ? 'Indica' : 'Hybrid',
+    thc: Math.floor(Math.random() * 15) + 15,
+    price: Math.random() * 40 + 20,
+    description: `An exquisite ${category.name.toLowerCase()} with a unique profile. Perfect for both new and experienced users looking for a quality experience.`,
+    image: `https://placehold.co/600x400.png`,
+    hint: category.hint,
+  }));
+};
+
+const allProducts = categories.reduce((acc, category) => {
+  acc[category.name] = generateProducts(category, 10);
+  return acc;
+}, {} as Record<string, Product[]>);
+
+
 export default function Home() {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+  };
+
+  const closeModal = () => {
+    setSelectedProduct(null);
+  };
+  
   return (
     <div className="flex flex-col min-h-screen bg-white text-foreground">
       <Header />
@@ -58,12 +94,12 @@ export default function Home() {
         {/* Shop by Category Section */}
         <section className="pt-16 md:pt-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
-            <CategoryCircles />
+            <CategoryCircles onProductClick={handleProductClick} />
           </div>
         </section>
 
         {/* Deals & Steals Section */}
-        <DealsSteals />
+        <DealsSteals onProductClick={handleProductClick} />
         
         {/* Category Product Grid Section */}
         <section id="menu" className="py-16 md:py-24 bg-white">
@@ -73,25 +109,27 @@ export default function Home() {
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8 text-primary">{category.name}</h2>
                 <div className="overflow-x-auto no-scrollbar -mx-4 px-4 md:-mx-6 md:px-6">
                   <ul className="flex flex-nowrap items-stretch gap-6 py-4">
-                    {Array.from({ length: 10 }).map((_, i) => (
-                      <li key={i} className="flex-shrink-0 w-64 sm:w-72">
-                        <Card className="h-full flex flex-col overflow-hidden group bg-white border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    {allProducts[category.name].map((product) => (
+                      <li key={product.id} className="flex-shrink-0 w-64 sm:w-72">
+                        <Card className="h-full flex flex-col overflow-hidden group bg-white border-border/60 hover:border-primary/50 transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-1">
                           <CardHeader className="p-0">
-                            <Image
-                              src={`https://placehold.co/600x400.png`}
-                              data-ai-hint={category.hint}
-                              alt={`${category.name} Product ${i + 1}`}
-                              width={600}
-                              height={400}
-                              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
+                            <button onClick={() => handleProductClick(product)} className="w-full aspect-[3/2] relative">
+                                <Image
+                                  src={product.image}
+                                  data-ai-hint={product.hint}
+                                  alt={product.name}
+                                  layout="fill"
+                                  objectFit="cover"
+                                  className="group-hover:scale-105 transition-transform duration-300"
+                                />
+                            </button>
                           </CardHeader>
                           <CardContent className="p-6 flex-grow">
-                            <CardTitle className="text-xl font-semibold">Product Name {i + 1}</CardTitle>
-                            <p className="text-sm text-muted-foreground mt-2">Sativa | 22% THC</p>
+                            <CardTitle className="text-xl font-semibold">{product.name}</CardTitle>
+                            <p className="text-sm text-muted-foreground mt-2">{product.type} | {product.thc}% THC</p>
                           </CardContent>
                           <CardFooter className="p-6 pt-0">
-                            <Button className="w-full" variant="default">View Product</Button>
+                            <Button className="w-full" variant="default" onClick={() => handleProductClick(product)}>View Product</Button>
                           </CardFooter>
                         </Card>
                       </li>
@@ -135,6 +173,11 @@ export default function Home() {
 
       </main>
       <Footer />
+      <ProductDetailModal
+        isOpen={!!selectedProduct}
+        onOpenChange={(isOpen) => !isOpen && closeModal()}
+        product={selectedProduct}
+      />
     </div>
   );
 }

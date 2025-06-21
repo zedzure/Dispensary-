@@ -1,4 +1,6 @@
+
 import Image from 'next/image';
+import type { Product } from '@/types/product';
 
 const deals = [
   { name: 'Blue Dream', hint: 'cannabis flower', tag: 'New' },
@@ -23,21 +25,36 @@ const deals = [
   { name: 'Zkittlez', hint: 'cannabis flower', tag: '10% Off' },
 ];
 
+interface DealsStealsProps {
+  onProductClick: (product: Product) => void;
+}
 
-export function DealsSteals() {
+export function DealsSteals({ onProductClick }: DealsStealsProps) {
+  const handleClick = (deal: { name: string; hint: string, tag?: string }) => {
+    const representativeProduct: Product = {
+      id: `deal-${deal.name.toLowerCase().replace(' ', '-')}`,
+      name: deal.name,
+      category: 'Deals',
+      type: 'Hybrid',
+      thc: 22,
+      price: 35.00,
+      description: `An amazing deal on ${deal.name}! This popular item is on sale for a limited time. Grab it before it's gone.`,
+      image: `https://placehold.co/600x400.png`,
+      hint: deal.hint,
+    };
+    onProductClick(representativeProduct);
+  };
+
   return (
     <section id="deals" className="pt-8 md:pt-12 pb-16 md:pb-24 bg-white">
       <div className="container mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12 text-primary">
           Deals & Steals
         </h2>
-        <div 
-          className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear_gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]"
-        >
-          <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-scroll hover:pause-animation">
+        <div className="flex -mx-4 px-4 space-x-4 overflow-x-auto pb-4 no-scrollbar">
             {deals.map((deal, index) => (
-              <li key={index} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28">
-                <div className="relative w-[98px] h-[98px] cursor-pointer group">
+              <button key={index} onClick={() => handleClick(deal)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
+                <div className="relative w-[98px] h-[98px] group-hover:drop-shadow-lg transition-all duration-300">
                   {deal.tag && (
                     <div className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md">
                       {deal.tag}
@@ -57,35 +74,8 @@ export function DealsSteals() {
                   </div>
                 </div>
                 <p className="text-xs font-medium text-foreground truncate w-full text-center">{deal.name}</p>
-              </li>
+              </button>
             ))}
-          </ul>
-          <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-scroll hover:pause-animation" aria-hidden="true">
-            {deals.map((deal, index) => (
-              <li key={index} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28">
-                <div className="relative w-[98px] h-[98px] cursor-pointer group">
-                  {deal.tag && (
-                    <div className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md">
-                      {deal.tag}
-                    </div>
-                  )}
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-500 animate-spin-slow group-hover:animate-spin"></div>
-                  <div className="absolute inset-0.5 bg-card rounded-full"></div>
-                  <div className="absolute inset-1 rounded-full overflow-hidden">
-                    <Image
-                      src={`https://placehold.co/90x90.png`}
-                      data-ai-hint={deal.hint}
-                      alt={deal.name}
-                      width={90}
-                      height={90}
-                      className="object-cover"
-                    />
-                  </div>
-                </div>
-                <p className="text-xs font-medium text-foreground truncate w-full text-center">{deal.name}</p>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>
