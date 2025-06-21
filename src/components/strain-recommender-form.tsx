@@ -54,7 +54,7 @@ export function StrainRecommenderForm() {
       <Card className="bg-card shadow-xl border-border/60">
         <CardHeader className="text-center items-center">
           <Sparkles className="h-10 w-10 text-primary mb-4" />
-          <CardTitle className="text-3xl font-semibold tracking-tight">AI Strain Recommender</CardTitle>
+          <CardTitle className="text-3xl font-semibold tracking-tight">Recommended for you</CardTitle>
           <CardDescription>Not sure what to choose? Let our AI guide you to the perfect experience.</CardDescription>
         </CardHeader>
         <CardContent>
