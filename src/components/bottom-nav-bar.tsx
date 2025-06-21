@@ -10,7 +10,7 @@ export function BottomNavBar() {
     { href: '#deals', icon: Gift, label: 'Deals' },
     { href: '#recommender', icon: Sparkles, label: 'AI' },
     { href: '#why-us', icon: MapPin, label: 'Locations' },
-    { href: '/login', icon: User, label: 'Profile' },
+    { href: '/profile', icon: User, label: 'Profile' },
     { href: '#', icon: Mail, label: 'Contact' },
   ];
 
