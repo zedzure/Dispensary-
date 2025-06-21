@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const StrainRecommenderInputSchema = z.object({
   preferences: z
@@ -21,12 +21,12 @@ const StrainRecommenderInputSchema = z.object({
 export type StrainRecommenderInput = z.infer<typeof StrainRecommenderInputSchema>;
 
 const StrainRecommenderOutputSchema = z.object({
-  strainSuggestions: z
-    .array(z.string())
-    .describe('A list of cannabis strain suggestions based on the user preferences.'),
-  reasons: z
-    .array(z.string())
-    .describe('Reasons for suggesting each strain, based on the user preferences.'),
+  recommendations: z.array(
+    z.object({
+      strain: z.string().describe('The name of the recommended cannabis strain.'),
+      reason: z.string().describe('The reason for recommending this specific strain.'),
+    })
+  ).describe('A list of strain recommendations, each with a strain name and a reason.'),
 });
 export type StrainRecommenderOutput = z.infer<typeof StrainRecommenderOutputSchema>;
 
@@ -40,14 +40,11 @@ const prompt = ai.definePrompt({
   output: {schema: StrainRecommenderOutputSchema},
   prompt: `You are an expert cannabis strain recommender.
 
-  Based on the user's preferences and desired effects, suggest a list of cannabis strains that the user might prefer.
-  Include reasons for each suggestion.
+  Based on the user's preferences and desired effects, suggest a list of cannabis strains that the user might prefer. For each suggestion, provide the strain name and a reason for the recommendation.
 
   User Preferences: {{{preferences}}}
 
-  Format your response as a JSON object that contains two lists:
-  - strainSuggestions: A list of strain names
-  - reasons: A list of reasons for each strain recommendation.
+  Format your response as a JSON object containing a list of recommendations. Each recommendation should be an object with "strain" and "reason" fields.
 `,
 });
 

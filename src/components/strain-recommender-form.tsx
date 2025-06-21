@@ -104,16 +104,16 @@ export function StrainRecommenderForm() {
             <div className="mt-8">
               <h3 className="font-semibold text-2xl mb-4 text-center">Here are your recommendations:</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {result.strainSuggestions.map((strain, index) => (
+                {result.recommendations.map((rec, index) => (
                   <Card key={index} className="flex flex-col bg-secondary/30 border-border/60 hover:border-primary transition-colors">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 font-semibold">
                         <Leaf className="h-5 w-5 text-primary" />
-                        {strain}
+                        {rec.strain}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="flex-grow">
-                      <p className="text-sm text-muted-foreground">{result.reasons[index]}</p>
+                      <p className="text-sm text-muted-foreground">{rec.reason}</p>
                     </CardContent>
                   </Card>
                 ))}
