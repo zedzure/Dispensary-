@@ -5,8 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Leaf, MapPin, Tag } from "lucide-react";
 import Image from 'next/image';
-import { CategoryCircles } from "@/components/category-circles";
-import { DealsSteals } from "@/components/deals-steals";
+
+const categories = [
+  { name: 'Pre-rolls', hint: 'cannabis joint' },
+  { name: 'Flower', hint: 'cannabis bud' },
+  { name: 'Vapes', hint: 'vape pen' },
+  { name: 'Edibles', hint: 'gummy candy' },
+  { name: 'Concentrates', hint: 'cannabis oil' },
+  { name: 'Tinctures', hint: 'dropper bottle' },
+  { name: 'Topicals', hint: 'cream jar' },
+  { name: 'Seeds', hint: 'cannabis seed' },
+  { name: 'Gear', hint: 'grinder accessory' },
+  { name: 'Deals', hint: 'sale tag' },
+];
 
 export default function Home() {
   return (
@@ -42,55 +53,42 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Category Section */}
-        <section id="categories" className="py-16 md:py-24 bg-card">
-          <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">
-              Shop by Category
-            </h2>
-            <CategoryCircles />
-          </div>
-        </section>
-
-        <DealsSteals />
-
-        {/* Featured Products Section */}
-        <section id="menu" className="py-16 md:py-24 bg-background">
-          <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">
-              Featured Products
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="overflow-hidden group bg-card border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                  <CardHeader className="p-0">
-                    <Image
-                      src={`https://placehold.co/600x400.png`}
-                      data-ai-hint="cannabis product"
-                      alt={`Product ${i + 1}`}
-                      width={600}
-                      height={400}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <CardTitle className="text-xl font-semibold">Product Name {i + 1}</CardTitle>
-                    <p className="text-sm text-muted-foreground mt-2">Sativa | 22% THC</p>
-                  </CardContent>
-                  <CardFooter className="p-6 pt-0">
-                    <Button className="w-full" variant="secondary">View Product</Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-            <div className="text-center mt-12">
-              <Button size="lg" variant="secondary">View Full Menu</Button>
-            </div>
+        {/* Category Product Grid Section */}
+        <section id="menu" className="py-16 md:py-24 bg-card">
+          <div className="container mx-auto px-4 md:px-6 space-y-16">
+            {categories.map((category) => (
+              <div key={category.name}>
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8">{category.name}</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+                  {Array.from({ length: 10 }).map((_, i) => (
+                    <Card key={i} className="overflow-hidden group bg-background border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                      <CardHeader className="p-0">
+                        <Image
+                          src={`https://placehold.co/600x400.png`}
+                          data-ai-hint={category.hint}
+                          alt={`${category.name} Product ${i + 1}`}
+                          width={600}
+                          height={400}
+                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </CardHeader>
+                      <CardContent className="p-6">
+                        <CardTitle className="text-xl font-semibold">Product Name {i + 1}</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-2">Sativa | 22% THC</p>
+                      </CardContent>
+                      <CardFooter className="p-6 pt-0">
+                        <Button className="w-full" variant="secondary">View Product</Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
         
         {/* Why Choose Us Section */}
-        <section id="why-us" className="py-16 md:py-24 bg-card">
+        <section id="why-us" className="py-16 md:py-24 bg-background">
             <div className="container mx-auto px-4 md:px-6">
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">Why GreenLeaf Guide?</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
