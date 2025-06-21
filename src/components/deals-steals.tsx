@@ -46,7 +46,7 @@ export function DealsSteals({ onProductClick }: DealsStealsProps) {
   };
 
   return (
-    <section id="deals" className="pt-8 md:pt-12 pb-16 md:pb-24 bg-white">
+    <section id="deals" className="py-8 md:py-12 bg-white">
       <div className="container mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12 text-primary">
           Deals & Steals
@@ -55,12 +55,7 @@ export function DealsSteals({ onProductClick }: DealsStealsProps) {
             {deals.map((deal, index) => (
               <button key={index} onClick={() => handleClick(deal)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
                 <div className="relative w-[98px] h-[98px] group-hover:drop-shadow-lg transition-all duration-300">
-                  {deal.tag && (
-                    <div className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md">
-                      {deal.tag}
-                    </div>
-                  )}
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-500 animate-spin-slow group-hover:animate-spin"></div>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-500"></div>
                   <div className="absolute inset-0.5 bg-card rounded-full"></div>
                   <div className="absolute inset-1 rounded-full overflow-hidden">
                     <Image
@@ -73,6 +68,11 @@ export function DealsSteals({ onProductClick }: DealsStealsProps) {
                     />
                   </div>
                 </div>
+                {deal.tag && (
+                  <div className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md">
+                    {deal.tag}
+                  </div>
+                )}
                 <p className="text-xs font-medium text-foreground truncate w-full text-center">{deal.name}</p>
               </button>
             ))}

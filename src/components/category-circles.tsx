@@ -40,7 +40,7 @@ export function CategoryCircles({ onProductClick }: CategoryCirclesProps) {
         {categories.map((category) => (
           <button key={category.name} onClick={() => handleClick(category)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
             <div className="relative w-[98px] h-[98px] group-hover:drop-shadow-lg transition-all duration-300">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-500 animate-spin-slow group-hover:animate-spin"></div>
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-500"></div>
               <div className="absolute inset-0.5 bg-card rounded-full"></div>
               <div className="absolute inset-1 rounded-full overflow-hidden">
                 <Image
