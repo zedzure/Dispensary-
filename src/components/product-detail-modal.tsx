@@ -42,9 +42,12 @@ export function ProductDetailModal({ product, isOpen, onOpenChange }: ProductDet
                     {product.thc && <Badge variant="outline">{product.thc}% THC</Badge>}
                 </div>
                 <p className="text-base text-muted-foreground flex-grow mb-4">{product.description}</p>
-                <div className="flex items-center justify-between pt-4 border-t">
+                <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t">
                     {product.price ? <p className="text-2xl font-bold text-primary">${product.price.toFixed(2)}</p> : <div />}
-                    <Button size="lg">Add to Cart</Button>
+                    <div className="flex gap-2">
+                        <Button size="lg" variant="outline" onClick={() => onOpenChange(false)}>Continue Shopping</Button>
+                        <Button size="lg">Add to Cart</Button>
+                    </div>
                 </div>
             </div>
         </div>

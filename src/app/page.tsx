@@ -17,12 +17,12 @@ import type { Product } from "@/types/product";
 const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint' },
   { name: 'Flower', hint: 'cannabis bud' },
-  { name: 'Seeds', hint: 'cannabis seed' },
+  { name: 'Vapes', hint: 'vape pen' },
   { name: 'Edibles', hint: 'gummy candy' },
   { name: 'Concentrates', hint: 'cannabis oil' },
   { name: 'Tinctures', hint: 'dropper bottle' },
   { name: 'Topicals', hint: 'cream jar' },
-  { name: 'Vapes', hint: 'vape pen' },
+  { name: 'Seeds', hint: 'cannabis seed' },
   { name: 'Gear', hint: 'grinder accessory' },
   { name: 'Deals', hint: 'sale tag' },
 ];
@@ -111,7 +111,7 @@ export default function Home() {
                   <ul className="flex flex-nowrap items-stretch gap-6 py-4">
                     {allProducts[category.name].map((product) => (
                       <li key={product.id} className="flex-shrink-0 w-64 sm:w-72">
-                        <Card className="h-full flex flex-col overflow-hidden group bg-white border-border/60 hover:border-primary/50 transition-all duration-300 shadow-lg">
+                        <Card className="h-full flex flex-col overflow-hidden group bg-white border-border/60 transition-all duration-300 shadow-lg">
                           <CardHeader className="p-0">
                             <button onClick={() => handleProductClick(product)} className="w-full aspect-[3/2] relative">
                                 <Image
@@ -128,8 +128,9 @@ export default function Home() {
                             <CardTitle className="text-xl font-semibold">{product.name}</CardTitle>
                             <p className="text-sm text-muted-foreground mt-2">{product.type} | {product.thc}% THC</p>
                           </CardContent>
-                          <CardFooter className="p-6 pt-0">
-                            <Button className="w-full" variant="default" onClick={() => handleProductClick(product)}>View Product</Button>
+                          <CardFooter className="p-6 pt-0 flex items-center justify-between">
+                            <p className="text-xl font-bold text-primary">${product.price?.toFixed(2)}</p>
+                            <Button variant="default" onClick={() => handleProductClick(product)}>View</Button>
                           </CardFooter>
                         </Card>
                       </li>
