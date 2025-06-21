@@ -59,28 +59,59 @@ export default function Home() {
             {categories.map((category) => (
               <div key={category.name}>
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8">{category.name}</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-                  {Array.from({ length: 10 }).map((_, i) => (
-                    <Card key={i} className="overflow-hidden group bg-background border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                      <CardHeader className="p-0">
-                        <Image
-                          src={`https://placehold.co/600x400.png`}
-                          data-ai-hint={category.hint}
-                          alt={`${category.name} Product ${i + 1}`}
-                          width={600}
-                          height={400}
-                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </CardHeader>
-                      <CardContent className="p-6">
-                        <CardTitle className="text-xl font-semibold">Product Name {i + 1}</CardTitle>
-                        <p className="text-sm text-muted-foreground mt-2">Sativa | 22% THC</p>
-                      </CardContent>
-                      <CardFooter className="p-6 pt-0">
-                        <Button className="w-full" variant="secondary">View Product</Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
+                <div 
+                  className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear_gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]"
+                >
+                  <ul className="flex items-stretch justify-center md:justify-start [&_li]:mx-4 animate-scroll hover:pause-animation">
+                    {Array.from({ length: 10 }).map((_, i) => (
+                      <li key={i} className="flex-shrink-0 w-80">
+                        <Card className="h-full flex flex-col overflow-hidden group bg-background border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                          <CardHeader className="p-0">
+                            <Image
+                              src={`https://placehold.co/600x400.png`}
+                              data-ai-hint={category.hint}
+                              alt={`${category.name} Product ${i + 1}`}
+                              width={600}
+                              height={400}
+                              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </CardHeader>
+                          <CardContent className="p-6 flex-grow">
+                            <CardTitle className="text-xl font-semibold">Product Name {i + 1}</CardTitle>
+                            <p className="text-sm text-muted-foreground mt-2">Sativa | 22% THC</p>
+                          </CardContent>
+                          <CardFooter className="p-6 pt-0">
+                            <Button className="w-full" variant="secondary">View Product</Button>
+                          </CardFooter>
+                        </Card>
+                      </li>
+                    ))}
+                  </ul>
+                  <ul className="flex items-stretch justify-center md:justify-start [&_li]:mx-4 animate-scroll hover:pause-animation" aria-hidden="true">
+                     {Array.from({ length: 10 }).map((_, i) => (
+                      <li key={i} className="flex-shrink-0 w-80">
+                        <Card className="h-full flex flex-col overflow-hidden group bg-background border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                          <CardHeader className="p-0">
+                            <Image
+                              src={`https://placehold.co/600x400.png`}
+                              data-ai-hint={category.hint}
+                              alt={`${category.name} Product ${i + 1}`}
+                              width={600}
+                              height={400}
+                              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </CardHeader>
+                          <CardContent className="p-6 flex-grow">
+                            <CardTitle className="text-xl font-semibold">Product Name {i + 1}</CardTitle>
+                            <p className="text-sm text-muted-foreground mt-2">Sativa | 22% THC</p>
+                          </CardContent>
+                          <CardFooter className="p-6 pt-0">
+                            <Button className="w-full" variant="secondary">View Product</Button>
+                          </CardFooter>
+                        </Card>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             ))}
