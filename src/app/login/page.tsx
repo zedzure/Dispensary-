@@ -117,7 +117,7 @@ export default function ProfilePage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Order Details</TableHead>
+                      <TableHead className="w-[50%]">Order Details</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead className="text-right">Total</TableHead>
                       <TableHead className="text-center">Status</TableHead>
@@ -131,14 +131,14 @@ export default function ProfilePage() {
                                 <Image src={order.items[0].image} alt={order.items[0].name} width={40} height={40} className="rounded-md" data-ai-hint={order.items[0].hint}/>
                                 <div>
                                     <p className="font-semibold">{order.id}</p>
-                                    <p className="text-xs text-muted-foreground">{order.items[0].name}{order.items.length > 1 ? ` + ${order.items.length - 1} more` : ''}</p>
+                                    <p className="text-xs text-muted-foreground truncate">{order.items[0].name}{order.items.length > 1 ? ` + ${order.items.length - 1} more` : ''}</p>
                                 </div>
                             </div>
                         </TableCell>
                         <TableCell>{order.date}</TableCell>
                         <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
                         <TableCell className="text-center">
-                            <Badge variant="secondary" className="bg-green-100 text-green-800 border border-green-200 hover:bg-green-200">{order.status}</Badge>
+                            <Badge variant="secondary">{order.status}</Badge>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -159,7 +159,7 @@ export default function ProfilePage() {
                 {paymentMethods.map((method, index) => (
                     <div key={index} className="flex items-center justify-between rounded-lg border p-4 bg-white">
                         <div className="flex items-center gap-4">
-                            <div className="bg-gray-100 p-2 rounded-md">
+                            <div className="bg-muted p-2 rounded-md">
                                 <CreditCard className="h-6 w-6 text-muted-foreground" />
                             </div>
                             <div>
