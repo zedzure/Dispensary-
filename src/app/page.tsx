@@ -34,14 +34,14 @@ const generateProducts = (category: { name: string, hint: string }, count: numbe
     const productType = i % 3 === 0 ? 'Sativa' : i % 3 === 1 ? 'Indica' : 'Hybrid';
     let specificHint = category.hint;
     
-    if (productType !== 'Hybrid') {
-      if (category.name === 'Flower') {
-          specificHint = `${productType.toLowerCase()} flower`;
-      } else if (category.name === 'Vapes') {
-          specificHint = `${productType.toLowerCase()} vape`;
-      } else if (category.name === 'Pre-rolls') {
-          specificHint = `${productType.toLowerCase()} joint`;
-      }
+    if (category.name === 'Flower') {
+      specificHint = `${productType.toLowerCase()} cannabis`;
+    } else if (productType !== 'Hybrid') {
+        if (category.name === 'Vapes') {
+            specificHint = `${productType.toLowerCase()} vape`;
+        } else if (category.name === 'Pre-rolls') {
+            specificHint = `${productType.toLowerCase()} joint`;
+        }
     }
 
     return {
