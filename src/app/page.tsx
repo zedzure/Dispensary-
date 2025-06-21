@@ -11,12 +11,12 @@ import { DealsSteals } from "@/components/deals-steals";
 const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint' },
   { name: 'Flower', hint: 'cannabis bud' },
-  { name: 'Seeds', hint: 'cannabis seed' },
+  { name: 'Vapes', hint: 'vape pen' },
   { name: 'Edibles', hint: 'gummy candy' },
   { name: 'Concentrates', hint: 'cannabis oil' },
   { name: 'Tinctures', hint: 'dropper bottle' },
   { name: 'Topicals', hint: 'cream jar' },
-  { name: 'Vapes', hint: 'vape pen' },
+  { name: 'Seeds', hint: 'cannabis seed' },
   { name: 'Gear', hint: 'grinder accessory' },
   { name: 'Deals', hint: 'sale tag' },
 ];
@@ -74,37 +74,10 @@ export default function Home() {
             {categories.map((category) => (
               <div key={category.name}>
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8">{category.name}</h2>
-                <div 
-                  className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear_gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]"
-                >
-                  <ul className="flex items-stretch justify-center md:justify-start [&_li]:mx-4 animate-scroll hover:pause-animation">
+                <div className="overflow-x-auto no-scrollbar -mx-4 px-4 md:-mx-6 md:px-6">
+                  <ul className="flex flex-nowrap items-stretch gap-6 py-4">
                     {Array.from({ length: 10 }).map((_, i) => (
-                      <li key={i} className="flex-shrink-0 w-80">
-                        <Card className="h-full flex flex-col overflow-hidden group bg-card border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                          <CardHeader className="p-0">
-                            <Image
-                              src={`https://placehold.co/600x400.png`}
-                              data-ai-hint={category.hint}
-                              alt={`${category.name} Product ${i + 1}`}
-                              width={600}
-                              height={400}
-                              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          </CardHeader>
-                          <CardContent className="p-6 flex-grow">
-                            <CardTitle className="text-xl font-semibold">Product Name {i + 1}</CardTitle>
-                            <p className="text-sm text-muted-foreground mt-2">Sativa | 22% THC</p>
-                          </CardContent>
-                          <CardFooter className="p-6 pt-0">
-                            <Button className="w-full" variant="secondary">View Product</Button>
-                          </CardFooter>
-                        </Card>
-                      </li>
-                    ))}
-                  </ul>
-                  <ul className="flex items-stretch justify-center md:justify-start [&_li]:mx-4 animate-scroll hover:pause-animation" aria-hidden="true">
-                     {Array.from({ length: 10 }).map((_, i) => (
-                      <li key={i} className="flex-shrink-0 w-80">
+                      <li key={i} className="flex-shrink-0 w-64 sm:w-72">
                         <Card className="h-full flex flex-col overflow-hidden group bg-card border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                           <CardHeader className="p-0">
                             <Image
