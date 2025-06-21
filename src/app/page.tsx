@@ -58,9 +58,6 @@ export default function Home() {
         {/* Shop by Category Section */}
         <section className="pt-16 md:pt-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12 text-primary">
-              Shop by Category
-            </h2>
             <CategoryCircles />
           </div>
         </section>
@@ -94,7 +91,7 @@ export default function Home() {
                             <p className="text-sm text-muted-foreground mt-2">Sativa | 22% THC</p>
                           </CardContent>
                           <CardFooter className="p-6 pt-0">
-                            <Button className="w-full">View Product</Button>
+                            <Button className="w-full" variant="default">View Product</Button>
                           </CardFooter>
                         </Card>
                       </li>

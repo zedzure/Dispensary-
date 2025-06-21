@@ -22,7 +22,7 @@ export function Header() {
             <ShoppingCart className="h-5 w-5" />
             <span className="sr-only">Cart</span>
           </Button>
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="default" size="sm" asChild>
             <Link href="/login">
               <User className="mr-2 h-4 w-4" />
               Login
