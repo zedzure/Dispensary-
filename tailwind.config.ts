@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -105,6 +106,10 @@ export default {
           'from': { width: '0' },
           'to': { width: '100%' }
         },
+        're-enter': {
+          'from': { opacity: '0', transform: 'translateY(40px) scale(0.8)' },
+          'to': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -112,8 +117,9 @@ export default {
         'spin-slow': 'spin 3s linear infinite',
         'scroll': 'scroll 60s linear infinite',
         'fade-in-down': 'fade-in-down 1s ease-out forwards',
-        'u-exit': 'u-exit 1.5s ease-in forwards',
-        'typing': 'typing 2.5s steps(40, end) forwards',
+        'u-exit': 'u-exit 2s ease-in forwards',
+        'typing': 'typing 3s steps(40, end) forwards',
+        're-enter': 're-enter 1.5s ease-out forwards',
       },
     },
   },
