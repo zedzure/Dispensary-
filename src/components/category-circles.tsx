@@ -3,12 +3,12 @@ import Image from 'next/image';
 const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint' },
   { name: 'Flower', hint: 'cannabis bud' },
-  { name: 'Vapes', hint: 'vape pen' },
+  { name: 'Seeds', hint: 'cannabis seed' },
   { name: 'Edibles', hint: 'gummy candy' },
   { name: 'Concentrates', hint: 'cannabis oil' },
   { name: 'Tinctures', hint: 'dropper bottle' },
   { name: 'Topicals', hint: 'cream jar' },
-  { name: 'Seeds', hint: 'cannabis seed' },
+  { name: 'Vapes', hint: 'vape pen' },
   { name: 'Gear', hint: 'grinder accessory' },
   { name: 'Deals', hint: 'sale tag' },
 ];
