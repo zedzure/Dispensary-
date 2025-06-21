@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Leaf, MapPin, Tag } from "lucide-react";
 import Image from 'next/image';
+import { CategoryCircles } from "@/components/category-circles";
+import { DealsSteals } from "@/components/deals-steals";
 
 const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint' },
@@ -53,8 +55,21 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Shop by Category Section */}
+        <section className="py-16 md:py-24 bg-card">
+          <div className="container mx-auto px-4 md:px-6">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">
+              Shop by Category
+            </h2>
+            <CategoryCircles />
+          </div>
+        </section>
+
+        {/* Deals & Steals Section */}
+        <DealsSteals />
+        
         {/* Category Product Grid Section */}
-        <section id="menu" className="py-16 md:py-24 bg-card">
+        <section id="menu" className="py-16 md:py-24 bg-background">
           <div className="container mx-auto px-4 md:px-6 space-y-16">
             {categories.map((category) => (
               <div key={category.name}>
@@ -65,7 +80,7 @@ export default function Home() {
                   <ul className="flex items-stretch justify-center md:justify-start [&_li]:mx-4 animate-scroll hover:pause-animation">
                     {Array.from({ length: 10 }).map((_, i) => (
                       <li key={i} className="flex-shrink-0 w-80">
-                        <Card className="h-full flex flex-col overflow-hidden group bg-background border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                        <Card className="h-full flex flex-col overflow-hidden group bg-card border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                           <CardHeader className="p-0">
                             <Image
                               src={`https://placehold.co/600x400.png`}
@@ -90,7 +105,7 @@ export default function Home() {
                   <ul className="flex items-stretch justify-center md:justify-start [&_li]:mx-4 animate-scroll hover:pause-animation" aria-hidden="true">
                      {Array.from({ length: 10 }).map((_, i) => (
                       <li key={i} className="flex-shrink-0 w-80">
-                        <Card className="h-full flex flex-col overflow-hidden group bg-background border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                        <Card className="h-full flex flex-col overflow-hidden group bg-card border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                           <CardHeader className="p-0">
                             <Image
                               src={`https://placehold.co/600x400.png`}
@@ -119,7 +134,7 @@ export default function Home() {
         </section>
         
         {/* Why Choose Us Section */}
-        <section id="why-us" className="py-16 md:py-24 bg-background">
+        <section id="why-us" className="py-16 md:py-24 bg-card">
             <div className="container mx-auto px-4 md:px-6">
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">Why GreenLeaf Guide?</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
