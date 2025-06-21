@@ -6,6 +6,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/types/product";
 import { Button } from "./ui/button";
+import { useCart } from "@/context/cart-context";
+import { useToast } from "@/hooks/use-toast";
+import { Check } from "lucide-react";
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -14,9 +17,26 @@ interface ProductDetailModalProps {
 }
 
 export function ProductDetailModal({ product, isOpen, onOpenChange }: ProductDetailModalProps) {
+  const { addToCart } = useCart();
+  const { toast } = useToast();
+
   if (!product) {
     return null;
   }
+
+  const handleAddToCart = () => {
+    addToCart(product);
+    toast({
+      title: (
+        <div className="flex items-center">
+          <Check className="h-5 w-5 text-green-500 mr-2" />
+          <span>Added to cart!</span>
+        </div>
+      ),
+      description: `${product.name} is now in your cart.`,
+    });
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -46,7 +66,7 @@ export function ProductDetailModal({ product, isOpen, onOpenChange }: ProductDet
                     {product.price ? <p className="text-2xl font-bold text-primary">${product.price.toFixed(2)}</p> : <div />}
                     <div className="flex gap-2">
                         <Button size="lg" variant="outline" onClick={() => onOpenChange(false)}>Continue Shopping</Button>
-                        <Button size="lg">Add to Cart</Button>
+                        <Button size="lg" onClick={handleAddToCart}>Add to Cart</Button>
                     </div>
                 </div>
             </div>

@@ -1,8 +1,12 @@
 import { Leaf, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { useCart } from "@/context/cart-context";
+import { Badge } from "./ui/badge";
 
 export function Header() {
+  const { totalItems, setCartOpen } = useCart();
+
   return (
     <header className="py-4 px-4 md:px-6 bg-background/80 backdrop-blur-sm sticky top-0 z-50 border-b">
       <div className="container mx-auto flex items-center justify-between">
@@ -18,7 +22,10 @@ export function Header() {
           <Link href="#recommender" className="text-muted-foreground hover:text-primary transition-colors">Recommender</Link>
         </nav>
         <div className="flex items-center gap-2 md:gap-4">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="relative" onClick={() => setCartOpen(true)}>
+            {totalItems > 0 && (
+              <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{totalItems}</Badge>
+            )}
             <ShoppingCart className="h-5 w-5" />
             <span className="sr-only">Cart</span>
           </Button>

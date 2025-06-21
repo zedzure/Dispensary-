@@ -13,6 +13,7 @@ import { CategoryCircles } from "@/components/category-circles";
 import { DealsSteals } from "@/components/deals-steals";
 import { ProductDetailModal } from "@/components/product-detail-modal";
 import type { Product } from "@/types/product";
+import { CartSheet } from "@/components/cart-sheet";
 
 const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint' },
@@ -61,6 +62,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-white text-foreground">
       <Header />
+      <CartSheet />
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="relative py-20 md:py-32 bg-white">
