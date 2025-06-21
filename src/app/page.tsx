@@ -20,22 +20,24 @@ export default function Home() {
             alt="Hero background"
             fill={true}
             quality={80}
-            className="object-cover opacity-5 dark:opacity-10"
+            className="object-cover opacity-10 dark:opacity-10"
             priority
           />
           <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
-            <h1 className="text-4xl md:text-6xl font-headline font-bold text-foreground">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground">
               Discover Your Perfect Strain
             </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+            <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
               Explore our curated selection of high-quality cannabis products and find exactly what you need with our AI-powered recommender.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <a href="#menu">Browse Menu <ArrowRight className="ml-2 h-5 w-5" /></a>
+              <Button size="lg" asChild>
+                <a href="#recommender">
+                  Strain Finder AI <ArrowRight className="ml-2 h-5 w-5" />
+                </a>
               </Button>
-              <Button size="lg" variant="secondary" asChild>
-                <a href="#recommender">Strain Finder AI</a>
+              <Button size="lg" variant="outline" asChild>
+                <a href="#menu">Browse Menu</a>
               </Button>
             </div>
           </div>
@@ -49,14 +51,14 @@ export default function Home() {
         </section>
 
         {/* Featured Products Section */}
-        <section id="menu" className="py-16 md:py-24 bg-secondary/30">
+        <section id="menu" className="py-16 md:py-24">
           <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-3xl md:text-4xl font-headline font-bold text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-center mb-12">
               Featured Products
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="overflow-hidden group border-border/60 hover:border-primary transition-all duration-300 hover:shadow-lg">
+                <Card key={i} className="overflow-hidden group bg-card border-border/60 hover:border-primary transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                   <CardHeader className="p-0">
                     <Image
                       src={`https://placehold.co/600x400.png`}
@@ -68,11 +70,11 @@ export default function Home() {
                     />
                   </CardHeader>
                   <CardContent className="p-4">
-                    <CardTitle className="text-lg font-headline">Product Name {i + 1}</CardTitle>
+                    <CardTitle className="text-lg font-medium">Product Name {i + 1}</CardTitle>
                     <p className="text-sm text-muted-foreground mt-1">Sativa | 22% THC</p>
                   </CardContent>
                   <CardFooter className="p-4 pt-0">
-                    <Button className="w-full" variant="outline">View Product</Button>
+                    <Button className="w-full" variant="secondary">View Product</Button>
                   </CardFooter>
                 </Card>
               ))}
@@ -86,27 +88,27 @@ export default function Home() {
         {/* Why Choose Us Section */}
         <section id="why-us" className="py-16 md:py-24">
             <div className="container mx-auto px-4 md:px-6">
-                <h2 className="text-3xl md:text-4xl font-headline font-bold text-center mb-12">Why GreenLeaf Guide?</h2>
+                <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-center mb-12">Why GreenLeaf Guide?</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    <div className="flex flex-col items-center p-6 rounded-lg">
-                        <div className="bg-primary/20 p-4 rounded-full mb-4">
-                            <Leaf className="h-8 w-8 text-primary"/>
+                    <div className="flex flex-col items-center p-6">
+                        <div className="p-3 rounded-full mb-4">
+                            <Leaf className="h-10 w-10 text-primary"/>
                         </div>
-                        <h3 className="text-xl font-headline font-semibold">Premium Selection</h3>
+                        <h3 className="text-xl font-semibold">Premium Selection</h3>
                         <p className="text-muted-foreground mt-2 max-w-xs">Curated list of the highest quality strains from trusted growers.</p>
                     </div>
-                    <div className="flex flex-col items-center p-6 rounded-lg">
-                        <div className="bg-primary/20 p-4 rounded-full mb-4">
-                            <Tag className="h-8 w-8 text-primary"/>
+                    <div className="flex flex-col items-center p-6">
+                        <div className="p-3 rounded-full mb-4">
+                            <Tag className="h-10 w-10 text-primary"/>
                         </div>
-                        <h3 className="text-xl font-headline font-semibold">Exclusive Deals</h3>
+                        <h3 className="text-xl font-semibold">Exclusive Deals</h3>
                         <p className="text-muted-foreground mt-2 max-w-xs">Access special offers and a rewarding loyalty program.</p>
                     </div>
-                    <div className="flex flex-col items-center p-6 rounded-lg">
-                        <div className="bg-primary/20 p-4 rounded-full mb-4">
-                            <MapPin className="h-8 w-8 text-primary"/>
+                    <div className="flex flex-col items-center p-6">
+                        <div className="p-3 rounded-full mb-4">
+                            <MapPin className="h-10 w-10 text-primary"/>
                         </div>
-                        <h3 className="text-xl font-headline font-semibold">Local & Convenient</h3>
+                        <h3 className="text-xl font-semibold">Local & Convenient</h3>
                         <p className="text-muted-foreground mt-2 max-w-xs">Find dispensaries near you for easy pickup or delivery.</p>
                     </div>
                 </div>

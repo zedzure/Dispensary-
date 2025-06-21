@@ -51,12 +51,10 @@ export function StrainRecommenderForm() {
 
   return (
     <div className="w-full max-w-3xl mx-auto">
-      <Card className="bg-card/80 backdrop-blur-sm shadow-lg border-border/60">
-        <CardHeader className="text-center">
-          <div className="mx-auto bg-accent/20 p-3 rounded-full w-fit mb-4">
-            <Sparkles className="h-8 w-8 text-accent" />
-          </div>
-          <CardTitle className="font-headline text-3xl">AI Strain Recommender</CardTitle>
+      <Card className="bg-card shadow-xl border-border/60">
+        <CardHeader className="text-center items-center">
+          <Sparkles className="h-10 w-10 text-primary mb-4" />
+          <CardTitle className="text-3xl font-semibold tracking-tight">AI Strain Recommender</CardTitle>
           <CardDescription>Not sure what to choose? Let our AI guide you to the perfect experience.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -92,7 +90,7 @@ export function StrainRecommenderForm() {
 
           {isLoading && (
             <div className="mt-8 space-y-4">
-              <p className="font-headline text-2xl text-center text-muted-foreground animate-pulse">Finding the perfect match...</p>
+              <p className="font-semibold text-2xl text-center text-muted-foreground animate-pulse">Finding the perfect match...</p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Skeleton className="h-48 w-full rounded-lg" />
                 <Skeleton className="h-48 w-full rounded-lg" />
@@ -103,12 +101,12 @@ export function StrainRecommenderForm() {
 
           {result && (
             <div className="mt-8">
-              <h3 className="font-headline text-2xl mb-4 text-center">Here are your recommendations:</h3>
+              <h3 className="font-semibold text-2xl mb-4 text-center">Here are your recommendations:</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {result.strainSuggestions.map((strain, index) => (
-                  <Card key={index} className="flex flex-col border-border/60 hover:border-primary transition-colors">
+                  <Card key={index} className="flex flex-col bg-secondary/30 border-border/60 hover:border-primary transition-colors">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 font-headline">
+                      <CardTitle className="flex items-center gap-2 font-semibold">
                         <Leaf className="h-5 w-5 text-primary" />
                         {strain}
                       </CardTitle>
