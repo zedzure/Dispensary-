@@ -27,11 +27,18 @@ const GoogleIcon = () => (
 export default function LoginPage() {
   const { login } = useAuth();
   const { toast } = useToast();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  
+  // Login states
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  // Sign up states
+  const [signUpName, setSignUpName] = useState("");
+  const [signUpEmail, setSignUpEmail] = useState("");
+  const [signUpPassword, setSignUpPassword] = useState("");
 
   const handleLogin = () => {
-    if (email === "kim.l@silzeypos.com" && password === "Dancer$5109") {
+    if (loginEmail === "kim.l@silzeypos.com" && loginPassword === "Dancer$5109") {
       const loggedInUser = {
         name: "Kim L.",
         email: "kim.l@silzeypos.com",
@@ -48,6 +55,31 @@ export default function LoginPage() {
         description: "Invalid credentials. Please try again.",
       });
     }
+  };
+
+  const handleSignUp = () => {
+    if (!signUpName || !signUpEmail || !signUpPassword) {
+      toast({
+        variant: "destructive",
+        title: "Sign Up Failed",
+        description: "Please fill out all fields.",
+      });
+      return;
+    }
+
+    const newUser = {
+      name: signUpName,
+      email: signUpEmail,
+      memberSince: new Date().getFullYear().toString(),
+      avatarUrl: "https://placehold.co/100x100.png",
+      points: 0,
+      nextReward: 1000,
+    };
+    login(newUser);
+    toast({
+      title: "Account Created!",
+      description: `Welcome to GreenLeaf Guide, ${signUpName}!`,
+    });
   };
 
   return (
@@ -74,8 +106,8 @@ export default function LoginPage() {
                     type="email" 
                     placeholder="jane@example.com" 
                     required 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
@@ -89,8 +121,8 @@ export default function LoginPage() {
                     id="password-login" 
                     type="password" 
                     required 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                   />
                 </div>
@@ -124,23 +156,22 @@ export default function LoginPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="name-signup">Full Name</Label>
-                    <Input id="name-signup" placeholder="Jane Doe" required />
+                    <Input id="name-signup" placeholder="Jane Doe" required value={signUpName} onChange={(e) => setSignUpName(e.target.value)} />
                 </div>
-                .
                 <div className="space-y-2">
                   <Label htmlFor="email-signup">Email</Label>
-                  <Input id="email-signup" type="email" placeholder="jane@example.com" required />
+                  <Input id="email-signup" type="email" placeholder="jane@example.com" required value={signUpEmail} onChange={(e) => setSignUpEmail(e.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password-signup">Password</Label>
-                  <Input id="password-signup" type="password" required />
+                  <Input id="password-signup" type="password" required value={signUpPassword} onChange={(e) => setSignUpPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSignUp()} />
                 </div>
                  <p className="text-xs text-muted-foreground pt-2">
                     By creating an account, you agree to our <Link href="#" className="underline">Terms of Service</Link> and <Link href="#" className="underline">Privacy Policy</Link>.
                 </p>
               </CardContent>
               <CardFooter className="flex flex-col gap-4 pt-6">
-                <Button className="w-full">Create Account</Button>
+                <Button className="w-full" onClick={handleSignUp}>Create Account</Button>
                 <div className="relative w-full">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t" />
