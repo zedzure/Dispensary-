@@ -7,13 +7,13 @@ const deals = Array.from({ length: 20 }).map((_, i) => ({
 
 export function DealsSteals() {
   return (
-    <section id="deals" className="py-16 md:py-24 bg-background">
+    <section id="deals" className="py-16 md:py-24 bg-card">
       <div className="container mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">
           Deals & Steals
         </h2>
         <div 
-          className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]"
+          className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear_gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]"
         >
           <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-scroll hover:pause-animation">
             {deals.map((deal, index) => (

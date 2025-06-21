@@ -55,14 +55,14 @@ export default function Home() {
         <DealsSteals />
 
         {/* Featured Products Section */}
-        <section id="menu" className="py-16 md:py-24 bg-card">
+        <section id="menu" className="py-16 md:py-24 bg-background">
           <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">
               Featured Products
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="overflow-hidden group bg-background border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <Card key={i} className="overflow-hidden group bg-card border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                   <CardHeader className="p-0">
                     <Image
                       src={`https://placehold.co/600x400.png`}
@@ -90,7 +90,7 @@ export default function Home() {
         </section>
         
         {/* Why Choose Us Section */}
-        <section id="why-us" className="py-16 md:py-24 bg-background">
+        <section id="why-us" className="py-16 md:py-24 bg-card">
             <div className="container mx-auto px-4 md:px-6">
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">Why GreenLeaf Guide?</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
