@@ -54,7 +54,7 @@ export function DealsSteals({ onProductClick }: DealsStealsProps) {
         <div className="flex -mx-4 px-4 space-x-4 overflow-x-auto pb-4 no-scrollbar">
             {deals.map((deal, index) => (
               <button key={index} onClick={() => handleClick(deal)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
-                <div className="relative w-[98px] h-[98px] group-hover:drop-shadow-lg transition-all duration-300">
+                <div className="relative w-[98px] h-[98px] transition-all duration-300">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-500"></div>
                   <div className="absolute inset-0.5 bg-card rounded-full"></div>
                   <div className="absolute inset-1 rounded-full overflow-hidden">

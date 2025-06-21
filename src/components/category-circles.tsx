@@ -5,12 +5,12 @@ import type { Product } from '@/types/product';
 const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint' },
   { name: 'Flower', hint: 'cannabis bud' },
-  { name: 'Vapes', hint: 'vape pen' },
+  { name: 'Seeds', hint: 'cannabis seed' },
   { name: 'Edibles', hint: 'gummy candy' },
   { name: 'Concentrates', hint: 'cannabis oil' },
   { name: 'Tinctures', hint: 'dropper bottle' },
   { name: 'Topicals', hint: 'cream jar' },
-  { name: 'Seeds', hint: 'cannabis seed' },
+  { name: 'Vapes', hint: 'vape pen' },
   { name: 'Gear', hint: 'grinder accessory' },
   { name: 'Deals', hint: 'sale tag' },
 ];
@@ -39,7 +39,7 @@ export function CategoryCircles({ onProductClick }: CategoryCirclesProps) {
     <div className="flex -mx-4 px-4 space-x-4 overflow-x-auto pb-4 no-scrollbar">
         {categories.map((category) => (
           <button key={category.name} onClick={() => handleClick(category)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
-            <div className="relative w-[98px] h-[98px] group-hover:drop-shadow-lg transition-all duration-300">
+            <div className="relative w-[98px] h-[98px] transition-all duration-300">
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-500"></div>
               <div className="absolute inset-0.5 bg-card rounded-full"></div>
               <div className="absolute inset-1 rounded-full overflow-hidden">
