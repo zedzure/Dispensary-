@@ -1,9 +1,28 @@
 import Image from 'next/image';
 
-const deals = Array.from({ length: 20 }).map((_, i) => ({
-  name: `Amazing Deal ${i + 1}`,
-  hint: 'discount price tag',
-}));
+const deals = [
+  { name: 'Blue Dream', hint: 'cannabis flower', tag: 'New' },
+  { name: 'Sour Diesel', hint: 'cannabis flower', tag: 'Popular' },
+  { name: 'OG Kush', hint: 'cannabis flower', tag: '5% Off' },
+  { name: 'Granddaddy Purple', hint: 'cannabis flower', tag: 'Just In' },
+  { name: 'White Widow', hint: 'cannabis flower', tag: '10 Left' },
+  { name: 'AK-47', hint: 'cannabis flower' },
+  { name: 'Jack Herer', hint: 'cannabis flower', tag: '10% Off' },
+  { name: 'Green Crack', hint: 'cannabis flower' },
+  { name: 'Pineapple Express', hint: 'cannabis flower', tag: '5 Left' },
+  { name: 'Girl Scout Cookies', hint: 'cannabis flower', tag: 'Popular' },
+  { name: 'Northern Lights', hint: 'cannabis flower' },
+  { name: 'Bubba Kush', hint: 'cannabis flower', tag: 'New' },
+  { name: 'Durban Poison', hint: 'cannabis flower' },
+  { name: 'Maui Wowie', hint: 'cannabis flower', tag: 'Just In' },
+  { name: 'Trainwreck', hint: 'cannabis flower', tag: '5% Off' },
+  { name: 'Chemdawg', hint: 'cannabis flower' },
+  { name: 'Super Lemon Haze', hint: 'cannabis flower', tag: '10 Left' },
+  { name: 'Strawberry Cough', hint: 'cannabis flower' },
+  { name: 'Gorilla Glue #4', hint: 'cannabis flower', tag: 'Popular' },
+  { name: 'Zkittlez', hint: 'cannabis flower', tag: '10% Off' },
+];
+
 
 export function DealsSteals() {
   return (
@@ -19,6 +38,11 @@ export function DealsSteals() {
             {deals.map((deal, index) => (
               <li key={index} className="flex flex-col items-center space-y-2 flex-shrink-0 w-20">
                 <div className="relative w-16 h-16 cursor-pointer group">
+                  {deal.tag && (
+                    <div className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md">
+                      {deal.tag}
+                    </div>
+                  )}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-500 animate-spin-slow group-hover:animate-spin"></div>
                   <div className="absolute inset-0.5 bg-card rounded-full"></div>
                   <div className="absolute inset-1 rounded-full overflow-hidden">
@@ -40,6 +64,11 @@ export function DealsSteals() {
             {deals.map((deal, index) => (
               <li key={index} className="flex flex-col items-center space-y-2 flex-shrink-0 w-20">
                 <div className="relative w-16 h-16 cursor-pointer group">
+                  {deal.tag && (
+                    <div className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md">
+                      {deal.tag}
+                    </div>
+                  )}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-500 animate-spin-slow group-hover:animate-spin"></div>
                   <div className="absolute inset-0.5 bg-card rounded-full"></div>
                   <div className="absolute inset-1 rounded-full overflow-hidden">
