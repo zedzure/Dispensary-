@@ -36,7 +36,7 @@ const paymentMethods = [
 
 export default function ProfilePage() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 text-foreground">
+    <div className="flex flex-col min-h-screen bg-muted/20 text-foreground">
       <Header />
       <main className="flex-grow container mx-auto px-4 md:px-6 py-8 pb-24 md:pb-8">
         <div className="flex items-center gap-4 mb-8">
@@ -51,7 +51,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column */}
           <div className="lg:col-span-1 space-y-8">
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-border/60">
               <CardContent className="pt-6 flex flex-col items-center text-center">
                 <Avatar className="h-24 w-24 mb-4">
                   <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="person face" />
@@ -66,7 +66,7 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-border/60">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Gift className="h-5 w-5 text-primary" />
@@ -85,7 +85,7 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
             
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-border/60">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Settings className="h-5 w-5 text-primary" />
@@ -95,7 +95,7 @@ export default function ProfilePage() {
                 <CardContent className="space-y-2">
                     <Button variant="ghost" className="w-full justify-start"><ShoppingBag className="mr-2"/> Start New Order</Button>
                     <Button variant="ghost" className="w-full justify-start"><MapPin className="mr-2"/> Manage Locations</Button>
-                    <Button variant="ghost" className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50">
+                    <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive/90 hover:bg-destructive/10">
                         <LogOut className="mr-2"/> Logout
                     </Button>
                 </CardContent>
@@ -105,7 +105,7 @@ export default function ProfilePage() {
 
           {/* Right Column */}
           <div className="lg:col-span-2 space-y-8">
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-border/60">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <ShoppingBag className="h-5 w-5 text-primary" />
@@ -113,41 +113,77 @@ export default function ProfilePage() {
                 </CardTitle>
                 <CardDescription>View your past purchases and track current orders.</CardDescription>
               </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50%]">Order Details</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead className="text-right">Total</TableHead>
-                      <TableHead className="text-center">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell className="font-medium">
-                            <div className="flex items-center gap-3">
-                                <Image src={order.items[0].image} alt={order.items[0].name} width={40} height={40} className="rounded-md" data-ai-hint={order.items[0].hint}/>
-                                <div>
-                                    <p className="font-semibold">{order.id}</p>
-                                    <p className="text-xs text-muted-foreground truncate">{order.items[0].name}{order.items.length > 1 ? ` + ${order.items.length - 1} more` : ''}</p>
+              <CardContent className="p-4 md:p-6">
+                {/* Mobile View: List of Cards */}
+                <div className="space-y-4 md:hidden">
+                  {orders.map((order) => (
+                    <Card key={order.id} className="border-border/60 overflow-hidden">
+                       <CardHeader className="flex flex-row items-center justify-between p-4 bg-muted/30">
+                          <div>
+                            <CardTitle className="text-base font-semibold">{order.id}</CardTitle>
+                            <CardDescription className="text-xs">{order.date}</CardDescription>
+                          </div>
+                          <Badge variant={order.status === 'Completed' || order.status === 'Delivered' ? 'default' : 'secondary'} className="capitalize shrink-0">{order.status}</Badge>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                          <div className="divide-y divide-border">
+                            {order.items.map((item, index) => (
+                              <div key={index} className="flex items-center gap-3 p-4">
+                                <Image src={item.image} alt={item.name} width={48} height={48} className="rounded-md" data-ai-hint={item.hint} />
+                                <div className="flex-1">
+                                  <p className="font-medium text-sm">{item.name}</p>
+                                  <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                                 </div>
-                            </div>
-                        </TableCell>
-                        <TableCell>{order.date}</TableCell>
-                        <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
-                        <TableCell className="text-center">
-                            <Badge variant="secondary">{order.status}</Badge>
-                        </TableCell>
+                                <p className="font-medium text-sm">${(item.price * item.quantity).toFixed(2)}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                        <CardFooter className="p-4 bg-muted/30 flex justify-end items-center gap-4">
+                          <span className="text-sm text-muted-foreground">Total</span>
+                          <span className="font-bold text-base">${order.total.toFixed(2)}</span>
+                        </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Desktop View: Table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[55%]">Order Details</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead className="text-right">Total</TableHead>
+                        <TableHead className="text-center">Status</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {orders.map((order) => (
+                        <TableRow key={order.id}>
+                          <TableCell className="font-medium">
+                              <div className="flex items-center gap-3">
+                                  <Image src={order.items[0].image} alt={order.items[0].name} width={40} height={40} className="rounded-md" data-ai-hint={order.items[0].hint}/>
+                                  <div>
+                                      <p className="font-semibold">{order.id}</p>
+                                      <p className="text-xs text-muted-foreground truncate">{order.items.map(item => item.name).join(', ')}</p>
+                                  </div>
+                              </div>
+                          </TableCell>
+                          <TableCell>{order.date}</TableCell>
+                          <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
+                          <TableCell className="text-center">
+                              <Badge variant={order.status === 'Completed' || order.status === 'Delivered' ? 'default' : 'secondary'}>{order.status}</Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
             
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-border/60">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <CreditCard className="h-5 w-5 text-primary" />
@@ -157,7 +193,7 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {paymentMethods.map((method, index) => (
-                    <div key={index} className="flex items-center justify-between rounded-lg border p-4 bg-white">
+                    <div key={index} className="flex items-center justify-between rounded-lg border p-4 bg-background">
                         <div className="flex items-center gap-4">
                             <div className="bg-muted p-2 rounded-md">
                                 <CreditCard className="h-6 w-6 text-muted-foreground" />
