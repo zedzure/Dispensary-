@@ -12,6 +12,7 @@ export default {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         code: ['monospace'],
+        cursive: ['"Dancing Script"', 'cursive'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -90,13 +91,29 @@ export default {
         scroll: {
           from: { transform: 'translateX(0)' },
           to: { transform: 'translateX(-100%)' },
-        }
+        },
+        'fade-in-down': {
+          'from': { opacity: '0', transform: 'translateY(-20px)' },
+          'to': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'u-exit': {
+          '0%': { transform: 'translateY(0) scale(1)', opacity: '1' },
+          '40%': { transform: 'translateY(5rem) scale(0.9)', opacity: '1' },
+          '100%': { transform: 'translateY(-100vh) scale(0.5)', opacity: '0' },
+        },
+        'typing': {
+          'from': { width: '0' },
+          'to': { width: '100%' }
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'spin-slow': 'spin 3s linear infinite',
         'scroll': 'scroll 60s linear infinite',
+        'fade-in-down': 'fade-in-down 1s ease-out forwards',
+        'u-exit': 'u-exit 1.5s ease-in forwards',
+        'typing': 'typing 2.5s steps(40, end) forwards',
       },
     },
   },

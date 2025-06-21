@@ -14,16 +14,17 @@ import { DealsSteals } from "@/components/deals-steals";
 import { ProductDetailModal } from "@/components/product-detail-modal";
 import type { Product } from "@/types/product";
 import { CartSheet } from "@/components/cart-sheet";
+import { SplashScreen } from "@/components/splash-screen";
 
 const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint' },
   { name: 'Flower', hint: 'cannabis bud' },
-  { name: 'Vapes', hint: 'vape pen' },
+  { name: 'Seeds', hint: 'cannabis seed' },
   { name: 'Edibles', hint: 'gummy candy' },
   { name: 'Concentrates', hint: 'cannabis oil' },
   { name: 'Tinctures', hint: 'dropper bottle' },
   { name: 'Topicals', hint: 'cream jar' },
-  { name: 'Seeds', hint: 'cannabis seed' },
+  { name: 'Vapes', hint: 'vape pen' },
   { name: 'Gear', hint: 'grinder accessory' },
   { name: 'Deals', hint: 'sale tag' },
 ];
@@ -64,6 +65,7 @@ const allProducts = categories.reduce((acc, category) => {
 
 
 export default function Home() {
+  const [showSplash, setShowSplash] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const handleProductClick = (product: Product) => {
@@ -74,6 +76,10 @@ export default function Home() {
     setSelectedProduct(null);
   };
   
+  if (showSplash) {
+    return <SplashScreen onFinished={() => setShowSplash(false)} />;
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-white text-foreground">
       <Header />
@@ -109,7 +115,7 @@ export default function Home() {
         </section>
 
         {/* Shop by Category Section */}
-        <section className="pt-16 md:pt-24 bg-white">
+        <section className="pt-16 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <CategoryCircles onProductClick={handleProductClick} />
           </div>
@@ -128,7 +134,7 @@ export default function Home() {
                   <ul className="flex flex-nowrap items-stretch gap-6 py-4">
                     {allProducts[category.name].map((product) => (
                       <li key={product.id} className="flex-shrink-0 w-64 sm:w-72">
-                        <Card className="h-full flex flex-col overflow-hidden group bg-white border-border/60 transition-all duration-300 shadow-lg">
+                        <Card className="h-full flex flex-col overflow-hidden group bg-white border-border/60 shadow-lg">
                           <CardHeader className="p-0">
                             <button onClick={() => handleProductClick(product)} className="w-full aspect-[3/2] relative">
                                 <Image
