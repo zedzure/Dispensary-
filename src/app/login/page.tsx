@@ -32,7 +32,7 @@ export default function LoginPage() {
           </TabsList>
           
           <TabsContent value="login">
-            <Card className="shadow-lg border-border/60">
+            <Card className="shadow-xl border-border/60">
               <CardHeader className="text-center">
                 <CardTitle className="text-primary">Welcome Back!</CardTitle>
                 <CardDescription>Enter your credentials to access your account.</CardDescription>
@@ -73,7 +73,7 @@ export default function LoginPage() {
           </TabsContent>
 
           <TabsContent value="signup">
-            <Card className="shadow-lg border-border/60">
+            <Card className="shadow-xl border-border/60">
               <CardHeader className="text-center">
                 <CardTitle className="text-primary">Create an Account</CardTitle>
                 <CardDescription>Join GreenLeaf Guide to start your journey.</CardDescription>
