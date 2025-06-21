@@ -26,7 +26,7 @@ const deals = [
 
 export function DealsSteals() {
   return (
-    <section id="deals" className="py-16 md:py-24 bg-card">
+    <section id="deals" className="py-16 md:py-24">
       <div className="container mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">
           Deals & Steals

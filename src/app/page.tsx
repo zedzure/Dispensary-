@@ -27,7 +27,7 @@ export default function Home() {
       <Header />
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="relative py-20 md:py-32 bg-card">
+        <section className="relative py-20 md:py-32">
           <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground">
               Discover Your Perfect Strain
@@ -49,14 +49,14 @@ export default function Home() {
         </section>
 
         {/* Recommender Section */}
-        <section id="recommender" className="py-16 md:py-24 bg-background">
+        <section id="recommender" className="py-16 md:py-24">
           <div className="container mx-auto px-4 md:px-6">
             <StrainRecommenderForm />
           </div>
         </section>
 
         {/* Shop by Category Section */}
-        <section className="py-16 md:py-24 bg-card">
+        <section className="py-16 md:py-24">
           <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">
               Shop by Category
@@ -69,7 +69,7 @@ export default function Home() {
         <DealsSteals />
         
         {/* Category Product Grid Section */}
-        <section id="menu" className="py-16 md:py-24 bg-background">
+        <section id="menu" className="py-16 md:py-24">
           <div className="container mx-auto px-4 md:px-6 space-y-16">
             {categories.map((category) => (
               <div key={category.name}>
@@ -107,7 +107,7 @@ export default function Home() {
         </section>
         
         {/* Why Choose Us Section */}
-        <section id="why-us" className="py-16 md:py-24 bg-card">
+        <section id="why-us" className="py-16 md:py-24">
             <div className="container mx-auto px-4 md:px-6">
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">Why GreenLeaf Guide?</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
