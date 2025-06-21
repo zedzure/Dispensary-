@@ -21,7 +21,7 @@ export function BottomNavBar() {
           <Link
             key={item.label}
             href={item.href}
-            className="inline-flex flex-col items-center justify-center px-1 text-center text-muted-foreground hover:text-primary group"
+            className="inline-flex flex-col items-center justify-center px-1 text-center text-primary hover:text-primary/80 group"
           >
             <item.icon className="w-5 h-5 mb-1" />
             <span className="text-xs">
