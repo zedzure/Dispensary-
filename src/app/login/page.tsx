@@ -1,7 +1,7 @@
+
 'use client';
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { BottomNavBar } from "@/components/bottom-nav-bar";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/auth-context";
 
 const GoogleIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="h-5 w-5 mr-2">
@@ -24,14 +25,22 @@ const GoogleIcon = () => (
 
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { login } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
     if (email === "kim.l@silzeypos.com" && password === "Dancer$5109") {
-      router.push("/profile");
+      const loggedInUser = {
+        name: "Kim L.",
+        email: "kim.l@silzeypos.com",
+        memberSince: "2024",
+        avatarUrl: "https://placehold.co/100x100.png",
+        points: 2500,
+        nextReward: 3000,
+      };
+      login(loggedInUser);
     } else {
       toast({
         variant: "destructive",

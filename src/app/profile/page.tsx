@@ -1,6 +1,9 @@
 
 'use client';
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { BottomNavBar } from "@/components/bottom-nav-bar";
@@ -13,15 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, CreditCard, Edit, Gift, LogOut, MapPin, Settings, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-
-const user = {
-  name: "Jane Doe",
-  email: "jane.doe@example.com",
-  memberSince: "2022",
-  avatarUrl: "https://placehold.co/100x100.png",
-  points: 1250,
-  nextReward: 2000,
-};
+import { Skeleton } from "@/components/ui/skeleton";
 
 const orders = [
   { id: "#G12345", date: "2024-07-20", total: 75.50, status: "Completed", items: [{ name: "OG Kush", quantity: 1, price: 45.00, image: "https://placehold.co/100x100.png", hint: "hybrid cannabis"}, { name: "Pre-roll Pack", quantity: 1, price: 30.50, image: "https://placehold.co/100x100.png", hint: "cannabis joint" }] },
@@ -35,6 +30,42 @@ const paymentMethods = [
 ];
 
 export default function ProfilePage() {
+  const { user, logout, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace('/login');
+    }
+  }, [user, isLoading, router]);
+
+  if (isLoading || !user) {
+    return (
+      <div className="flex flex-col min-h-screen bg-muted/20 text-foreground">
+        <Header />
+        <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
+            <div className="flex items-center gap-4 mb-8">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <Skeleton className="h-8 w-48" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-1 space-y-8">
+                    <Skeleton className="h-64 w-full rounded-lg" />
+                    <Skeleton className="h-48 w-full rounded-lg" />
+                    <Skeleton className="h-48 w-full rounded-lg" />
+                </div>
+                <div className="lg:col-span-2 space-y-8">
+                    <Skeleton className="h-96 w-full rounded-lg" />
+                    <Skeleton className="h-64 w-full rounded-lg" />
+                </div>
+            </div>
+        </main>
+        <Footer />
+        <BottomNavBar />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-muted/20 text-foreground">
       <Header />
@@ -95,7 +126,7 @@ export default function ProfilePage() {
                 <CardContent className="space-y-2">
                     <Button variant="ghost" className="w-full justify-start"><ShoppingBag className="mr-2"/> Start New Order</Button>
                     <Button variant="ghost" className="w-full justify-start"><MapPin className="mr-2"/> Manage Locations</Button>
-                    <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive/90 hover:bg-destructive/10">
+                    <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive/90 hover:bg-destructive/10" onClick={logout}>
                         <LogOut className="mr-2"/> Logout
                     </Button>
                 </CardContent>
