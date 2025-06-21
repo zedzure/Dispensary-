@@ -15,6 +15,7 @@ import { ProductDetailModal } from "@/components/product-detail-modal";
 import type { Product } from "@/types/product";
 import { CartSheet } from "@/components/cart-sheet";
 import { SplashScreen } from "@/components/splash-screen";
+import { BottomNavBar } from "@/components/bottom-nav-bar";
 
 const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint' },
@@ -84,7 +85,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-white text-foreground">
       <Header />
       <CartSheet />
-      <main className="flex-grow">
+      <main className="flex-grow pb-16 md:pb-0">
         {/* Hero Section */}
         <section className="relative py-20 md:py-32 bg-white">
           <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
@@ -202,6 +203,7 @@ export default function Home() {
         onOpenChange={(isOpen) => !isOpen && closeModal()}
         product={selectedProduct}
       />
+      <BottomNavBar />
     </div>
   );
 }
