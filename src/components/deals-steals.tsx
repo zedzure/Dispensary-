@@ -36,8 +36,8 @@ export function DealsSteals() {
         >
           <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-scroll hover:pause-animation">
             {deals.map((deal, index) => (
-              <li key={index} className="flex flex-col items-center space-y-2 flex-shrink-0 w-20">
-                <div className="relative w-16 h-16 cursor-pointer group">
+              <li key={index} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28">
+                <div className="relative w-[98px] h-[98px] cursor-pointer group">
                   {deal.tag && (
                     <div className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md">
                       {deal.tag}
@@ -47,11 +47,11 @@ export function DealsSteals() {
                   <div className="absolute inset-0.5 bg-card rounded-full"></div>
                   <div className="absolute inset-1 rounded-full overflow-hidden">
                     <Image
-                      src={`https://placehold.co/56x56.png`}
+                      src={`https://placehold.co/90x90.png`}
                       data-ai-hint={deal.hint}
                       alt={deal.name}
-                      width={56}
-                      height={56}
+                      width={90}
+                      height={90}
                       className="object-cover"
                     />
                   </div>
@@ -62,8 +62,8 @@ export function DealsSteals() {
           </ul>
           <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-scroll hover:pause-animation" aria-hidden="true">
             {deals.map((deal, index) => (
-              <li key={index} className="flex flex-col items-center space-y-2 flex-shrink-0 w-20">
-                <div className="relative w-16 h-16 cursor-pointer group">
+              <li key={index} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28">
+                <div className="relative w-[98px] h-[98px] cursor-pointer group">
                   {deal.tag && (
                     <div className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md">
                       {deal.tag}
@@ -73,11 +73,11 @@ export function DealsSteals() {
                   <div className="absolute inset-0.5 bg-card rounded-full"></div>
                   <div className="absolute inset-1 rounded-full overflow-hidden">
                     <Image
-                      src={`https://placehold.co/56x56.png`}
+                      src={`https://placehold.co/90x90.png`}
                       data-ai-hint={deal.hint}
                       alt={deal.name}
-                      width={56}
-                      height={56}
+                      width={90}
+                      height={90}
                       className="object-cover"
                     />
                   </div>
