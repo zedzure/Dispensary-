@@ -17,12 +17,12 @@ import type { Product } from "@/types/product";
 const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint' },
   { name: 'Flower', hint: 'cannabis bud' },
-  { name: 'Seeds', hint: 'cannabis seed' },
+  { name: 'Vapes', hint: 'vape pen' },
   { name: 'Edibles', hint: 'gummy candy' },
   { name: 'Concentrates', hint: 'cannabis oil' },
   { name: 'Tinctures', hint: 'dropper bottle' },
   { name: 'Topicals', hint: 'cream jar' },
-  { name: 'Vapes', hint: 'vape pen' },
+  { name: 'Seeds', hint: 'cannabis seed' },
   { name: 'Gear', hint: 'grinder accessory' },
   { name: 'Deals', hint: 'sale tag' },
 ];
@@ -111,7 +111,7 @@ export default function Home() {
                   <ul className="flex flex-nowrap items-stretch gap-6 py-4">
                     {allProducts[category.name].map((product) => (
                       <li key={product.id} className="flex-shrink-0 w-64 sm:w-72">
-                        <Card className="h-full flex flex-col overflow-hidden group bg-white border-border/60 hover:border-primary/50 transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-1">
+                        <Card className="h-full flex flex-col overflow-hidden group bg-white border-border/60 hover:border-primary/50 transition-all duration-300 shadow-lg hover:shadow-2xl">
                           <CardHeader className="p-0">
                             <button onClick={() => handleProductClick(product)} className="w-full aspect-[3/2] relative">
                                 <Image
@@ -120,7 +120,7 @@ export default function Home() {
                                   alt={product.name}
                                   layout="fill"
                                   objectFit="cover"
-                                  className="group-hover:scale-105 transition-transform duration-300"
+                                  className="transition-transform duration-300"
                                 />
                             </button>
                           </CardHeader>
