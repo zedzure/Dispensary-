@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -9,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { BottomNavBar } from "@/components/bottom-nav-bar";
+import { useToast } from "@/hooks/use-toast";
 
 const GoogleIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="h-5 w-5 mr-2">
@@ -21,6 +24,23 @@ const GoogleIcon = () => (
 
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = () => {
+    if (email === "kim.l@silzeypos.com" && password === "Dancer$5109") {
+      router.push("/profile");
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "Invalid credentials. Please try again.",
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-secondary text-foreground">
       <Header />
@@ -40,7 +60,14 @@ export default function LoginPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email-login">Email</Label>
-                  <Input id="email-login" type="email" placeholder="jane@example.com" required />
+                  <Input 
+                    id="email-login" 
+                    type="email" 
+                    placeholder="jane@example.com" 
+                    required 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                    <div className="flex items-center justify-between">
@@ -49,11 +76,18 @@ export default function LoginPage() {
                       Forgot?
                     </Link>
                   </div>
-                  <Input id="password-login" type="password" required />
+                  <Input 
+                    id="password-login" 
+                    type="password" 
+                    required 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                  />
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col gap-4 pt-6">
-                <Button className="w-full">Login</Button>
+                <Button className="w-full" onClick={handleLogin}>Login</Button>
                  <div className="relative w-full">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t" />
@@ -83,6 +117,7 @@ export default function LoginPage() {
                     <Label htmlFor="name-signup">Full Name</Label>
                     <Input id="name-signup" placeholder="Jane Doe" required />
                 </div>
+                .
                 <div className="space-y-2">
                   <Label htmlFor="email-signup">Email</Label>
                   <Input id="email-signup" type="email" placeholder="jane@example.com" required />
