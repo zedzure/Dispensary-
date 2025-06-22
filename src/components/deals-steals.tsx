@@ -3,26 +3,21 @@ import Image from 'next/image';
 import type { Product } from '@/types/product';
 
 const deals = [
-  { name: 'Blue Dream', hint: 'sativa cannabis', tag: 'New' },
-  { name: 'Sour Diesel', hint: 'sativa cannabis', tag: 'Popular' },
-  { name: 'OG Kush', hint: 'hybrid cannabis', tag: '5% Off' },
-  { name: 'Granddaddy Purple', hint: 'indica cannabis', tag: 'Just In' },
-  { name: 'White Widow', hint: 'hybrid cannabis', tag: '10 Left' },
-  { name: 'AK-47', hint: 'hybrid cannabis' },
-  { name: 'Jack Herer', hint: 'sativa cannabis', tag: '10% Off' },
-  { name: 'Green Crack', hint: 'sativa cannabis' },
-  { name: 'Pineapple Express', hint: 'hybrid cannabis', tag: '5 Left' },
-  { name: 'Girl Scout Cookies', hint: 'indica cannabis', tag: 'Popular' },
-  { name: 'Northern Lights', hint: 'indica cannabis' },
-  { name: 'Bubba Kush', hint: 'indica cannabis', tag: 'New' },
-  { name: 'Durban Poison', hint: 'sativa cannabis' },
-  { name: 'Maui Wowie', hint: 'sativa cannabis', tag: 'Just In' },
-  { name: 'Trainwreck', hint: 'hybrid cannabis', tag: '5% Off' },
-  { name: 'Chemdawg', hint: 'hybrid cannabis' },
-  { name: 'Super Lemon Haze', hint: 'sativa cannabis', tag: '10 Left' },
-  { name: 'Strawberry Cough', hint: 'sativa cannabis' },
-  { name: 'Gorilla Glue #4', hint: 'hybrid cannabis', tag: 'Popular' },
-  { name: 'Zkittlez', hint: 'indica cannabis', tag: '10% Off' },
+  { name: 'Blue Dream', hint: 'sativa cannabis', tag: 'New', image: 'https://images.unsplash.com/photo-1616694639036-935c75a45270?q=80&w=600&auto=format&fit=crop' },
+  { name: 'Sour Diesel', hint: 'sativa cannabis', tag: 'Popular', image: 'https://images.unsplash.com/photo-1608929033586-9a2373e0f735?q=80&w=600&auto=format&fit=crop' },
+  { name: 'OG Kush', hint: 'hybrid cannabis', tag: '5% Off', image: 'https://images.unsplash.com/photo-1556928045-16f7f50be0f3?q=80&w=600&auto=format&fit=crop' },
+  { name: 'GSC Pre-roll', hint: 'indica cannabis', tag: 'Just In', image: 'https://images.unsplash.com/photo-1599425883628-76503c3fc6a3?q=80&w=600&auto=format&fit=crop' },
+  { name: 'White Widow', hint: 'hybrid cannabis', tag: '10 Left', image: 'https://images.unsplash.com/photo-1631557813531-1f3162a8c326?q=80&w=600&auto=format&fit=crop' },
+  { name: 'CBD Tincture', hint: 'tincture cannabis', image: 'https://images.unsplash.com/photo-1631094034889-8669b3252f41?q=80&w=600&auto=format&fit=crop' },
+  { name: 'Jack Herer', hint: 'sativa cannabis', tag: '10% Off', image: 'https://images.unsplash.com/photo-1627522502813-f3687a731d68?q=80&w=600&auto=format&fit=crop' },
+  { name: 'Gummy Edibles', hint: 'gummy candy', image: 'https://images.unsplash.com/photo-1620573934390-33759a2c358f?q=80&w=600&auto=format&fit=crop' },
+  { name: 'Vape Pen', hint: 'hybrid cannabis', tag: '5 Left', image: 'https://images.unsplash.com/photo-1611294612375-a8c67921010b?q=80&w=600&auto=format&fit=crop' },
+  { name: 'Girl Scout Cookies', hint: 'indica cannabis', tag: 'Popular', image: 'https://images.unsplash.com/photo-1621293292444-a6a1f8ad81c4?q=80&w=600&auto=format&fit=crop' },
+  { name: 'Northern Lights', hint: 'indica cannabis', image: 'https://images.unsplash.com/photo-1590420799015-bd424953457f?q=80&w=600&auto=format&fit=crop' },
+  { name: 'Bubba Kush', hint: 'indica cannabis', tag: 'New', image: 'https://images.unsplash.com/photo-1618233336943-e99427b3e1b7?q=80&w=600&auto=format&fit=crop' },
+  { name: 'Durban Poison', hint: 'sativa cannabis', image: 'https://images.unsplash.com/photo-1628029519113-4c59385555d4?q=80&w=600&auto=format&fit=crop' },
+  { name: 'Concentrate', hint: 'cannabis oil', tag: 'Just In', image: 'https://images.unsplash.com/photo-1642289452813-912b3236a53b?q=80&w=600&auto=format&fit=crop' },
+  { name: 'Joint Pack', hint: 'hybrid cannabis', tag: '5% Off', image: 'https://images.unsplash.com/photo-1609252811124-5e4548483542?q=80&w=600&auto=format&fit=crop' },
 ];
 
 interface DealsStealsProps {
@@ -30,7 +25,7 @@ interface DealsStealsProps {
 }
 
 export function DealsSteals({ onProductClick }: DealsStealsProps) {
-  const handleClick = (deal: { name: string; hint: string, tag?: string }) => {
+  const handleClick = (deal: typeof deals[0]) => {
     const representativeProduct: Product = {
       id: `deal-${deal.name.toLowerCase().replace(' ', '-')}`,
       name: deal.name,
@@ -39,7 +34,7 @@ export function DealsSteals({ onProductClick }: DealsStealsProps) {
       thc: 22,
       price: 35.00,
       description: `An amazing deal on ${deal.name}! This popular item is on sale for a limited time. Grab it before it's gone.`,
-      image: `https://placehold.co/600x400.png`,
+      image: deal.image,
       hint: deal.hint,
     };
     onProductClick(representativeProduct);
@@ -61,7 +56,7 @@ export function DealsSteals({ onProductClick }: DealsStealsProps) {
                   <div className="absolute inset-0.5 bg-card rounded-full"></div>
                   <div className="absolute inset-1 rounded-full overflow-hidden">
                     <Image
-                      src={`https://placehold.co/90x90.png`}
+                      src={deal.image}
                       data-ai-hint={deal.hint}
                       alt={deal.name}
                       width={90}

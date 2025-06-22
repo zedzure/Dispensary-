@@ -8,7 +8,7 @@ interface CategoryCirclesProps {
 }
 
 export function CategoryCircles({ onProductClick }: CategoryCirclesProps) {
-  const handleClick = (category: { name: string; hint: string }) => {
+  const handleClick = (category: typeof categories[0]) => {
     const representativeProduct: Product = {
       id: `cat-${category.name.toLowerCase().replace(' ', '-')}`,
       name: `Featured ${category.name}`,
@@ -17,7 +17,7 @@ export function CategoryCircles({ onProductClick }: CategoryCirclesProps) {
       thc: 20,
       price: 45.00,
       description: `A fine selection of our best ${category.name.toLowerCase()}. Click 'Add to Cart' to explore similar products from this category.`,
-      image: `https://placehold.co/600x400.png`,
+      image: category.image,
       hint: category.hint,
     };
     onProductClick(representativeProduct);
@@ -33,7 +33,7 @@ export function CategoryCircles({ onProductClick }: CategoryCirclesProps) {
                 <div className="absolute inset-0.5 bg-card rounded-full"></div>
                 <div className="absolute inset-1 rounded-full overflow-hidden">
                   <Image
-                      src={`https://placehold.co/90x90.png`}
+                      src={category.image}
                       data-ai-hint={category.hint}
                       alt={category.name}
                       width={90}
