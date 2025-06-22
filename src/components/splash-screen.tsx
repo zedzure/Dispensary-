@@ -18,10 +18,10 @@ export function SplashScreen({ onFinished }: SplashScreenProps) {
 
   useEffect(() => {
     const sequence = [
-      setTimeout(() => setStep(2), 2000),      // Start logo exit and text typing
-      setTimeout(() => setStep(3), 5300),      // Start re-entry after typing (2000 + 300 + 3000)
-      setTimeout(() => setStep(4), 6800),      // Start fade out after re-entry (5300 + 1500)
-      setTimeout(onFinished, 7800),         // Call onFinished after fade (6800 + 1000)
+      setTimeout(() => setStep(2), 800),      // Start logo exit and text typing
+      setTimeout(() => setStep(3), 2300),     // Start re-entry after typing (800ms + 1500ms)
+      setTimeout(() => setStep(4), 2800),     // Start fade out after re-entry (2300ms + 500ms)
+      setTimeout(onFinished, 3300),         // Call onFinished after fade (2800ms + 500ms)
     ];
     return () => sequence.forEach(clearTimeout);
   }, [onFinished]);
@@ -29,7 +29,7 @@ export function SplashScreen({ onFinished }: SplashScreenProps) {
   return (
     <div
       className={cn(
-        'fixed inset-0 z-[100] flex items-center justify-center bg-primary transition-opacity duration-1000',
+        'fixed inset-0 z-[100] flex items-center justify-center bg-primary transition-opacity duration-500',
         step === 4 ? 'opacity-0' : 'opacity-100'
       )}
     >
@@ -50,7 +50,7 @@ export function SplashScreen({ onFinished }: SplashScreenProps) {
             'mt-6 text-5xl font-cursive text-primary-foreground overflow-hidden whitespace-nowrap opacity-0 relative z-10',
             step >= 2 && 'animate-typing opacity-100'
           )}
-          style={{ animationFillMode: 'forwards', animationDelay: '0.3s' }}
+          style={{ animationFillMode: 'forwards' }}
         >
           GreenLeaf Guide
         </h1>
