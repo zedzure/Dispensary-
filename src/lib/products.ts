@@ -2,43 +2,43 @@ import type { Product } from "@/types/product";
 
 const productImages: Record<string, string[]> = {
   'Pre-rolls': [
-    'https://images.unsplash.com/photo-1599425883628-76503c3fc6a3?q=80&w=600&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1620343383988-2d886566c7f8?q=80&w=600&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1609252811124-5e4548483542?q=80&w=600&auto=format&fit=crop',
+    'https://images.pexels.com/photos/7689143/pexels-photo-7689143.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/8340645/pexels-photo-8340645.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/7924849/pexels-photo-7924849.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Flower': [
-    'https://images.unsplash.com/photo-1616694639036-935c75a45270?q=80&w=600&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1556928045-16f7f50be0f3?q=80&w=600&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1608929033586-9a2373e0f735?q=80&w=600&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1631557813531-1f3162a8c326?q=80&w=600&auto=format&fit=crop',
+    'https://images.pexels.com/photos/7700269/pexels-photo-7700269.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/9331317/pexels-photo-9331317.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/7689148/pexels-photo-7689148.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/8132961/pexels-photo-8132961.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Seeds': [
-      'https://images.unsplash.com/photo-1615485925348-523495b3a328?q=80&w=600&auto=format&fit=crop'
+      'https://images.pexels.com/photos/7700262/pexels-photo-7700262.jpeg?auto=compress&cs=tinysrgb&w=600'
   ],
   'Edibles': [
-    'https://images.unsplash.com/photo-1620573934390-33759a2c358f?q=80&w=600&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1615392415951-54641c8888a7?q=80&w=600&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1619154381226-5a4a5842d504?q=80&w=600&auto=format&fit=crop',
+    'https://images.pexels.com/photos/5743259/pexels-photo-5743259.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/6604803/pexels-photo-6604803.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/7258380/pexels-photo-7258380.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Concentrates': [
-    'https://images.unsplash.com/photo-1642289452813-912b3236a53b?q=80&w=600&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1622046420552-788094d45c55?q=80&w=600&auto=format&fit=crop',
+    'https://images.pexels.com/photos/7689150/pexels-photo-7689150.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/8464977/pexels-photo-8464977.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Tinctures': [
-      'https://images.unsplash.com/photo-1631094034889-8669b3252f41?q=80&w=600&auto=format&fit=crop'
+      'https://images.pexels.com/photos/7667732/pexels-photo-7667732.jpeg?auto=compress&cs=tinysrgb&w=600'
   ],
   'Topicals': [
-      'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600&auto=format&fit=crop' // Generic cream
+      'https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&cs=tinysrgb&w=600' // Generic cream
   ],
   'Vapes': [
-    'https://images.unsplash.com/photo-1624503254922-d38ccf75471d?q=80&w=600&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1611294612375-a8c67921010b?q=80&w=600&auto=format&fit=crop',
+    'https://images.pexels.com/photos/8340640/pexels-photo-8340640.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/8340656/pexels-photo-8340656.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Gear': [
-      'https://images.unsplash.com/photo-1593033875791-0d33887c4f4b?q=80&w=600&auto=format&fit=crop'
+      'https://images.pexels.com/photos/8132959/pexels-photo-8132959.jpeg?auto=compress&cs=tinysrgb&w=600'
   ],
   'Deals': [
-    'https://images.unsplash.com/photo-1579586337278-35d9addb018b?q=80&w=600&auto=format&fit=crop' // sale tag
+    'https://images.pexels.com/photos/5632397/pexels-photo-5632397.jpeg?auto=compress&cs=tinysrgb&w=600' // sale tag
   ]
 };
 
