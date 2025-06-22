@@ -20,14 +20,10 @@ const StrainRecommenderFlowInputSchema = z.object({
 });
 
 // This is the schema for the LLM's direct output.
-// We only ask for IDs to prevent hallucination of product details and reduce parsing errors.
-const RecommendedProductIdSchema = z.object({
-  id: z.string().describe('The ID of the recommended product.'),
-});
-
+// We ask for a flat array of IDs to make the model's job easier and more reliable.
 const StrainRecommenderLLMOutputSchema = z.object({
   recommendation: z.string().describe('A summary of why these products are recommended based on the user preferences.'),
-  products: z.array(RecommendedProductIdSchema).length(4).describe('An array of exactly 4 recommended product IDs from the provided list that best match the preferences.'),
+  productIds: z.array(z.string()).length(4).describe('An array of exactly 4 product IDs from the provided list that best match the preferences.'),
 });
 
 // Zod schema for a single product, mirroring the Product type for the final output.
@@ -87,7 +83,7 @@ Please analyze the user's preferences and the product list.
 Your task is to:
 1. Write a short, friendly, and insightful summary explaining your recommendation strategy.
 2. Select exactly 4 product IDs from the list that best match the user's preferences.
-3. Your response MUST be in the specified JSON format, containing the recommendation summary and an array of the 4 selected product objects. Each product object in the array should ONLY contain the 'id' field of the selected product.
+3. Your response MUST be in the specified JSON format, containing the recommendation summary and a 'productIds' field which is an array of the 4 selected product ID strings.
 `,
 });
 
@@ -101,16 +97,16 @@ const strainRecommenderFlow = ai.defineFlow(
     const { output: llmOutput } = await prompt(input);
     
     // Validate the LLM output.
-    if (!llmOutput || llmOutput.products.length !== 4) {
+    if (!llmOutput || llmOutput.productIds.length !== 4) {
       throw new Error('Failed to get a valid recommendation from the AI model.');
     }
 
     // Look up the full product details using the IDs returned by the model.
     // This is more robust than asking the model to return the full object.
     const recommendedProducts: Product[] = [];
-    for (const p of llmOutput.products) {
+    for (const productId of llmOutput.productIds) {
         const product = allProductsFlat.find(
-          (fullProduct) => fullProduct.id === p.id
+          (fullProduct) => fullProduct.id === productId
         );
         if (product) {
             recommendedProducts.push(product);
