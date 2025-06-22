@@ -20,10 +20,10 @@ const StrainRecommenderFlowInputSchema = z.object({
 });
 
 // This is the schema for the LLM's direct output.
-// We ask for a flat array of IDs to make the model's job easier and more reliable.
+// We make this more flexible to handle variations in the model's response.
 const StrainRecommenderLLMOutputSchema = z.object({
   recommendation: z.string().describe('A summary of why these products are recommended based on the user preferences.'),
-  productIds: z.array(z.string()).length(4).describe('An array of exactly 4 product IDs from the provided list that best match the preferences.'),
+  productIds: z.array(z.string()).min(1).max(4).describe('An array of 1 to 4 product IDs from the provided list that best match the preferences.'),
 });
 
 // Zod schema for a single product, mirroring the Product type for the final output.
@@ -56,7 +56,8 @@ export async function strainRecommender(input: StrainRecommenderInput): Promise<
   
   return strainRecommenderFlow({
     preferences: input.preferences,
-    productsJSON: JSON.stringify(productsForModel),
+    // Pretty-print the JSON to make it easier for the model to parse.
+    productsJSON: JSON.stringify(productsForModel, null, 2),
   });
 }
 
@@ -82,8 +83,8 @@ Here is a list of all available products in JSON format. ONLY use products from 
 Please analyze the user's preferences and the product list.
 Your task is to:
 1. Write a short, friendly, and insightful summary explaining your recommendation strategy.
-2. Select exactly 4 product IDs from the list that best match the user's preferences.
-3. Your response MUST be in the specified JSON format, containing the recommendation summary and a 'productIds' field which is an array of the 4 selected product ID strings.
+2. Select between 1 and 4 product IDs from the list that best match the user's preferences.
+3. Your response MUST be in the specified JSON format, containing the recommendation summary and a 'productIds' field which is an array of the selected product ID strings.
 `,
 });
 
@@ -96,8 +97,8 @@ const strainRecommenderFlow = ai.defineFlow(
   async (input) => {
     const { output: llmOutput } = await prompt(input);
     
-    // Validate the LLM output.
-    if (!llmOutput || llmOutput.productIds.length !== 4) {
+    // Validate the LLM output. It's now more flexible.
+    if (!llmOutput || llmOutput.productIds.length === 0) {
       throw new Error('Failed to get a valid recommendation from the AI model.');
     }
 
@@ -108,14 +109,16 @@ const strainRecommenderFlow = ai.defineFlow(
         const product = allProductsFlat.find(
           (fullProduct) => fullProduct.id === productId
         );
+        // Only add the product if it's found, gracefully ignoring any hallucinated IDs.
         if (product) {
             recommendedProducts.push(product);
         }
     }
     
-    // Ensure we found all 4 products. If not, the model may have hallucinated an ID.
-    if (recommendedProducts.length !== 4) {
-        throw new Error(`AI recommended products with invalid IDs. Found ${recommendedProducts.length} valid products.`);
+    // Ensure we found at least one valid product after filtering.
+    if (recommendedProducts.length === 0) {
+        // This can happen if the model only returns IDs that don't exist in our list.
+        throw new Error(`AI recommended products, but none of the IDs were valid.`);
     }
 
     return {
@@ -124,4 +127,3 @@ const strainRecommenderFlow = ai.defineFlow(
     };
   }
 );
-    
