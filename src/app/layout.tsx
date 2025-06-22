@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { CartProvider } from "@/context/cart-context";
-import { AuthProvider } from "@/context/auth-context";
 import { Inter, Dancing_Script } from 'next/font/google';
+import { Providers } from "./providers";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -31,12 +30,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${dancingScript.variable}`}>
       <body className="font-sans antialiased">
-        <AuthProvider>
-          <CartProvider>
-            {children}
-            <Toaster />
-          </CartProvider>
-        </AuthProvider>
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );
