@@ -6,9 +6,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { StrainRecommenderForm } from "@/components/strain-recommender-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Leaf, MapPin, Tag } from "lucide-react";
-import Image from 'next/image';
 import { CategoryCircles } from "@/components/category-circles";
 import { DealsSteals } from "@/components/deals-steals";
 import { ProductDetailModal } from "@/components/product-detail-modal";
@@ -16,53 +14,8 @@ import type { Product } from "@/types/product";
 import { CartSheet } from "@/components/cart-sheet";
 import { SplashScreen } from "@/components/splash-screen";
 import { BottomNavBar } from "@/components/bottom-nav-bar";
-
-const categories = [
-  { name: 'Pre-rolls', hint: 'cannabis joint' },
-  { name: 'Flower', hint: 'cannabis bud' },
-  { name: 'Seeds', hint: 'cannabis seed' },
-  { name: 'Edibles', hint: 'gummy candy' },
-  { name: 'Concentrates', hint: 'cannabis oil' },
-  { name: 'Tinctures', hint: 'dropper bottle' },
-  { name: 'Topicals', hint: 'cream jar' },
-  { name: 'Vapes', hint: 'vape pen' },
-  { name: 'Gear', hint: 'grinder accessory' },
-  { name: 'Deals', hint: 'sale tag' },
-];
-
-const generateProducts = (category: { name: string, hint: string }, count: number): Product[] => {
-  return Array.from({ length: count }).map((_, i) => {
-    const productType = i % 3 === 0 ? 'Sativa' : i % 3 === 1 ? 'Indica' : 'Hybrid';
-    let specificHint = category.hint;
-    
-    if (category.name === 'Flower') {
-      specificHint = `${productType.toLowerCase()} cannabis`;
-    } else if (productType !== 'Hybrid') {
-        if (category.name === 'Vapes') {
-            specificHint = `${productType.toLowerCase()} vape`;
-        } else if (category.name === 'Pre-rolls') {
-            specificHint = `${productType.toLowerCase()} joint`;
-        }
-    }
-
-    return {
-        id: `${category.name}-${i}`,
-        name: `${category.name} Product ${i + 1}`,
-        category: category.name,
-        type: productType,
-        thc: ((i * 3) % 15) + 15,
-        price: ((i * 7) % 40) + 20,
-        description: `An exquisite ${category.name.toLowerCase()} with a unique profile. Perfect for both new and experienced users looking for a quality experience.`,
-        image: `https://placehold.co/600x400.png`,
-        hint: specificHint,
-    };
-  });
-};
-
-const allProducts = categories.reduce((acc, category) => {
-  acc[category.name] = generateProducts(category, 10);
-  return acc;
-}, {} as Record<string, Product[]>);
+import { categories, allProducts } from "@/lib/products";
+import { ProductCard } from "@/components/product-card";
 
 
 export default function Home() {
@@ -117,6 +70,9 @@ export default function Home() {
 
         {/* Shop by Category Section */}
         <section className="pt-16 bg-white">
+          <div className="container mx-auto px-4 md:px-6">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8 text-primary">Shop by Category</h2>
+          </div>
           <CategoryCircles onProductClick={handleProductClick} />
         </section>
 
@@ -132,31 +88,10 @@ export default function Home() {
                   <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8 text-primary">{category.name}</h2>
                 </div>
                 <div className="overflow-x-auto no-scrollbar">
-                  <ul className="flex flex-nowrap items-stretch gap-6 py-4 px-4 md:px-6">
+                  <ul className="flex flex-nowrap items-stretch gap-6 py-4 pl-4 pr-4 md:pl-6 md:pr-6">
                     {allProducts[category.name].map((product) => (
                       <li key={product.id} className="flex-shrink-0 w-64 sm:w-72">
-                        <Card className="h-full flex flex-col overflow-hidden group bg-white border-border/60 shadow-lg">
-                          <CardHeader className="p-0">
-                            <button onClick={() => handleProductClick(product)} className="w-full aspect-[3/2] relative">
-                                <Image
-                                  src={product.image}
-                                  data-ai-hint={product.hint}
-                                  alt={product.name}
-                                  layout="fill"
-                                  objectFit="cover"
-                                  className=""
-                                />
-                            </button>
-                          </CardHeader>
-                          <CardContent className="p-6 flex-grow">
-                            <CardTitle className="text-xl font-semibold">{product.name}</CardTitle>
-                            <p className="text-sm text-muted-foreground mt-2">{product.type} | {product.thc}% THC</p>
-                          </CardContent>
-                          <CardFooter className="p-6 pt-0 flex items-center justify-between">
-                            <p className="text-xl font-bold text-primary">${product.price?.toFixed(2)}</p>
-                            <Button variant="default" onClick={() => handleProductClick(product)}>View</Button>
-                          </CardFooter>
-                        </Card>
+                        <ProductCard product={product} onProductClick={handleProductClick} />
                       </li>
                     ))}
                   </ul>
