@@ -49,7 +49,7 @@ export async function strainRecommender(input: StrainRecommenderInput): Promise<
 const idealProductNarrativePrompt = ai.definePrompt({
     name: 'idealProductNarrativePrompt',
     input: { schema: z.object({ preferences: z.string() }) },
-    output: { schema: z.object({ ideal_product_description: z.string().describe("A short paragraph describing the ideal product, including type, THC level, and desired effects/flavors.") }) },
+    // NO OUTPUT SCHEMA - will return raw text. This is more reliable.
     config: {
         safetySettings: [ { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' } ],
     },
@@ -99,7 +99,7 @@ function scoreProduct(product: Product, narrative: string): number {
 const summaryGeneratorPrompt = ai.definePrompt({
     name: 'summaryGeneratorPrompt',
     input: { schema: z.object({ preferences: z.string(), products: z.array(ProductSchema) }) },
-    output: { schema: z.object({ recommendation: z.string() }) },
+    // NO OUTPUT SCHEMA - will return raw text. This is more reliable.
     config: {
         safetySettings: [ { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' } ],
     },
@@ -112,6 +112,8 @@ Your Recommended Products:
 {{#each products}}
 - {{this.name}}
 {{/each}}
+
+Your Summary:
 `,
 });
 
@@ -124,11 +126,12 @@ const strainRecommenderFlow = ai.defineFlow(
   },
   async ({ preferences }) => {
     // Step 1: Generate a narrative description of the ideal product.
-    const { output } = await idealProductNarrativePrompt({ preferences });
-    if (!output?.ideal_product_description) {
+    const narrativeResponse = await idealProductNarrativePrompt({ preferences });
+    const narrative = narrativeResponse.text;
+
+    if (!narrative) {
       throw new Error('AI failed to generate a product description. Please try rephrasing your request.');
     }
-    const narrative = output.ideal_product_description;
 
     // Step 2: Score all products based on the AI-generated narrative.
     const scoredProducts = allProductsFlat.map(p => ({ product: p, score: scoreProduct(p, narrative) }));
@@ -146,14 +149,16 @@ const strainRecommenderFlow = ai.defineFlow(
     }
     
     // Step 5: Generate a friendly summary for the recommended products.
-    const { output: summary } = await summaryGeneratorPrompt({ preferences, products: recommendedProducts });
-    if (!summary?.recommendation) {
+    const summaryResponse = await summaryGeneratorPrompt({ preferences, products: recommendedProducts });
+    const recommendation = summaryResponse.text;
+    
+    if (!recommendation) {
       throw new Error('AI failed to generate a recommendation summary.');
     }
 
     // Return the final result.
     return {
-      recommendation: summary.recommendation,
+      recommendation,
       products: recommendedProducts,
     };
   }
