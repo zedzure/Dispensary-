@@ -66,6 +66,8 @@ export default function ProfilePage() {
     );
   }
 
+  const progressPercentage = (user.points / user.nextReward) * 100;
+
   return (
     <div className="flex flex-col min-h-screen bg-muted/20 text-foreground">
       <Header />
@@ -109,7 +111,7 @@ export default function ProfilePage() {
                     <p className="text-4xl font-bold text-primary">🌿 {user.points.toLocaleString()}</p>
                     <p className="text-muted-foreground">Points</p>
                 </div>
-                <Progress value={(user.points / user.nextReward) * 100} className="mt-4 h-2" />
+                <Progress value={progressPercentage > 0 ? Math.max(1, progressPercentage) : 0} className="mt-4 h-2" />
                 <p className="text-sm text-muted-foreground text-center mt-2">
                     {user.nextReward - user.points} points away from your next reward!
                 </p>
