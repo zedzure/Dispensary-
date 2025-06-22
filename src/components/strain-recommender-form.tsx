@@ -24,10 +24,16 @@ const formSchema = z.object({
 });
 
 const quickRecs = [
-    { label: "Sativa Vapes", query: "I'm looking for a Sativa vape pen for daytime energy and focus." },
-    { label: "For Sleep", query: "I need a strong Indica flower or edible to help me fall asleep and stay asleep." },
-    { label: "Relaxing Indica", query: "What's a good Indica strain for relaxing on the couch and watching movies?" },
-    { label: "Creative Hybrids", query: "I want a hybrid strain that sparks creativity and conversation without causing anxiety." },
+    { label: "Ease Anxiety", query: "I'm looking for a strain that helps reduce anxiety and stress without being too sedative." },
+    { label: "Pain Relief", query: "I need a potent strain, maybe a topical or an edible, for chronic pain relief that's long-lasting." },
+    { label: "Social Buzz", query: "Recommend a euphoric and talkative strain that's great for social gatherings and parties." },
+    { label: "Boost Appetite", query: "I'm looking for a product that can help stimulate my appetite." },
+    { label: "Beginner Friendly", query: "I'm new to cannabis. What's a good, low-THC flower or vape that won't be overwhelming?" },
+    { label: "Productivity Boost", query: "I need a sativa-dominant strain that helps with focus and productivity for work or studying." },
+    { label: "Creative Spark", query: "What's a good hybrid strain that can help spark creativity for writing or art projects?" },
+    { label: "Sleep Aid", query: "I'm looking for a strong indica product, like an edible or tincture, to help with insomnia." },
+    { label: "Uplifting Mood", query: "Suggest a strain that is known for its uplifting and mood-enhancing effects to help with feelings of depression." },
+    { label: "Relax & Unwind", query: "I want a relaxing strain to help me unwind at the end of the day, perfect for watching a movie." },
 ];
 
 export function StrainRecommenderForm() {
