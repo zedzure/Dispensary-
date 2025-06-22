@@ -43,7 +43,7 @@ export default function LoginPage() {
         name: "Kim L.",
         email: "kim.l@silzeypos.com",
         memberSince: "2024",
-        avatarUrl: "https://placehold.co/100x100.png",
+        avatarUrl: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
         points: 2500,
         nextReward: 3000,
       };
@@ -71,7 +71,7 @@ export default function LoginPage() {
       name: signUpName,
       email: signUpEmail,
       memberSince: new Date().getFullYear().toString(),
-      avatarUrl: "https://placehold.co/100x100.png",
+      avatarUrl: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
       points: 0,
       nextReward: 1000,
     };
