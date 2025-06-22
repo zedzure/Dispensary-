@@ -18,10 +18,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 
+const placeholderImage = 'https://images.pexels.com/photos/7667737/pexels-photo-7667737.jpeg?auto=compress&cs=tinysrgb&w=600';
+const placeholderHint = 'cannabis product';
+
 const orders = [
-  { id: "#G12345", date: "2024-07-20", total: 75.50, status: "Completed", items: [{ name: "OG Kush", quantity: 1, price: 45.00, image: "https://images.pexels.com/photos/7689148/pexels-photo-7689148.jpeg?auto=compress&cs=tinysrgb&w=600", hint: "hybrid cannabis"}, { name: "Pre-roll Pack", quantity: 1, price: 30.50, image: "https://images.pexels.com/photos/7689143/pexels-photo-7689143.jpeg?auto=compress&cs=tinysrgb&w=600", hint: "cannabis joint" }] },
-  { id: "#G12344", date: "2024-07-15", total: 50.00, status: "Delivered", items: [{ name: "Blue Dream Vape", quantity: 2, price: 25.00, image: "https://images.pexels.com/photos/8340640/pexels-photo-8340640.jpeg?auto=compress&cs=tinysrgb&w=600", hint: "sativa vape" }] },
-  { id: "#G12342", date: "2024-07-01", total: 120.00, status: "Delivered", items: [{ name: "Edibles Mix", quantity: 3, price: 40.00, image: "https://images.pexels.com/photos/6604803/pexels-photo-6604803.jpeg?auto=compress&cs=tinysrgb&w=600", hint: "gummy candy" }] },
+  { id: "#G12345", date: "2024-07-20", total: 75.50, status: "Completed", items: [{ name: "OG Kush", quantity: 1, price: 45.00, image: placeholderImage, hint: placeholderHint }, { name: "Pre-roll Pack", quantity: 1, price: 30.50, image: placeholderImage, hint: placeholderHint }] },
+  { id: "#G12344", date: "2024-07-15", total: 50.00, status: "Delivered", items: [{ name: "Blue Dream Vape", quantity: 2, price: 25.00, image: placeholderImage, hint: placeholderHint }] },
+  { id: "#G12342", date: "2024-07-01", total: 120.00, status: "Delivered", items: [{ name: "Edibles Mix", quantity: 3, price: 40.00, image: placeholderImage, hint: placeholderHint }] },
 ];
 
 const paymentMethods = [

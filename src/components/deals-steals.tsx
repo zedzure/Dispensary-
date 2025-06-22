@@ -2,22 +2,24 @@
 import Image from 'next/image';
 import type { Product } from '@/types/product';
 
+const placeholderImage = 'https://images.pexels.com/photos/7667737/pexels-photo-7667737.jpeg?auto=compress&cs=tinysrgb&w=600';
+
 const deals = [
-  { name: 'Blue Dream', hint: 'sativa cannabis', tag: 'New', image: 'https://images.pexels.com/photos/7700269/pexels-photo-7700269.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Sour Diesel', hint: 'sativa cannabis', tag: 'Popular', image: 'https://images.pexels.com/photos/8132961/pexels-photo-8132961.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'OG Kush', hint: 'hybrid cannabis', tag: '5% Off', image: 'https://images.pexels.com/photos/7689148/pexels-photo-7689148.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'GSC Pre-roll', hint: 'indica cannabis', tag: 'Just In', image: 'https://images.pexels.com/photos/7689143/pexels-photo-7689143.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'White Widow', hint: 'hybrid cannabis', tag: '10 Left', image: 'https://images.pexels.com/photos/9331317/pexels-photo-9331317.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'CBD Tincture', hint: 'tincture cannabis', image: 'https://images.pexels.com/photos/7667732/pexels-photo-7667732.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Jack Herer', hint: 'sativa cannabis', tag: '10% Off', image: 'https://images.pexels.com/photos/7689151/pexels-photo-7689151.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Gummy Edibles', hint: 'gummy candy', image: 'https://images.pexels.com/photos/5743259/pexels-photo-5743259.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Vape Pen', hint: 'hybrid cannabis', tag: '5 Left', image: 'https://images.pexels.com/photos/8340640/pexels-photo-8340640.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Girl Scout Cookies', hint: 'indica cannabis', tag: 'Popular', image: 'https://images.pexels.com/photos/7689149/pexels-photo-7689149.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Northern Lights', hint: 'indica cannabis', image: 'https://images.pexels.com/photos/7700261/pexels-photo-7700261.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Bubba Kush', hint: 'indica cannabis', tag: 'New', image: 'https://images.pexels.com/photos/7700263/pexels-photo-7700263.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Durban Poison', hint: 'sativa cannabis', image: 'https://images.pexels.com/photos/8132962/pexels-photo-8132962.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Concentrate', hint: 'cannabis oil', tag: 'Just In', image: 'https://images.pexels.com/photos/7689150/pexels-photo-7689150.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Joint Pack', hint: 'hybrid cannabis', tag: '5% Off', image: 'https://images.pexels.com/photos/8340645/pexels-photo-8340645.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { name: 'Blue Dream', hint: 'sativa cannabis', tag: 'New', image: placeholderImage },
+  { name: 'Sour Diesel', hint: 'sativa cannabis', tag: 'Popular', image: placeholderImage },
+  { name: 'OG Kush', hint: 'hybrid cannabis', tag: '5% Off', image: placeholderImage },
+  { name: 'GSC Pre-roll', hint: 'indica cannabis', tag: 'Just In', image: placeholderImage },
+  { name: 'White Widow', hint: 'hybrid cannabis', tag: '10 Left', image: placeholderImage },
+  { name: 'CBD Tincture', hint: 'tincture cannabis', tag: 'Sale', image: placeholderImage },
+  { name: 'Jack Herer', hint: 'sativa cannabis', tag: '10% Off', image: placeholderImage },
+  { name: 'Gummy Edibles', hint: 'gummy candy', tag: 'Sweet Deal', image: placeholderImage },
+  { name: 'Vape Pen', hint: 'hybrid cannabis', tag: '5 Left', image: placeholderImage },
+  { name: 'Girl Scout Cookies', hint: 'indica cannabis', tag: 'Popular', image: placeholderImage },
+  { name: 'Northern Lights', hint: 'indica cannabis', tag: 'Limited', image: placeholderImage },
+  { name: 'Bubba Kush', hint: 'indica cannabis', tag: 'New', image: placeholderImage },
+  { name: 'Durban Poison', hint: 'sativa cannabis', tag: 'Classic', image: placeholderImage },
+  { name: 'Concentrate', hint: 'cannabis oil', tag: 'Just In', image: placeholderImage },
+  { name: 'Joint Pack', hint: 'hybrid cannabis', tag: '5% Off', image: placeholderImage },
 ];
 
 interface DealsStealsProps {
