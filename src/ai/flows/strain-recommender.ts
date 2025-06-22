@@ -4,9 +4,9 @@
 /**
  * @fileOverview An AI-powered strain recommender flow.
  * This file implements a more robust, two-step recommendation process.
- * 1. The AI first generates ideal criteria based on user preferences.
- * 2. The code then programmatically filters the product list based on these criteria.
- * This approach is more reliable than asking the AI to select from a large list directly.
+ * 1. The AI first generates a narrative description of the ideal product.
+ * 2. The code then programmatically filters the product list based on keywords from that narrative.
+ * This approach is more reliable than asking the AI to select from a large list or return complex JSON.
  *
  * - strainRecommender - The main function that handles the recommendation process.
  * - StrainRecommenderOutput - The return type for the strainRecommender function.
@@ -45,76 +45,57 @@ export async function strainRecommender(input: StrainRecommenderInput): Promise<
 
 // --- AI and Flow Logic ---
 
-// Step 1: AI generates criteria
-const IdealCriteriaSchema = z.object({
-  type: z.preprocess(
-    (val) => {
-      if (typeof val !== 'string' || !val.trim()) return 'Any';
-      const lower = val.toLowerCase();
-      const formatted = lower.charAt(0).toUpperCase() + lower.slice(1);
-      return ['Sativa', 'Indica', 'Hybrid'].includes(formatted) ? formatted : 'Any';
-    },
-    z.enum(['Sativa', 'Indica', 'Hybrid', 'Any'])
-  ).describe("The ideal cannabis type. Must be one of: Sativa, Indica, Hybrid, Any."),
-  thc_level: z.preprocess(
-    (val) => (typeof val === 'string' && ['low', 'moderate', 'high'].includes(val.toLowerCase()) ? val.toLowerCase() : 'any'),
-    z.enum(['low', 'moderate', 'high', 'any'])
-  ).describe("The user's preferred THC level. Must be one of: low, moderate, high, or any."),
-  keywords: z.preprocess(
-    (val) => {
-      if (Array.isArray(val)) {
-        return val.filter(v => typeof v === 'string' && v.trim().length > 0);
-      }
-      if (typeof val === 'string' && val.trim().length > 0) {
-        return [val];
-      }
-      return [];
-    },
-    z.array(z.string())
-  ).describe('A list of 2-3 keywords from the user preferences to help find matching products (e.g., "anxiety", "sleep", "fruity").')
-});
-
-const criteriaGeneratorPrompt = ai.definePrompt({
-    name: 'criteriaGeneratorPrompt',
+// Step 1: AI generates a narrative description of the ideal product.
+const idealProductNarrativePrompt = ai.definePrompt({
+    name: 'idealProductNarrativePrompt',
     input: { schema: z.object({ preferences: z.string() }) },
-    output: { schema: IdealCriteriaSchema },
+    output: { schema: z.object({ ideal_product_description: z.string().describe("A short paragraph describing the ideal product, including type, THC level, and desired effects/flavors.") }) },
     config: {
         safetySettings: [ { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' } ],
     },
-    prompt: `Analyze the user's request for a cannabis product and determine the ideal criteria for a recommendation.
+    prompt: `Analyze the user's request and describe the ideal cannabis product for them in a short paragraph.
+Your description should be used to find matching products.
+Include the ideal type (like Sativa, Indica, or Hybrid), THC level (like low, moderate, or high), and key effects or flavors (like relaxing, focus, sleepy, fruity, earthy).
+
 User Request: "{{{preferences}}}"
-- For the type, choose one of: Sativa, Indica, Hybrid, or Any.
-- For the thc_level, choose one of: low, moderate, high, or any (use lowercase).
-- For keywords, extract 2-3 relevant keywords from the request.
-Default to 'Any' or 'any' if a specific preference is not mentioned.`,
+
+Ideal Product Description:`,
 });
 
-// Step 2: Code scores products
-function scoreProduct(product: Product, criteria: z.infer<typeof IdealCriteriaSchema>): number {
+// Step 2: Code scores products based on the AI's narrative.
+function scoreProduct(product: Product, narrative: string): number {
     let score = 0;
     const productText = `${product.name} ${product.description} ${product.type}`.toLowerCase();
+    const narrativeLower = narrative.toLowerCase();
 
-    if (criteria.type !== 'Any' && product.type?.toLowerCase() === criteria.type.toLowerCase()) {
-        score += 5;
+    // Give a big boost for type match
+    if (product.type) {
+        if (narrativeLower.includes(product.type.toLowerCase())) {
+            score += 5;
+        }
     }
 
+    // Check for THC level keywords
     const thc = product.thc ?? 0;
-    if (criteria.thc_level !== 'any') {
-        if (criteria.thc_level === 'low' && thc < 18) score += 3;
-        if (criteria.thc_level === 'moderate' && thc >= 18 && thc <= 25) score += 3;
-        if (criteria.thc_level === 'high' && thc > 25) score += 3;
-    }
+    if ((narrativeLower.includes('low') || narrativeLower.includes('mild')) && thc < 18) score += 3;
+    if (narrativeLower.includes('moderate') && thc >= 18 && thc <= 25) score += 3;
+    if ((narrativeLower.includes('high') || narrativeLower.includes('strong') || narrativeLower.includes('potent')) && thc > 25) score += 3;
 
-    criteria.keywords.forEach(keyword => {
-        if (productText.includes(keyword.toLowerCase())) {
-            score += 2;
+    // Use keywords from the narrative to score
+    // Simple keyword extraction from the narrative.
+    const keywords = narrativeLower.match(/\b(\w+)\b/g) || [];
+    const uniqueKeywords = [...new Set(keywords)].filter(kw => kw.length > 3); // Filter short words
+
+    uniqueKeywords.forEach(keyword => {
+        if (productText.includes(keyword)) {
+            score += 1;
         }
     });
 
     return score;
 }
 
-// Step 3: AI generates summary
+// Step 3: AI generates a friendly summary for the chosen products.
 const summaryGeneratorPrompt = ai.definePrompt({
     name: 'summaryGeneratorPrompt',
     input: { schema: z.object({ preferences: z.string(), products: z.array(ProductSchema) }) },
@@ -122,7 +103,7 @@ const summaryGeneratorPrompt = ai.definePrompt({
     config: {
         safetySettings: [ { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' } ],
     },
-    prompt: `You are a helpful cannabis expert. A user described what they want, and you have selected the following products.
+    prompt: `You are a helpful cannabis expert. A user described what they want, and you have selected the following products that are a good match.
 Write a short, friendly summary explaining why these products are a good choice based on their request.
 
 User Request: "{{{preferences}}}"
@@ -142,29 +123,31 @@ const strainRecommenderFlow = ai.defineFlow(
     outputSchema: StrainRecommenderOutputSchema,
   },
   async ({ preferences }) => {
-    // Step 1: Generate criteria from the user's preferences.
-    const { output: criteria } = await criteriaGeneratorPrompt({ preferences });
-    if (!criteria) {
-      throw new Error('AI failed to determine criteria. Please try rephrasing your request.');
+    // Step 1: Generate a narrative description of the ideal product.
+    const { output } = await idealProductNarrativePrompt({ preferences });
+    if (!output?.ideal_product_description) {
+      throw new Error('AI failed to generate a product description. Please try rephrasing your request.');
     }
+    const narrative = output.ideal_product_description;
 
-    // Step 2: Score products based on the AI-generated criteria.
-    const scoredProducts = allProductsFlat.map(p => ({ product: p, score: scoreProduct(p, criteria) }));
+    // Step 2: Score all products based on the AI-generated narrative.
+    const scoredProducts = allProductsFlat.map(p => ({ product: p, score: scoreProduct(p, narrative) }));
+    
+    // Step 3: Filter and sort to find the best matches.
     const sortedProducts = scoredProducts.filter(p => p.score > 0).sort((a, b) => b.score - a.score);
     const recommendedProducts = sortedProducts.slice(0, 4).map(p => p.product);
 
-    // Step 3: Handle the case where no products match.
+    // Step 4: Handle the case where no products match.
     if (recommendedProducts.length === 0) {
-      // If no products get a positive score, return a helpful message instead of erroring.
       return {
         recommendation: "We couldn't find any products that currently match your preferences. Please try being more specific or using different keywords.",
         products: [],
       };
     }
     
-    // Step 4: Generate a friendly summary for the recommended products.
+    // Step 5: Generate a friendly summary for the recommended products.
     const { output: summary } = await summaryGeneratorPrompt({ preferences, products: recommendedProducts });
-    if (!summary) {
+    if (!summary?.recommendation) {
       throw new Error('AI failed to generate a recommendation summary.');
     }
 
