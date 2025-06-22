@@ -117,9 +117,7 @@ export default function Home() {
 
         {/* Shop by Category Section */}
         <section className="pt-16 bg-white">
-          <div className="container mx-auto px-4 md:px-6">
-            <CategoryCircles onProductClick={handleProductClick} />
-          </div>
+          <CategoryCircles onProductClick={handleProductClick} />
         </section>
 
         {/* Deals & Steals Section */}
@@ -127,12 +125,14 @@ export default function Home() {
         
         {/* Category Product Grid Section */}
         <section id="menu" className="py-16 md:py-24 bg-white">
-          <div className="container mx-auto px-4 md:px-6 space-y-16">
+          <div className="space-y-16">
             {categories.map((category) => (
               <div key={category.name}>
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8 text-primary">{category.name}</h2>
-                <div className="overflow-x-auto no-scrollbar -mx-4 px-4 md:-mx-6 md:px-6">
-                  <ul className="flex flex-nowrap items-stretch gap-6 py-4 pr-4 md:pr-6">
+                <div className="container mx-auto px-4 md:px-6">
+                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8 text-primary">{category.name}</h2>
+                </div>
+                <div className="overflow-x-auto no-scrollbar">
+                  <ul className="flex flex-nowrap items-stretch gap-6 py-4 px-4 md:px-6">
                     {allProducts[category.name].map((product) => (
                       <li key={product.id} className="flex-shrink-0 w-64 sm:w-72">
                         <Card className="h-full flex flex-col overflow-hidden group bg-white border-border/60 shadow-lg">

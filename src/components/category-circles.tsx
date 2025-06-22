@@ -36,7 +36,7 @@ export function CategoryCircles({ onProductClick }: CategoryCirclesProps) {
   };
 
   return (
-    <div className="flex -mx-4 pl-4 pr-6 space-x-4 overflow-x-auto pb-4 no-scrollbar">
+    <div className="flex px-4 md:px-6 space-x-4 overflow-x-auto pb-4 no-scrollbar">
         {categories.map((category) => (
           <button key={category.name} onClick={() => handleClick(category)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
             <div className="relative w-[98px] h-[98px] transition-all duration-300">
