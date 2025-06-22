@@ -30,7 +30,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${dancingScript.variable}`}>
-      <head />
       <body className="font-sans antialiased">
         <AuthProvider>
           <CartProvider>
