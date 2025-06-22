@@ -87,7 +87,7 @@ export default function Home() {
       <CartSheet />
       <main className="flex-grow pb-16 md:pb-0">
         {/* Hero Section */}
-        <section className="relative py-20 md:py-32 bg-white">
+        <section className="relative py-10 md:py-16 bg-white">
           <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground">
               Discover Your Perfect Strain
@@ -132,7 +132,7 @@ export default function Home() {
               <div key={category.name}>
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8 text-primary">{category.name}</h2>
                 <div className="overflow-x-auto no-scrollbar -mx-4 px-4 md:-mx-6 md:px-6">
-                  <ul className="flex flex-nowrap items-stretch gap-6 py-4">
+                  <ul className="flex flex-nowrap items-stretch gap-6 py-4 pr-4 md:pr-6">
                     {allProducts[category.name].map((product) => (
                       <li key={product.id} className="flex-shrink-0 w-64 sm:w-72">
                         <Card className="h-full flex flex-col overflow-hidden group bg-white border-border/60 shadow-lg">

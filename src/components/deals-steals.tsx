@@ -51,7 +51,7 @@ export function DealsSteals({ onProductClick }: DealsStealsProps) {
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12 text-primary">
           Deals & Steals
         </h2>
-        <div className="flex -mx-4 px-4 space-x-4 overflow-x-auto pb-4 no-scrollbar">
+        <div className="flex -mx-4 pl-4 pr-6 space-x-4 overflow-x-auto pb-4 no-scrollbar">
             {deals.map((deal, index) => (
               <button key={index} onClick={() => handleClick(deal)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
                 <div className="relative w-[98px] h-[98px] transition-all duration-300">
