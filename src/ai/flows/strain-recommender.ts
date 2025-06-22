@@ -67,7 +67,15 @@ export async function strainRecommender(input: StrainRecommenderInput): Promise<
 const prompt = ai.definePrompt({
   name: 'strainRecommenderPrompt',
   input: {schema: StrainRecommenderFlowInputSchema},
-  output: {schema: StrainRecommenderLLMOutputSchema}, // Use the new schema for the LLM's response
+  output: {schema: StrainRecommenderLLMOutputSchema},
+  config: {
+    safetySettings: [
+      {
+        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+        threshold: 'BLOCK_NONE',
+      },
+    ],
+  },
   prompt: `You are an expert cannabis sommelier for GreenLeaf Guide.
 A user is looking for recommendations.
 Their preferences are: "{{{preferences}}}"
