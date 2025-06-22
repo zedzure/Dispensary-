@@ -3,10 +3,8 @@
 
 /**
  * @fileOverview An AI-powered strain recommender flow.
- * This file implements a more robust, two-step recommendation process.
- * 1. The AI first generates a narrative description of the ideal product.
- * 2. The code then programmatically filters the product list based on keywords from that narrative.
- * This approach is more reliable than asking the AI to select from a large list or return complex JSON.
+ * This file implements a flow that asks the AI to select product IDs and then looks them up.
+ * It includes robust error handling and fallbacks to ensure it always returns a valid response.
  *
  * - strainRecommender - The main function that handles the recommendation process.
  * - StrainRecommenderOutput - The return type for the strainRecommender function.
@@ -45,61 +43,39 @@ export async function strainRecommender(input: StrainRecommenderInput): Promise<
 
 // --- AI and Flow Logic ---
 
-// Step 1: AI generates a narrative description of the ideal product.
-const idealProductNarrativePrompt = ai.definePrompt({
-    name: 'idealProductNarrativePrompt',
-    input: { schema: z.object({ preferences: z.string() }) },
-    // NO OUTPUT SCHEMA - will return raw text. This is more reliable.
+// Prepare a string of all products for the AI prompt.
+const productListForPrompt = allProductsFlat.map(p => JSON.stringify({
+    id: p.id,
+    name: p.name,
+    category: p.category,
+    type: p.type,
+    thc: p.thc,
+    description: p.description,
+})).join('\n');
+
+// Prompt for the AI to select relevant product IDs.
+const productSelectorPrompt = ai.definePrompt({
+    name: 'productSelectorPrompt',
+    input: { schema: z.object({ preferences: z.string(), products: z.string() }) },
     config: {
         safetySettings: [ { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' } ],
     },
-    prompt: `Analyze the user's request and describe the ideal cannabis product for them in a short paragraph.
-Your description should be used to find matching products.
-Include the ideal type (like Sativa, Indica, or Hybrid), THC level (like low, moderate, or high), and key effects or flavors (like relaxing, focus, sleepy, fruity, earthy).
+    prompt: `You are a cannabis expert. Based on the user's preferences, select up to 4 of the most relevant product IDs from the provided list.
+Return ONLY a single line of comma-separated product IDs and nothing else. For example: "Flower-1,Edibles-5,Pre-rolls-2"
 
-User Request: "{{{preferences}}}"
+USER PREFERENCES:
+"{{{preferences}}}"
 
-Ideal Product Description:`,
+AVAILABLE PRODUCTS (JSON format, one per line):
+{{{products}}}
+
+Selected product IDs:`,
 });
 
-// Step 2: Code scores products based on the AI's narrative.
-function scoreProduct(product: Product, narrative: string): number {
-    let score = 0;
-    const productText = `${product.name} ${product.description} ${product.type}`.toLowerCase();
-    const narrativeLower = narrative.toLowerCase();
-
-    // Give a big boost for type match
-    if (product.type) {
-        if (narrativeLower.includes(product.type.toLowerCase())) {
-            score += 5;
-        }
-    }
-
-    // Check for THC level keywords
-    const thc = product.thc ?? 0;
-    if ((narrativeLower.includes('low') || narrativeLower.includes('mild')) && thc < 18) score += 3;
-    if (narrativeLower.includes('moderate') && thc >= 18 && thc <= 25) score += 3;
-    if ((narrativeLower.includes('high') || narrativeLower.includes('strong') || narrativeLower.includes('potent')) && thc > 25) score += 3;
-
-    // Use keywords from the narrative to score
-    // Simple keyword extraction from the narrative.
-    const keywords = narrativeLower.match(/\b(\w+)\b/g) || [];
-    const uniqueKeywords = [...new Set(keywords)].filter(kw => kw.length > 3); // Filter short words
-
-    uniqueKeywords.forEach(keyword => {
-        if (productText.includes(keyword)) {
-            score += 1;
-        }
-    });
-
-    return score;
-}
-
-// Step 3: AI generates a friendly summary for the chosen products.
+// Prompt to generate a summary for the selected products.
 const summaryGeneratorPrompt = ai.definePrompt({
     name: 'summaryGeneratorPrompt',
     input: { schema: z.object({ preferences: z.string(), products: z.array(ProductSchema) }) },
-    // NO OUTPUT SCHEMA - will return raw text. This is more reliable.
     config: {
         safetySettings: [ { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' } ],
     },
@@ -117,7 +93,7 @@ Your Summary:
 `,
 });
 
-// The main flow that orchestrates the new logic.
+// The main flow that orchestrates the logic with robust fallbacks.
 const strainRecommenderFlow = ai.defineFlow(
   {
     name: 'strainRecommenderFlow',
@@ -125,38 +101,48 @@ const strainRecommenderFlow = ai.defineFlow(
     outputSchema: StrainRecommenderOutputSchema,
   },
   async ({ preferences }) => {
-    // Step 1: Generate a narrative description of the ideal product.
-    const narrativeResponse = await idealProductNarrativePrompt({ preferences });
-    const narrative = narrativeResponse.text;
+    let recommendedProducts: Product[] = [];
+    let recommendation = "";
 
-    if (!narrative) {
-      throw new Error('AI failed to generate a product description. Please try rephrasing your request.');
+    try {
+        // Step 1: Ask AI to select product IDs.
+        const idSelectionResponse = await productSelectorPrompt({ preferences, products: productListForPrompt });
+        const idString = idSelectionResponse.text?.trim();
+
+        if (idString) {
+            const productIds = idString.split(',').map(id => id.trim());
+            
+            // Create a map for efficient lookup and preserving order.
+            const productMap = new Map(allProductsFlat.map(p => [p.id, p]));
+            const orderedProducts = productIds.map(id => productMap.get(id)).filter((p): p is Product => !!p);
+
+            if (orderedProducts.length > 0) {
+                recommendedProducts = orderedProducts;
+            }
+        }
+    } catch (e) {
+        console.error("AI recommendation failed, using fallback.", e);
+        // The fallback logic below will be triggered if this block fails.
     }
 
-    // Step 2: Score all products based on the AI-generated narrative.
-    const scoredProducts = allProductsFlat.map(p => ({ product: p, score: scoreProduct(p, narrative) }));
-    
-    // Step 3: Filter and sort to find the best matches.
-    const sortedProducts = scoredProducts.filter(p => p.score > 0).sort((a, b) => b.score - a.score);
-    const recommendedProducts = sortedProducts.slice(0, 4).map(p => p.product);
-
-    // Step 4: Handle the case where no products match.
+    // Step 2: If AI fails or finds nothing, use a fallback.
     if (recommendedProducts.length === 0) {
-      return {
-        recommendation: "We couldn't find any products that currently match your preferences. Please try being more specific or using different keywords.",
-        products: [],
-      };
-    }
-    
-    // Step 5: Generate a friendly summary for the recommended products.
-    const summaryResponse = await summaryGeneratorPrompt({ preferences, products: recommendedProducts });
-    const recommendation = summaryResponse.text;
-    
-    if (!recommendation) {
-      throw new Error('AI failed to generate a recommendation summary.');
+        recommendation = "We had some trouble finding a specific match for your request. In the meantime, here are some of our most popular products for you to check out!";
+        // Provide a sensible fallback, e.g., the first 4 flower products.
+        recommendedProducts = allProductsFlat.filter(p => p.category === 'Flower').slice(0, 4);
+    } else {
+        // Step 3: If products were found, try to generate a summary.
+        try {
+            const summaryResponse = await summaryGeneratorPrompt({ preferences, products: recommendedProducts });
+            recommendation = summaryResponse.text || `Based on your request for "${preferences}", we think you'll like these choices.`;
+        } catch(e) {
+            console.error("AI summary generation failed, using fallback summary.", e);
+            // If summary fails, provide a generic one.
+            recommendation = `Based on your request for "${preferences}", we think you'll like these choices.`;
+        }
     }
 
-    // Return the final result.
+    // Return the final result. It will always be valid.
     return {
       recommendation,
       products: recommendedProducts,
