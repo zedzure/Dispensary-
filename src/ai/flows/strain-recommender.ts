@@ -48,13 +48,22 @@ export async function strainRecommender(input: StrainRecommenderInput): Promise<
 // Step 1: AI generates criteria
 const IdealCriteriaSchema = z.object({
   type: z.preprocess(
-    (val) => (typeof val === 'string' ? val : 'Any'),
+    (val) => {
+      if (typeof val !== 'string' || !val.trim()) return 'Any';
+      const lower = val.toLowerCase();
+      // Capitalize first letter to match enum
+      const formatted = lower.charAt(0).toUpperCase() + lower.slice(1);
+      if (['Sativa', 'Indica', 'Hybrid'].includes(formatted)) {
+        return formatted;
+      }
+      return 'Any';
+    },
     z.enum(['Sativa', 'Indica', 'Hybrid', 'Any'])
   ).describe("The ideal cannabis type. Must be one of: Sativa, Indica, Hybrid, Any."),
   thc_level: z.preprocess(
     (val) => (typeof val === 'string' ? val.toLowerCase() : 'any'),
     z.enum(['low', 'moderate', 'high', 'any'])
-  ).describe("The user's preferred THC level. Must be one of: low, moderate, high, any."),
+  ).describe("The user's preferred THC level. Must be one of: low, moderate, high, or any."),
   keywords: z.array(z.string()).describe('A list of 2-3 keywords from the user preferences to help find matching products (e.g., "anxiety", "sleep", "fruity").')
 });
 
