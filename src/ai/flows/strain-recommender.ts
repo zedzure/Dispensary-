@@ -50,7 +50,6 @@ const productListForPrompt = allProductsFlat.map(p => JSON.stringify({
     category: p.category,
     type: p.type,
     thc: p.thc,
-    description: p.description,
 })).join('\n');
 
 // Prompt for the AI to select relevant product IDs.
@@ -72,27 +71,6 @@ AVAILABLE PRODUCTS (JSON format, one per line):
 Selected product IDs:`,
 });
 
-// Prompt to generate a summary for the selected products.
-const summaryGeneratorPrompt = ai.definePrompt({
-    name: 'summaryGeneratorPrompt',
-    input: { schema: z.object({ preferences: z.string(), products: z.array(ProductSchema) }) },
-    config: {
-        safetySettings: [ { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' } ],
-    },
-    prompt: `You are a helpful cannabis expert. A user described what they want, and you have selected the following products that are a good match.
-Write a short, friendly summary explaining why these products are a good choice based on their request.
-
-User Request: "{{{preferences}}}"
-
-Your Recommended Products:
-{{#each products}}
-- {{this.name}}
-{{/each}}
-
-Your Summary:
-`,
-});
-
 // The main flow that orchestrates the logic with robust fallbacks.
 const strainRecommenderFlow = ai.defineFlow(
   {
@@ -105,12 +83,12 @@ const strainRecommenderFlow = ai.defineFlow(
     let recommendation = "";
 
     try {
-        // Step 1: Ask AI to select product IDs.
         const idSelectionResponse = await productSelectorPrompt({ preferences, products: productListForPrompt });
         const idString = idSelectionResponse.text?.trim();
-
+        
         if (idString) {
-            const productIds = idString.split(',').map(id => id.trim());
+            // Get non-empty IDs from the AI's response
+            const productIds = idString.split(',').map(id => id.trim()).filter(id => id);
             
             // Create a map for efficient lookup and preserving order.
             const productMap = new Map(allProductsFlat.map(p => [p.id, p]));
@@ -118,31 +96,33 @@ const strainRecommenderFlow = ai.defineFlow(
 
             if (orderedProducts.length > 0) {
                 recommendedProducts = orderedProducts;
+                recommendation = `Based on your request for "${preferences}", we think you'll like these choices.`;
             }
         }
     } catch (e) {
-        console.error("AI recommendation failed, using fallback.", e);
-        // The fallback logic below will be triggered if this block fails.
+        console.error("AI recommendation step failed, proceeding to fallback. Full error:", e);
+        // The catch block is intentionally empty.
+        // We will fall through to the fallback logic below.
     }
 
-    // Step 2: If AI fails or finds nothing, use a fallback.
+    // Fallback logic: if the try block fails or finds no products, this will run.
     if (recommendedProducts.length === 0) {
         recommendation = "We had some trouble finding a specific match for your request. In the meantime, here are some of our most popular products for you to check out!";
         // Provide a sensible fallback, e.g., the first 4 flower products.
         recommendedProducts = allProductsFlat.filter(p => p.category === 'Flower').slice(0, 4);
-    } else {
-        // Step 3: If products were found, try to generate a summary.
-        try {
-            const summaryResponse = await summaryGeneratorPrompt({ preferences, products: recommendedProducts });
-            recommendation = summaryResponse.text || `Based on your request for "${preferences}", we think you'll like these choices.`;
-        } catch(e) {
-            console.error("AI summary generation failed, using fallback summary.", e);
-            // If summary fails, provide a generic one.
-            recommendation = `Based on your request for "${preferences}", we think you'll like these choices.`;
-        }
+    }
+    
+    // Final check to ensure we always return a valid response.
+    if (!recommendedProducts || recommendedProducts.length === 0) {
+      // This should be nearly impossible to reach, but it's a safeguard.
+      console.error("CRITICAL: Fallback logic failed to produce products.");
+      return {
+        recommendation: "An unexpected error occurred and we could not retrieve any products. Please try again later.",
+        products: [],
+      };
     }
 
-    // Return the final result. It will always be valid.
+    // Return the final result. It will always be valid and should not throw an error.
     return {
       recommendation,
       products: recommendedProducts,
