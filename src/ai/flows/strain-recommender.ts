@@ -47,8 +47,14 @@ export async function strainRecommender(input: StrainRecommenderInput): Promise<
 
 // Step 1: AI generates criteria
 const IdealCriteriaSchema = z.object({
-  type: z.enum(['Sativa', 'Indica', 'Hybrid', 'Any']).describe('The ideal cannabis type (Sativa, Indica, or Hybrid).'),
-  thc_level: z.enum(['low', 'moderate', 'high', 'any']).describe("The user's preferred THC level (low, moderate, or high)."),
+  type: z.preprocess(
+    (val) => (typeof val === 'string' ? val : 'Any'),
+    z.enum(['Sativa', 'Indica', 'Hybrid', 'Any'])
+  ).describe("The ideal cannabis type. Must be one of: Sativa, Indica, Hybrid, Any."),
+  thc_level: z.preprocess(
+    (val) => (typeof val === 'string' ? val.toLowerCase() : 'any'),
+    z.enum(['low', 'moderate', 'high', 'any'])
+  ).describe("The user's preferred THC level. Must be one of: low, moderate, high, any."),
   keywords: z.array(z.string()).describe('A list of 2-3 keywords from the user preferences to help find matching products (e.g., "anxiety", "sleep", "fruity").')
 });
 
@@ -61,7 +67,10 @@ const criteriaGeneratorPrompt = ai.definePrompt({
     },
     prompt: `Analyze the user's request for a cannabis product and determine the ideal criteria for a recommendation.
 User Request: "{{{preferences}}}"
-Extract the best product type, desired THC level, and 2-3 relevant keywords from the request. Default to 'Any' or 'any' if a specific preference is not mentioned.`,
+- For the type, choose one of: Sativa, Indica, Hybrid, or Any.
+- For the thc_level, choose one of: low, moderate, high, or any (use lowercase).
+- For keywords, extract 2-3 relevant keywords from the request.
+Default to 'Any' or 'any' if a specific preference is not mentioned.`,
 });
 
 // Step 2: Code scores products
@@ -117,40 +126,33 @@ const strainRecommenderFlow = ai.defineFlow(
     outputSchema: StrainRecommenderOutputSchema,
   },
   async ({ preferences }) => {
-    // Step 1: Generate criteria
+    // Step 1: Generate criteria from the user's preferences.
     const { output: criteria } = await criteriaGeneratorPrompt({ preferences });
     if (!criteria) {
       throw new Error('AI failed to determine criteria. Please try rephrasing your request.');
     }
 
-    // Step 2: Score, sort, and select products
+    // Step 2: Score products based on the AI-generated criteria.
     const scoredProducts = allProductsFlat.map(p => ({ product: p, score: scoreProduct(p, criteria) }));
     const sortedProducts = scoredProducts.filter(p => p.score > 0).sort((a, b) => b.score - a.score);
-    let recommendedProducts = sortedProducts.slice(0, 4).map(p => p.product);
+    const recommendedProducts = sortedProducts.slice(0, 4).map(p => p.product);
 
-    // Fallback if no products match
-    if (recommendedProducts.length < 4) {
-      // Add random products to ensure we always have 4 recommendations
-      const existingIds = new Set(recommendedProducts.map(p => p.id));
-      const fallbackProducts = allProductsFlat.filter(p => !existingIds.has(p.id));
-      const needed = 4 - recommendedProducts.length;
-
-      for (let i = 0; i < needed && i < fallbackProducts.length; i++) {
-        recommendedProducts.push(fallbackProducts[i]);
-      }
+    // Step 3: Handle the case where no products match.
+    if (recommendedProducts.length === 0) {
+      // If no products get a positive score, return a helpful message instead of erroring.
+      return {
+        recommendation: "We couldn't find any products that currently match your preferences. Please try being more specific or using different keywords.",
+        products: [],
+      };
     }
     
-    // Final check for empty products
-    if (recommendedProducts.length === 0) {
-        throw new Error('Could not find any products to recommend.');
-    }
-
-    // Step 3: Generate summary
+    // Step 4: Generate a friendly summary for the recommended products.
     const { output: summary } = await summaryGeneratorPrompt({ preferences, products: recommendedProducts });
     if (!summary) {
       throw new Error('AI failed to generate a recommendation summary.');
     }
 
+    // Return the final result.
     return {
       recommendation: summary.recommendation,
       products: recommendedProducts,
