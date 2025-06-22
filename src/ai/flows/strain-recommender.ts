@@ -2,127 +2,157 @@
 'use server';
 
 /**
- * @fileOverview An AI-powered strain recommender flow that suggests specific products.
+ * @fileOverview An AI-powered strain recommender flow.
+ * This file implements a more robust, two-step recommendation process.
+ * 1. The AI first generates ideal criteria based on user preferences.
+ * 2. The code then programmatically filters the product list based on these criteria.
+ * This approach is more reliable than asking the AI to select from a large list directly.
  *
- * - strainRecommender - A function that handles the strain recommendation process.
+ * - strainRecommender - The main function that handles the recommendation process.
  * - StrainRecommenderOutput - The return type for the strainRecommender function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'zod';
+import { ai } from '@/ai/genkit';
+import { z } from 'zod';
 import { allProductsFlat } from '@/lib/products';
 import type { Product } from '@/types/product';
 
-// This schema defines the input that the Genkit flow will receive.
-const StrainRecommenderFlowInputSchema = z.object({
-  preferences: z.string().describe('A description of the user preferences and desired effects for cannabis strains.'),
-  productsJSON: z.string().describe('A JSON string of available products with their key attributes.'),
-});
+// Input/Output schemas for the exported function
+export type StrainRecommenderInput = { preferences: string };
 
-// This is the schema for the LLM's direct output.
-// We make this more flexible to handle variations in the model's response.
-const StrainRecommenderLLMOutputSchema = z.object({
-  recommendation: z.string().describe('A summary of why these products are recommended based on the user preferences.'),
-  productIds: z.array(z.string()).min(1).max(4).describe('An array of 1 to 4 product IDs from the provided list that best match the preferences.'),
-});
-
-// Zod schema for a single product, mirroring the Product type for the final output.
 const ProductSchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    category: z.string(),
-    type: z.enum(['Sativa', 'Indica', 'Hybrid']).optional(),
-    thc: z.coerce.number().optional(),
-    price: z.coerce.number().optional(),
-    description: z.string(),
-    image: z.string(),
-    hint: z.string(),
+  id: z.string(),
+  name: z.string(),
+  category: z.string(),
+  type: z.enum(['Sativa', 'Indica', 'Hybrid']).optional(),
+  thc: z.coerce.number().optional(),
+  price: z.coerce.number().optional(),
+  description: z.string(),
+  image: z.string(),
+  hint: z.string(),
 });
-
-// This is the final output schema for the exported function, which the frontend expects.
-const StrainRecommenderOutputSchema = z.object({
+export const StrainRecommenderOutputSchema = z.object({
   recommendation: z.string(),
   products: z.array(ProductSchema),
 });
 export type StrainRecommenderOutput = z.infer<typeof StrainRecommenderOutputSchema>;
 
-// Define the type for the input of our exported function.
-export type StrainRecommenderInput = { preferences: string };
-
-// This is the exported function that the frontend will call.
+// Exported function calls the flow
 export async function strainRecommender(input: StrainRecommenderInput): Promise<StrainRecommenderOutput> {
-  // Pass only the relevant product data to the model to save tokens and improve reliability.
-  const productsForModel = allProductsFlat.map(({ id, name, category, type, thc }) => ({ id, name, category, type, thc }));
-  
-  return strainRecommenderFlow({
-    preferences: input.preferences,
-    // Pretty-print the JSON to make it easier for the model to parse.
-    productsJSON: JSON.stringify(productsForModel, null, 2),
-  });
+  return strainRecommenderFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'strainRecommenderPrompt',
-  input: {schema: StrainRecommenderFlowInputSchema},
-  output: {schema: StrainRecommenderLLMOutputSchema},
-  config: {
-    safetySettings: [
-      {
-        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-        threshold: 'BLOCK_NONE',
-      },
-    ],
-  },
-  prompt: `You are an expert cannabis sommelier for GreenLeaf Guide.
-A user is looking for recommendations.
-Their preferences are: "{{{preferences}}}"
 
-Here is a list of all available products in JSON format. ONLY use products from this list.
-{{{productsJSON}}}
+// --- AI and Flow Logic ---
 
-Please analyze the user's preferences and the product list.
-Your task is to:
-1. Write a short, friendly, and insightful summary explaining your recommendation strategy.
-2. Select between 1 and 4 product IDs from the list that best match the user's preferences.
-3. Your response MUST be in the specified JSON format, containing the recommendation summary and a 'productIds' field which is an array of the selected product ID strings.
+// Step 1: AI generates criteria
+const IdealCriteriaSchema = z.object({
+  type: z.enum(['Sativa', 'Indica', 'Hybrid', 'Any']).describe('The ideal cannabis type (Sativa, Indica, or Hybrid).'),
+  thc_level: z.enum(['low', 'moderate', 'high', 'any']).describe("The user's preferred THC level (low, moderate, or high)."),
+  keywords: z.array(z.string()).describe('A list of 2-3 keywords from the user preferences to help find matching products (e.g., "anxiety", "sleep", "fruity").')
+});
+
+const criteriaGeneratorPrompt = ai.definePrompt({
+    name: 'criteriaGeneratorPrompt',
+    input: { schema: z.object({ preferences: z.string() }) },
+    output: { schema: IdealCriteriaSchema },
+    config: {
+        safetySettings: [ { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' } ],
+    },
+    prompt: `Analyze the user's request for a cannabis product and determine the ideal criteria for a recommendation.
+User Request: "{{{preferences}}}"
+Extract the best product type, desired THC level, and 2-3 relevant keywords from the request. Default to 'Any' or 'any' if a specific preference is not mentioned.`,
+});
+
+// Step 2: Code scores products
+function scoreProduct(product: Product, criteria: z.infer<typeof IdealCriteriaSchema>): number {
+    let score = 0;
+    const productText = `${product.name} ${product.description} ${product.type}`.toLowerCase();
+
+    if (criteria.type !== 'Any' && product.type?.toLowerCase() === criteria.type.toLowerCase()) {
+        score += 5;
+    }
+
+    const thc = product.thc ?? 0;
+    if (criteria.thc_level !== 'any') {
+        if (criteria.thc_level === 'low' && thc < 18) score += 3;
+        if (criteria.thc_level === 'moderate' && thc >= 18 && thc <= 25) score += 3;
+        if (criteria.thc_level === 'high' && thc > 25) score += 3;
+    }
+
+    criteria.keywords.forEach(keyword => {
+        if (productText.includes(keyword.toLowerCase())) {
+            score += 2;
+        }
+    });
+
+    return score;
+}
+
+// Step 3: AI generates summary
+const summaryGeneratorPrompt = ai.definePrompt({
+    name: 'summaryGeneratorPrompt',
+    input: { schema: z.object({ preferences: z.string(), products: z.array(ProductSchema) }) },
+    output: { schema: z.object({ recommendation: z.string() }) },
+    config: {
+        safetySettings: [ { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' } ],
+    },
+    prompt: `You are a helpful cannabis expert. A user described what they want, and you have selected the following products.
+Write a short, friendly summary explaining why these products are a good choice based on their request.
+
+User Request: "{{{preferences}}}"
+
+Your Recommended Products:
+{{#each products}}
+- {{this.name}}
+{{/each}}
 `,
 });
 
+// The main flow that orchestrates the new logic.
 const strainRecommenderFlow = ai.defineFlow(
   {
     name: 'strainRecommenderFlow',
-    inputSchema: StrainRecommenderFlowInputSchema,
+    inputSchema: z.object({ preferences: z.string() }),
     outputSchema: StrainRecommenderOutputSchema,
   },
-  async (input) => {
-    const { output: llmOutput } = await prompt(input);
-    
-    // Validate the LLM output. It's now more flexible.
-    if (!llmOutput || llmOutput.productIds.length === 0) {
-      throw new Error('Failed to get a valid recommendation from the AI model.');
+  async ({ preferences }) => {
+    // Step 1: Generate criteria
+    const { output: criteria } = await criteriaGeneratorPrompt({ preferences });
+    if (!criteria) {
+      throw new Error('AI failed to determine criteria. Please try rephrasing your request.');
     }
 
-    // Look up the full product details using the IDs returned by the model.
-    // This is more robust than asking the model to return the full object.
-    const recommendedProducts: Product[] = [];
-    for (const productId of llmOutput.productIds) {
-        const product = allProductsFlat.find(
-          (fullProduct) => fullProduct.id === productId
-        );
-        // Only add the product if it's found, gracefully ignoring any hallucinated IDs.
-        if (product) {
-            recommendedProducts.push(product);
-        }
+    // Step 2: Score, sort, and select products
+    const scoredProducts = allProductsFlat.map(p => ({ product: p, score: scoreProduct(p, criteria) }));
+    const sortedProducts = scoredProducts.filter(p => p.score > 0).sort((a, b) => b.score - a.score);
+    let recommendedProducts = sortedProducts.slice(0, 4).map(p => p.product);
+
+    // Fallback if no products match
+    if (recommendedProducts.length < 4) {
+      // Add random products to ensure we always have 4 recommendations
+      const existingIds = new Set(recommendedProducts.map(p => p.id));
+      const fallbackProducts = allProductsFlat.filter(p => !existingIds.has(p.id));
+      const needed = 4 - recommendedProducts.length;
+
+      for (let i = 0; i < needed && i < fallbackProducts.length; i++) {
+        recommendedProducts.push(fallbackProducts[i]);
+      }
     }
     
-    // Ensure we found at least one valid product after filtering.
+    // Final check for empty products
     if (recommendedProducts.length === 0) {
-        // This can happen if the model only returns IDs that don't exist in our list.
-        throw new Error(`AI recommended products, but none of the IDs were valid.`);
+        throw new Error('Could not find any products to recommend.');
+    }
+
+    // Step 3: Generate summary
+    const { output: summary } = await summaryGeneratorPrompt({ preferences, products: recommendedProducts });
+    if (!summary) {
+      throw new Error('AI failed to generate a recommendation summary.');
     }
 
     return {
-      recommendation: llmOutput.recommendation,
+      recommendation: summary.recommendation,
       products: recommendedProducts,
     };
   }
