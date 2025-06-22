@@ -13,7 +13,8 @@ const productImages: Record<string, string[]> = {
     'https://images.pexels.com/photos/8132961/pexels-photo-8132961.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Seeds': [
-      'https://images.pexels.com/photos/7700262/pexels-photo-7700262.jpeg?auto=compress&cs=tinysrgb&w=600'
+    'https://images.pexels.com/photos/7700262/pexels-photo-7700262.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/807598/pexels-photo-807598.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Edibles': [
     'https://images.pexels.com/photos/5743259/pexels-photo-5743259.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -25,17 +26,23 @@ const productImages: Record<string, string[]> = {
     'https://images.pexels.com/photos/8464977/pexels-photo-8464977.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Tinctures': [
-      'https://images.pexels.com/photos/7667732/pexels-photo-7667732.jpeg?auto=compress&cs=tinysrgb&w=600'
+    'https://images.pexels.com/photos/7667732/pexels-photo-7667732.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/7231996/pexels-photo-7231996.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/7667737/pexels-photo-7667737.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Topicals': [
-      'https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&cs=tinysrgb&w=600' // Generic cream
+    'https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/4202325/pexels-photo-4202325.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/4041391/pexels-photo-4041391.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Vapes': [
     'https://images.pexels.com/photos/8340640/pexels-photo-8340640.jpeg?auto=compress&cs=tinysrgb&w=600',
     'https://images.pexels.com/photos/8340656/pexels-photo-8340656.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Gear': [
-      'https://images.pexels.com/photos/8132959/pexels-photo-8132959.jpeg?auto=compress&cs=tinysrgb&w=600'
+      'https://images.pexels.com/photos/8132959/pexels-photo-8132959.jpeg?auto=compress&cs=tinysrgb&w=600',
+      'https://images.pexels.com/photos/8464953/pexels-photo-8464953.jpeg?auto=compress&cs=tinysrgb&w=600',
+      'https://images.pexels.com/photos/14101374/pexels-photo-14101374.jpeg?auto=compress&cs=tinysrgb&w=600',
   ],
   'Deals': [
     'https://images.pexels.com/photos/5632397/pexels-photo-5632397.jpeg?auto=compress&cs=tinysrgb&w=600' // sale tag

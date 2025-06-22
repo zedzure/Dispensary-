@@ -9,13 +9,13 @@ const deals = [
   { name: 'GSC Pre-roll', hint: 'indica cannabis', tag: 'Just In', image: 'https://images.pexels.com/photos/7689143/pexels-photo-7689143.jpeg?auto=compress&cs=tinysrgb&w=600' },
   { name: 'White Widow', hint: 'hybrid cannabis', tag: '10 Left', image: 'https://images.pexels.com/photos/9331317/pexels-photo-9331317.jpeg?auto=compress&cs=tinysrgb&w=600' },
   { name: 'CBD Tincture', hint: 'tincture cannabis', image: 'https://images.pexels.com/photos/7667732/pexels-photo-7667732.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Jack Herer', hint: 'sativa cannabis', tag: '10% Off', image: 'https://images.pexels.com/photos/7700269/pexels-photo-7700269.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { name: 'Jack Herer', hint: 'sativa cannabis', tag: '10% Off', image: 'https://images.pexels.com/photos/7689151/pexels-photo-7689151.jpeg?auto=compress&cs=tinysrgb&w=600' },
   { name: 'Gummy Edibles', hint: 'gummy candy', image: 'https://images.pexels.com/photos/5743259/pexels-photo-5743259.jpeg?auto=compress&cs=tinysrgb&w=600' },
   { name: 'Vape Pen', hint: 'hybrid cannabis', tag: '5 Left', image: 'https://images.pexels.com/photos/8340640/pexels-photo-8340640.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Girl Scout Cookies', hint: 'indica cannabis', tag: 'Popular', image: 'https://images.pexels.com/photos/7689148/pexels-photo-7689148.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Northern Lights', hint: 'indica cannabis', image: 'https://images.pexels.com/photos/9331317/pexels-photo-9331317.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Bubba Kush', hint: 'indica cannabis', tag: 'New', image: 'https://images.pexels.com/photos/7700269/pexels-photo-7700269.jpeg?auto=compress&cs=tinysrgb&w=600' },
-  { name: 'Durban Poison', hint: 'sativa cannabis', image: 'https://images.pexels.com/photos/8132961/pexels-photo-8132961.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { name: 'Girl Scout Cookies', hint: 'indica cannabis', tag: 'Popular', image: 'https://images.pexels.com/photos/7689149/pexels-photo-7689149.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { name: 'Northern Lights', hint: 'indica cannabis', image: 'https://images.pexels.com/photos/7700261/pexels-photo-7700261.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { name: 'Bubba Kush', hint: 'indica cannabis', tag: 'New', image: 'https://images.pexels.com/photos/7700263/pexels-photo-7700263.jpeg?auto=compress&cs=tinysrgb&w=600' },
+  { name: 'Durban Poison', hint: 'sativa cannabis', image: 'https://images.pexels.com/photos/8132962/pexels-photo-8132962.jpeg?auto=compress&cs=tinysrgb&w=600' },
   { name: 'Concentrate', hint: 'cannabis oil', tag: 'Just In', image: 'https://images.pexels.com/photos/7689150/pexels-photo-7689150.jpeg?auto=compress&cs=tinysrgb&w=600' },
   { name: 'Joint Pack', hint: 'hybrid cannabis', tag: '5% Off', image: 'https://images.pexels.com/photos/8340645/pexels-photo-8340645.jpeg?auto=compress&cs=tinysrgb&w=600' },
 ];
@@ -48,7 +48,7 @@ export function DealsSteals({ onProductClick }: DealsStealsProps) {
         </h2>
       </div>
       <div className="overflow-x-auto no-scrollbar">
-        <div className="flex items-start space-x-4 pb-4 pl-4 md:pl-6">
+        <div className="flex items-start space-x-4 pb-4 pl-4 pr-4 md:pl-6 md:pr-6">
             {deals.map((deal, index) => (
               <button key={index} onClick={() => handleClick(deal)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
                 <div className="relative w-[98px] h-[98px] transition-all duration-300">
