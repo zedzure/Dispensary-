@@ -56,7 +56,7 @@ export type StrainRecommenderInput = { preferences: string };
 // This is the exported function that the frontend will call.
 export async function strainRecommender(input: StrainRecommenderInput): Promise<StrainRecommenderOutput> {
   // Pass only the relevant product data to the model to save tokens and improve reliability.
-  const productsForModel = allProductsFlat.map(({ id, name, category, type, thc, description }) => ({ id, name, category, type, thc, description }));
+  const productsForModel = allProductsFlat.map(({ id, name, category, type, thc }) => ({ id, name, category, type, thc }));
   
   return strainRecommenderFlow({
     preferences: input.preferences,
