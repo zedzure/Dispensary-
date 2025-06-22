@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -25,8 +26,8 @@ const ProductSchema = z.object({
     name: z.string(),
     category: z.string(),
     type: z.enum(['Sativa', 'Indica', 'Hybrid']).optional(),
-    thc: z.number().optional(),
-    price: z.number().optional(),
+    thc: z.coerce.number().optional(),
+    price: z.coerce.number().optional(),
     description: z.string(),
     image: z.string(),
     hint: z.string(),
