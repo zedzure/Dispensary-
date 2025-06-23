@@ -9,6 +9,9 @@ interface CategoryCirclesProps {
 
 export function CategoryCircles({ onProductClick }: CategoryCirclesProps) {
   const handleClick = (category: typeof categories[0]) => {
+    if (category.name === 'Coming Soon') {
+      return;
+    }
     const representativeProduct: Product = {
       id: `cat-${category.name.toLowerCase().replace(' ', '-')}`,
       name: `Featured ${category.name}`,
@@ -27,7 +30,12 @@ export function CategoryCircles({ onProductClick }: CategoryCirclesProps) {
     <div className="overflow-x-auto no-scrollbar">
       <div className="flex px-4 md:px-6 space-x-4 pb-4">
           {categories.map((category) => (
-            <button key={category.name} onClick={() => handleClick(category)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
+            <button
+              key={category.name}
+              onClick={() => handleClick(category)}
+              className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={category.name === 'Coming Soon'}
+            >
               <div className="relative w-[98px] h-[98px] transition-all duration-300">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-500"></div>
                 <div className="absolute inset-0.5 bg-card rounded-full"></div>

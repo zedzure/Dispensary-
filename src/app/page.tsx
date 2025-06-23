@@ -87,15 +87,21 @@ export default function Home() {
                 <div className="container mx-auto px-4 md:px-6">
                   <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8 text-primary">{category.name}</h2>
                 </div>
-                <div className="overflow-x-auto no-scrollbar">
-                  <ul className="flex flex-nowrap items-stretch gap-6 py-4 pl-4 pr-4 md:pl-6 md:pr-6">
-                    {allProducts[category.name].map((product) => (
-                      <li key={product.id} className="flex-shrink-0 w-64 sm:w-72">
-                        <ProductCard product={product} onProductClick={handleProductClick} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {category.name === 'Coming Soon' ? (
+                  <div className="container mx-auto px-4 md:px-6">
+                    <p className="text-lg text-muted-foreground">Check back soon for new products!</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto no-scrollbar">
+                    <ul className="flex flex-nowrap items-stretch gap-6 py-4 pl-4 pr-4 md:pl-6 md:pr-6">
+                      {allProducts[category.name] && allProducts[category.name].map((product) => (
+                        <li key={product.id} className="flex-shrink-0 w-64 sm:w-72">
+                          <ProductCard product={product} onProductClick={handleProductClick} />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             ))}
           </div>

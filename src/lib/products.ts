@@ -6,7 +6,7 @@ const placeholderHint = 'cannabis product';
 export const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint', image: placeholderImage },
   { name: 'Flower', hint: 'cannabis bud', image: placeholderImage },
-  { name: 'Seeds', hint: 'cannabis seed', image: placeholderImage },
+  { name: 'Coming Soon', hint: 'coming soon', image: 'https://placehold.co/90x90.png' },
   { name: 'Edibles', hint: 'gummy candy', image: placeholderImage },
   { name: 'Concentrates', hint: 'cannabis oil', image: placeholderImage },
   { name: 'Tinctures', hint: 'dropper bottle', image: placeholderImage },
@@ -42,7 +42,9 @@ export const generateProducts = (category: { name: string, hint: string }, count
 };
 
 export const allProducts = categories.reduce((acc, category) => {
-  acc[category.name] = generateProducts(category, 10);
+  if (category.name !== 'Coming Soon') {
+    acc[category.name] = generateProducts(category, 10);
+  }
   return acc;
 }, {} as Record<string, Product[]>);
 
