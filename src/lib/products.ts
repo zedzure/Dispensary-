@@ -6,7 +6,7 @@ const placeholderHint = 'cannabis product';
 export const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint', image: placeholderImage },
   { name: 'Flower', hint: 'cannabis bud', image: placeholderImage },
-  { name: 'Coming Soon', hint: 'coming soon', image: 'https://placehold.co/90x90.png' },
+  { name: 'Seeds', hint: 'cannabis seeds', image: placeholderImage },
   { name: 'Edibles', hint: 'gummy candy', image: placeholderImage },
   { name: 'Concentrates', hint: 'cannabis oil', image: placeholderImage },
   { name: 'Tinctures', hint: 'dropper bottle', image: placeholderImage },
@@ -36,7 +36,7 @@ export const generateProducts = (category: { name: string, hint: string }, count
         price: ((i * 7) % 40) + 20,
         description: `An exquisite ${category.name.toLowerCase()} with a unique profile. Known for its ${randomEffect1} and ${randomEffect2} effects, it features a ${randomFlavor1} aroma with notes of ${randomFlavor2}. Perfect for both new and experienced users.`,
         image: placeholderImage,
-        hint: placeholderHint,
+        hint: category.hint || placeholderHint,
     };
   });
 };
