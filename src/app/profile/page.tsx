@@ -75,13 +75,18 @@ export default function ProfilePage() {
     <div className="flex flex-col min-h-screen bg-muted/20 text-foreground">
       <Header />
       <main className="flex-grow container mx-auto px-4 md:px-6 py-8 pb-24 md:pb-8">
-        <div className="flex items-center gap-4 mb-8">
-            <Button variant="ghost" size="icon" asChild>
-                <Link href="/">
-                    <ArrowLeft className="h-5 w-5" />
-                </Link>
+        <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+                <Button variant="ghost" size="icon" asChild>
+                    <Link href="/">
+                        <ArrowLeft className="h-5 w-5" />
+                    </Link>
+                </Button>
+                <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
+            </div>
+            <Button variant="outline" size="sm" onClick={logout}>
+                <LogOut className="mr-2 h-4 w-4" /> Logout
             </Button>
-            <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -131,9 +136,6 @@ export default function ProfilePage() {
                 <CardContent className="space-y-2">
                     <Button variant="ghost" className="w-full justify-start"><ShoppingBag className="mr-2"/> Start New Order</Button>
                     <Button variant="ghost" className="w-full justify-start"><MapPin className="mr-2"/> Manage Locations</Button>
-                    <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive/90 hover:bg-destructive/10" onClick={logout}>
-                        <LogOut className="mr-2"/> Logout
-                    </Button>
                 </CardContent>
             </Card>
 
