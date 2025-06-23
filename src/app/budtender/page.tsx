@@ -90,40 +90,40 @@ export default function BudtenderDashboard() {
 
         {/* Stat Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card>
+          <Card className="shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <DollarSign className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">$45,231.89</div>
               <p className="text-xs text-muted-foreground">+20.1% from last month</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">New Customers</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Users className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">+235</div>
               <p className="text-xs text-muted-foreground">+18.1% from last month</p>
             </CardContent>
           </Card>
-           <Card>
+           <Card className="shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Orders Today</CardTitle>
-              <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+              <ShoppingBag className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">+12</div>
               <p className="text-xs text-muted-foreground">+5 vs yesterday</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Avg. Order Value</CardTitle>
-              <BarChart className="h-4 w-4 text-muted-foreground" />
+              <BarChart className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">$92.50</div>
@@ -135,7 +135,7 @@ export default function BudtenderDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Recent Orders Table */}
           <div className="lg:col-span-2">
-            <Card>
+            <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle>Recent Orders</CardTitle>
                 <CardDescription>A list of the most recent customer orders.</CardDescription>
@@ -160,7 +160,12 @@ export default function BudtenderDashboard() {
                         <TableCell className="text-center">{order.items}</TableCell>
                         <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
                         <TableCell className="text-center">
-                            <Badge variant={order.status === 'Completed' ? 'default' : 'secondary'}>{order.status}</Badge>
+                            <Badge 
+                                variant={order.status === 'Pending' ? 'destructive' : (order.status === 'Completed' ? 'default' : 'secondary')}
+                                className={order.status === 'Pending' ? 'animate-pulse' : ''}
+                            >
+                                {order.status}
+                            </Badge>
                         </TableCell>
                          <TableCell className="text-right">
                             <Button variant="outline" size="sm">View</Button>
@@ -175,7 +180,7 @@ export default function BudtenderDashboard() {
 
           {/* Top Products */}
           <div>
-            <Card>
+            <Card className="shadow-lg">
                <CardHeader>
                 <CardTitle>Top Selling Products</CardTitle>
                 <CardDescription>Your most popular items this month.</CardDescription>

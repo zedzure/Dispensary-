@@ -83,7 +83,7 @@ export function StrainRecommenderForm() {
   return (
     <>
     <div className="w-full max-w-4xl mx-auto">
-      <Card className="bg-card shadow-xl border-border/60">
+      <Card className="bg-card shadow-lg border-border/60">
         <CardHeader className="text-center items-center">
           <Sparkles className="h-10 w-10 text-primary mb-4" />
           <CardTitle className="text-3xl font-semibold tracking-tight">AI Strain Finder</CardTitle>
