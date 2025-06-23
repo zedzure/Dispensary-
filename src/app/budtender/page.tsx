@@ -238,7 +238,7 @@ export default function BudtenderDashboard() {
                 <CardHeader>
                   <CardTitle>Top Selling Products</CardTitle>
                   <CardDescription>Your most popular items this month.</CardDescription>
-                </Header>
+                </CardHeader>
                 <CardContent className="space-y-4">
                   {topProducts.map((product) => (
                       <div key={product.name} className="flex items-center">
