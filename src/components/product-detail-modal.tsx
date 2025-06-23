@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -33,7 +32,25 @@ export function ProductDetailModal({ product, isOpen, onOpenChange }: ProductDet
           <span>Added to cart!</span>
         </div>
       ),
-      description: `${product.name} is now in your cart.`,
+      description: (
+        <div className="flex items-start gap-4 mt-2">
+          <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md">
+            <Image
+              src={product.image}
+              alt={product.name}
+              data-ai-hint={product.hint}
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-foreground">{product.name}</p>
+            <p className="text-sm font-bold text-primary">
+              ${product.price?.toFixed(2)}
+            </p>
+          </div>
+        </div>
+      ),
     });
     onOpenChange(false);
   };
