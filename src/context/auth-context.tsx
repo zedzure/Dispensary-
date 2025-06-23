@@ -3,15 +3,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-
-interface User {
-  name: string;
-  email: string;
-  memberSince: string;
-  avatarUrl: string;
-  points: number;
-  nextReward: number;
-}
+import type { User } from '@/types/user';
 
 interface AuthContextType {
   user: User | null;
@@ -44,7 +36,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = (userData: User) => {
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
-    router.push('/profile');
+    if (userData.role === 'budtender') {
+      router.push('/budtender');
+    } else {
+      router.push('/profile');
+    }
   };
 
   const logout = () => {

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Leaf, ShoppingCart, User } from "lucide-react";
+import { Leaf, ShoppingCart, User, ClipboardList } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { useCart } from "@/context/cart-context";
@@ -28,22 +28,34 @@ export function Header() {
           <Link href="#recommender" className="text-muted-foreground hover:text-primary transition-colors">Recommender</Link>
         </nav>
         <div className="flex items-center gap-2 md:gap-4">
-          <Button variant="ghost" size="icon" className="relative" onClick={() => setCartOpen(true)}>
-            {totalItems > 0 && (
-              <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{totalItems}</Badge>
-            )}
-            <ShoppingCart className="h-5 w-5" />
-            <span className="sr-only">Cart</span>
-          </Button>
-          {user ? (
-            <Button asChild variant="ghost" size="icon">
-              <Link href="/profile">
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="person face" />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-              </Link>
+          {user?.role !== 'budtender' && (
+            <Button variant="ghost" size="icon" className="relative" onClick={() => setCartOpen(true)}>
+              {totalItems > 0 && (
+                <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{totalItems}</Badge>
+              )}
+              <ShoppingCart className="h-5 w-5" />
+              <span className="sr-only">Cart</span>
             </Button>
+          )}
+
+          {user ? (
+            user.role === 'budtender' ? (
+              <Button asChild variant="outline" size="sm">
+                <Link href="/budtender">
+                  <ClipboardList className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild variant="ghost" size="icon">
+                <Link href="/profile">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="person face" />
+                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                </Link>
+              </Button>
+            )
           ) : (
             <Button variant="default" size="sm" asChild>
               <Link href="/login">

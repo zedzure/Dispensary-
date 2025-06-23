@@ -13,6 +13,7 @@ import Link from "next/link";
 import { BottomNavBar } from "@/components/bottom-nav-bar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/auth-context";
+import type { User } from "@/types/user";
 
 const GoogleIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="h-5 w-5 mr-2">
@@ -38,16 +39,32 @@ export default function LoginPage() {
   const [signUpPassword, setSignUpPassword] = useState("");
 
   const handleLogin = () => {
-    if (loginEmail === "kim.l@silzeypos.com" && loginPassword === "Dancer$5109") {
-      const loggedInUser = {
-        name: "Kim L.",
-        email: "kim.l@silzeypos.com",
-        memberSince: "2024",
-        avatarUrl: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
-        points: 2500,
-        nextReward: 3000,
-      };
-      login(loggedInUser);
+    let loggedInUser: User | null = null;
+    
+    if (loginEmail.toLowerCase() === "budtenderone@gmsil.com" && loginPassword === "Dancer$5109") {
+        loggedInUser = {
+            name: "Budtender One",
+            email: "budtenderone@gmsil.com",
+            memberSince: "2024",
+            avatarUrl: "https://images.pexels.com/photos/3777943/pexels-photo-3777943.jpeg?auto=compress&cs=tinysrgb&w=400",
+            points: 0,
+            nextReward: 0,
+            role: 'budtender',
+        };
+    } else if (loginEmail === "kim.l@silzeypos.com" && loginPassword === "Dancer$5109") {
+        loggedInUser = {
+            name: "Kim L.",
+            email: "kim.l@silzeypos.com",
+            memberSince: "2024",
+            avatarUrl: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
+            points: 2500,
+            nextReward: 3000,
+            role: 'customer',
+        };
+    }
+    
+    if (loggedInUser) {
+        login(loggedInUser);
     } else {
       toast({
         variant: "destructive",
@@ -67,13 +84,14 @@ export default function LoginPage() {
       return;
     }
 
-    const newUser = {
+    const newUser: User = {
       name: signUpName,
       email: signUpEmail,
       memberSince: new Date().getFullYear().toString(),
       avatarUrl: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
       points: 0,
       nextReward: 1000,
+      role: 'customer',
     };
     login(newUser);
     toast({
