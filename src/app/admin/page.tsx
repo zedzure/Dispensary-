@@ -14,6 +14,8 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Pie, Pie
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CustomerManagement } from '@/components/admin/customer-management';
 
 const chartConfigSales = { sales: { label: "Sales", color: "hsl(var(--chart-1))" } } satisfies ChartConfig;
 const chartConfigCustomers = { customers: { label: "New Customers", color: "hsl(var(--chart-2))" } } satisfies ChartConfig;
@@ -386,8 +388,8 @@ export default function AdminDashboardPage() {
         <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Admin</h1>
-                    <p className="text-muted-foreground">Welcome, {user.name}. View your analytics.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">Admin Portal</h1>
+                    <p className="text-muted-foreground">Welcome, {user.name}. Manage your store.</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" size="icon">
@@ -399,7 +401,24 @@ export default function AdminDashboardPage() {
                     </Button>
                 </div>
             </div>
-            <AdminAnalytics />
+
+            <Tabs defaultValue="dashboard" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="dashboard">
+                  <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
+                </TabsTrigger>
+                <TabsTrigger value="customers">
+                  <Users className="mr-2 h-4 w-4" /> Customers
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="dashboard">
+                <AdminAnalytics />
+              </TabsContent>
+              <TabsContent value="customers">
+                <CustomerManagement />
+              </TabsContent>
+            </Tabs>
+            
         </main>
         <Footer />
     </div>
