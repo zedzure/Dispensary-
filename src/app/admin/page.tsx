@@ -17,7 +17,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!isLoading && (!user || user.role !== 'admin')) {
-      router.replace('/admin/login');
+      router.replace('/login');
     }
   }, [user, isLoading, router]);
 

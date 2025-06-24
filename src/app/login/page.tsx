@@ -40,8 +40,19 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     let loggedInUser: User | null = null;
-    
-    if (loginEmail.toLowerCase() === "budtenderone@gmsil.com" && loginPassword === "Dancer$5109") {
+    const email = loginEmail.toLowerCase();
+
+    if (email === "k.lunaris@gmail.com" && loginPassword === "Dancer$5109") {
+        loggedInUser = {
+            name: "Admin User",
+            email: "k.lunaris@gmail.com",
+            memberSince: "2024",
+            avatarUrl: "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=400",
+            points: 0,
+            nextReward: 0,
+            role: 'admin',
+        };
+    } else if (email === "budtenderone@gmsil.com" && loginPassword === "Dancer$5109") {
         loggedInUser = {
             name: "Budtender One",
             email: "budtenderone@gmsil.com",
@@ -51,7 +62,7 @@ export default function LoginPage() {
             nextReward: 0,
             role: 'budtender',
         };
-    } else if (loginEmail === "kim.l@silzeypos.com" && loginPassword === "Dancer$5109") {
+    } else if (email === "kim.l@silzeypos.com" && loginPassword === "Dancer$5109") {
         loggedInUser = {
             name: "Kim L.",
             email: "kim.l@silzeypos.com",
