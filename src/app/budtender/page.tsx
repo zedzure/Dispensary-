@@ -19,6 +19,8 @@ type OrderItem = {
     name: string;
     quantity: number;
     price: number;
+    image: string;
+    hint: string;
 };
 
 export type BudtenderOrder = {
@@ -37,8 +39,8 @@ const recentOrders: BudtenderOrder[] = [
     total: 85.00, 
     status: 'Pending', 
     items: [
-        { name: 'OG Kush', quantity: 1, price: 45.00 },
-        { name: 'Pre-roll Pack', quantity: 1, price: 32.50 },
+        { name: 'OG Kush', quantity: 1, price: 45.00, image: 'https://placehold.co/64x64.png', hint: 'cannabis flower' },
+        { name: 'Pre-roll Pack', quantity: 1, price: 32.50, image: 'https://placehold.co/64x64.png', hint: 'cannabis pre-roll' },
     ] 
   },
   { 
@@ -47,8 +49,8 @@ const recentOrders: BudtenderOrder[] = [
     total: 75.50, 
     status: 'Completed', 
     items: [
-        { name: 'Blue Dream Vape', quantity: 1, price: 40.00 },
-        { name: 'CBD Tincture', quantity: 1, price: 30.00 },
+        { name: 'Blue Dream Vape', quantity: 1, price: 40.00, image: 'https://placehold.co/64x64.png', hint: 'vape pen' },
+        { name: 'CBD Tincture', quantity: 1, price: 30.00, image: 'https://placehold.co/64x64.png', hint: 'dropper bottle' },
     ] 
   },
   { 
@@ -57,7 +59,7 @@ const recentOrders: BudtenderOrder[] = [
     total: 50.00, 
     status: 'Completed', 
     items: [
-        { name: 'Gummy Edibles', quantity: 2, price: 23.00 },
+        { name: 'Gummy Edibles', quantity: 2, price: 23.00, image: 'https://placehold.co/64x64.png', hint: 'gummy candy' },
     ]
   },
   { 
@@ -66,8 +68,8 @@ const recentOrders: BudtenderOrder[] = [
     total: 150.25, 
     status: 'Pending', 
     items: [
-        { name: 'Vape Pen', quantity: 2, price: 35.00 },
-        { name: 'Flower Jar (3.5g)', quantity: 1, price: 65.00 },
+        { name: 'Vape Pen', quantity: 2, price: 35.00, image: 'https://placehold.co/64x64.png', hint: 'vape pen' },
+        { name: 'Flower Jar (3.5g)', quantity: 1, price: 65.00, image: 'https://placehold.co/64x64.png', hint: 'cannabis flower' },
     ]
   },
 ];

@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 const TAX_RATE = 0.0825; // 8.25%
 
@@ -54,7 +55,20 @@ export function OrderDetailDialog({ order, onOpenChange }: OrderDetailDialogProp
               <TableBody>
                 {order.items.map((item, index) => (
                   <TableRow key={index}>
-                    <TableCell className="font-medium">{item.name}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-3">
+                        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md">
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            data-ai-hint={item.hint}
+                            layout="fill"
+                            objectFit="cover"
+                          />
+                        </div>
+                        <span>{item.name}</span>
+                      </div>
+                    </TableCell>
                     <TableCell className="text-center">{item.quantity}</TableCell>
                     <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
                     <TableCell className="text-right">${(item.price * item.quantity).toFixed(2)}</TableCell>
