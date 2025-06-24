@@ -38,6 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
     if (userData.role === 'budtender') {
       router.push('/budtender');
+    } else if (userData.role === 'admin') {
+      router.push('/admin');
     } else {
       router.push('/profile');
     }

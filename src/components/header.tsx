@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Leaf, ShoppingCart, User, ClipboardList } from "lucide-react";
+import { Leaf, ShoppingCart, User, ClipboardList, Shield } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { useCart } from "@/context/cart-context";
@@ -28,7 +28,7 @@ export function Header() {
           <Link href="#recommender" className="text-muted-foreground hover:text-primary transition-colors">Recommender</Link>
         </nav>
         <div className="flex items-center gap-2 md:gap-4">
-          {user?.role !== 'budtender' && (
+          {user?.role !== 'budtender' && user?.role !== 'admin' && (
             <Button variant="ghost" size="icon" className="relative" onClick={() => setCartOpen(true)}>
               {totalItems > 0 && (
                 <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{totalItems}</Badge>
@@ -44,6 +44,13 @@ export function Header() {
                 <Link href="/budtender">
                   <ClipboardList className="mr-2 h-4 w-4" />
                   Dashboard
+                </Link>
+              </Button>
+            ) : user.role === 'admin' ? (
+              <Button asChild variant="destructive" size="sm">
+                <Link href="/admin">
+                  <Shield className="mr-2 h-4 w-4" />
+                  Admin
                 </Link>
               </Button>
             ) : (

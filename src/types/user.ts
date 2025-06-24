@@ -5,5 +5,5 @@ export interface User {
   avatarUrl: string;
   points: number;
   nextReward: number;
-  role: 'customer' | 'budtender';
+  role: 'customer' | 'budtender' | 'admin';
 }
