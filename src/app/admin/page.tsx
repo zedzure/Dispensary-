@@ -194,8 +194,8 @@ function AdminAnalytics() {
               <Skeleton className="h-5 w-1/3 mb-2" />
               <Skeleton className="h-4 w-2/3" />
             </CardHeader>
-            <CardContent className="h-[300px] flex items-center justify-center">
-              <div className="w-10 h-10 border-4 border-t-primary/50 border-primary rounded-full animate-spin"></div>
+            <CardContent>
+              <Skeleton className="h-[250px] w-full" />
             </CardContent>
           </Card>
         ))}
@@ -327,7 +327,7 @@ function AdminAnalytics() {
   return (
     <div className="flex flex-col gap-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <h1 className="text-3xl font-bold text-primary flex items-center">
+            <h1 className="text-3xl font-bold font-cursive text-primary flex items-center">
                 <LayoutDashboard className="mr-3 h-8 w-8" />
                 Admin Dashboard
             </h1>
@@ -388,7 +388,7 @@ export default function AdminDashboardPage() {
         <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Admin Portal</h1>
+                    <h1 className="text-3xl font-bold font-cursive tracking-tight">Admin Portal</h1>
                     <p className="text-muted-foreground">Welcome, {user.name}. Manage your store.</p>
                 </div>
                 <div className="flex items-center gap-2">
