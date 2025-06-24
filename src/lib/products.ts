@@ -37,6 +37,7 @@ export const generateProducts = (category: { name: string, hint: string }, count
         description: `An exquisite ${category.name.toLowerCase()} with a unique profile. Known for its ${randomEffect1} and ${randomEffect2} effects, it features a ${randomFlavor1} aroma with notes of ${randomFlavor2}. Perfect for both new and experienced users.`,
         image: placeholderImage,
         hint: category.hint || placeholderHint,
+        stock: Math.floor(Math.random() * 150),
     };
   });
 };

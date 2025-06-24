@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomerManagement } from '@/components/admin/customer-management';
+import { InventoryManagement } from '@/components/admin/inventory-management';
 
 const chartConfigSales = { sales: { label: "Sales", color: "hsl(var(--chart-1))" } } satisfies ChartConfig;
 const chartConfigCustomers = { customers: { label: "New Customers", color: "hsl(var(--chart-2))" } } satisfies ChartConfig;
@@ -403,12 +404,15 @@ export default function AdminDashboardPage() {
             </div>
 
             <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
                 <TabsTrigger value="dashboard">
                   <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
                 </TabsTrigger>
                 <TabsTrigger value="customers">
                   <Users className="mr-2 h-4 w-4" /> Customers
+                </TabsTrigger>
+                <TabsTrigger value="inventory">
+                  <Package className="mr-2 h-4 w-4" /> Inventory
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="dashboard">
@@ -416,6 +420,9 @@ export default function AdminDashboardPage() {
               </TabsContent>
               <TabsContent value="customers">
                 <CustomerManagement />
+              </TabsContent>
+              <TabsContent value="inventory">
+                <InventoryManagement />
               </TabsContent>
             </Tabs>
             
