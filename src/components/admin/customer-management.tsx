@@ -1,9 +1,9 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Users, UserPlus, Mail, CalendarDays, DollarSign, Search, ArrowUpDown } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Users, UserPlus, Mail, CalendarDays, DollarSign, Search, ArrowUpDown, MoreVertical } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -122,7 +122,7 @@ export function CustomerManagement() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold font-cursive text-primary flex items-center">
           <Users className="mr-3 h-8 w-8" />
           Customer Management
@@ -136,12 +136,12 @@ export function CustomerManagement() {
         <CardHeader>
           <CardTitle>All Customers ({sortedAndFilteredCustomers.length})</CardTitle>
           <CardDescription>View, manage, and segment customer information.</CardDescription>
-           <div className="pt-4 flex items-center gap-3">
-            <div className="relative flex-grow">
+           <div className="pt-4 flex flex-col sm:flex-row items-center gap-3">
+            <div className="relative flex-grow w-full">
               <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input 
-                placeholder="Search customers by name, email, or ID..." 
-                className="pl-8"
+                placeholder="Search customers..." 
+                className="pl-8 w-full"
                 value={searchTerm}
                 onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1);}}
               />
@@ -149,7 +149,7 @@ export function CustomerManagement() {
             {selectedCustomerIds.size > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline">Actions ({selectedCustomerIds.size})</Button>
+                  <Button variant="outline" className="w-full sm:w-auto">Actions ({selectedCustomerIds.size})</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>Email Selected</DropdownMenuItem>
@@ -162,75 +162,127 @@ export function CustomerManagement() {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">
-                  <Checkbox 
-                    checked={selectedCustomerIds.size === paginatedCustomers.length && paginatedCustomers.length > 0}
-                    onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
-                    aria-label="Select all customers on this page"
-                  />
-                </TableHead>
-                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('name')}>
-                  Name <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortKey === 'name' ? 'opacity-100' : 'opacity-30'}`} />
-                </TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('joinDate')}>
-                  <CalendarDays className="inline-block mr-1 h-4 w-4" />Joined <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortKey === 'joinDate' ? 'opacity-100' : 'opacity-30'}`} />
-                </TableHead>
-                <TableHead className="cursor-pointer hover:bg-muted/50 text-right" onClick={() => handleSort('totalSpent')}>
-                  <DollarSign className="inline-block mr-1 h-4 w-4" />Spent <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortKey === 'totalSpent' ? 'opacity-100' : 'opacity-30'}`} />
-                </TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedCustomers.map((customer) => (
-                <TableRow key={customer.id} data-state={selectedCustomerIds.has(customer.id) ? "selected" : ""}>
-                  <TableCell>
+          {/* Desktop View */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50px]">
                     <Checkbox 
-                      checked={selectedCustomerIds.has(customer.id)}
-                      onCheckedChange={(checked) => handleSelectCustomer(customer.id, Boolean(checked))}
-                      aria-label={`Select customer ${customer.name}`}
+                      checked={selectedCustomerIds.size === paginatedCustomers.length && paginatedCustomers.length > 0}
+                      onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
+                      aria-label="Select all customers on this page"
                     />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9">
+                  </TableHead>
+                  <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('name')}>
+                    Name <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortKey === 'name' ? 'opacity-100' : 'opacity-30'}`} />
+                  </TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('joinDate')}>
+                    <CalendarDays className="inline-block mr-1 h-4 w-4" />Joined <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortKey === 'joinDate' ? 'opacity-100' : 'opacity-30'}`} />
+                  </TableHead>
+                  <TableHead className="cursor-pointer hover:bg-muted/50 text-right" onClick={() => handleSort('totalSpent')}>
+                    <DollarSign className="inline-block mr-1 h-4 w-4" />Spent <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortKey === 'totalSpent' ? 'opacity-100' : 'opacity-30'}`} />
+                  </TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedCustomers.map((customer) => (
+                  <TableRow key={customer.id} data-state={selectedCustomerIds.has(customer.id) ? "selected" : ""}>
+                    <TableCell>
+                      <Checkbox 
+                        checked={selectedCustomerIds.has(customer.id)}
+                        onCheckedChange={(checked) => handleSelectCustomer(customer.id, Boolean(checked))}
+                        aria-label={`Select customer ${customer.name}`}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9">
+                          <AvatarImage src={customer.avatarUrl} alt={customer.name} data-ai-hint={customer.aiHint} />
+                          <AvatarFallback>{customer.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <span className="font-medium">{customer.name}</span>
+                          {customer.tags && customer.tags.length > 0 && (
+                            <div className="flex gap-1 mt-1">
+                              {customer.tags.map(tag => <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>)}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>{customer.email}</div>
+                      <div className="text-xs text-muted-foreground">{customer.id}</div>
+                    </TableCell>
+                    <TableCell>{new Date(customer.joinDate).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right">${customer.totalSpent.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="h-4 w-4" /></Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          {/* Mobile View */}
+          <div className="space-y-4 md:hidden">
+            {paginatedCustomers.map((customer) => (
+              <Card key={customer.id} className={`border-border/60 ${selectedCustomerIds.has(customer.id) ? 'border-primary' : ''}`}>
+                <CardHeader className="flex flex-row items-start gap-4 p-4">
+                   <Checkbox 
+                        checked={selectedCustomerIds.has(customer.id)}
+                        onCheckedChange={(checked) => handleSelectCustomer(customer.id, Boolean(checked))}
+                        aria-label={`Select customer ${customer.name}`}
+                        className="mt-1"
+                    />
+                  <div className="flex items-start gap-4 flex-1">
+                    <Avatar className="h-10 w-10">
                         <AvatarImage src={customer.avatarUrl} alt={customer.name} data-ai-hint={customer.aiHint} />
                         <AvatarFallback>{customer.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <span className="font-medium">{customer.name}</span>
+                    </Avatar>
+                    <div className="flex-1">
+                        <p className="font-semibold">{customer.name}</p>
+                        <p className="text-sm text-muted-foreground">{customer.email}</p>
                         {customer.tags && customer.tags.length > 0 && (
-                          <div className="flex gap-1 mt-1">
+                          <div className="flex flex-wrap gap-1 mt-2">
                             {customer.tags.map(tag => <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>)}
                           </div>
                         )}
-                      </div>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>{customer.email}</div>
-                    <div className="text-xs text-muted-foreground">{customer.id}</div>
-                  </TableCell>
-                  <TableCell>{new Date(customer.joinDate).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-right">${customer.totalSpent.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">View</Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {paginatedCustomers.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                    No customers found matching your criteria.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 -mt-2"><MoreVertical className="h-4 w-4" /></Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>View Customer</DropdownMenuItem>
+                        <DropdownMenuItem>Send Email</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <div className="flex justify-between items-center text-sm border-t pt-4">
+                      <div className="text-muted-foreground">
+                        <p>Total Spent</p>
+                        <p className="font-bold text-foreground">${customer.totalSpent.toFixed(2)}</p>
+                      </div>
+                      <div className="text-muted-foreground text-right">
+                        <p>Joined</p>
+                        <p className="font-bold text-foreground">{new Date(customer.joinDate).toLocaleDateString()}</p>
+                      </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          {paginatedCustomers.length === 0 && (
+            <div className="h-24 text-center flex items-center justify-center text-muted-foreground">
+              No customers found matching your criteria.
+            </div>
+          )}
         </CardContent>
         {totalPages > 1 && (
           <div className="p-4 border-t flex items-center justify-between">

@@ -7,10 +7,10 @@ import { useAuth } from '@/context/auth-context';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, Users, ShoppingBag, BarChart, LogOut, Settings, Bell } from 'lucide-react';
+import { DollarSign, Users, ShoppingBag, BarChart, LogOut, Settings, Bell, MoreVertical } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OrderDetailDialog } from '@/components/order-detail-dialog';
 
@@ -124,7 +124,7 @@ export default function BudtenderDashboard() {
       <div className="flex flex-col min-h-screen bg-muted/40">
         <Header />
         <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Budtender Dashboard</h1>
               <p className="text-muted-foreground">Welcome back, {user.name}. Here's your dispensary overview.</p>
@@ -189,7 +189,7 @@ export default function BudtenderDashboard() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Recent Orders Table */}
+            {/* Recent Orders */}
             <div className="lg:col-span-2">
               <Card className="shadow-lg">
                 <CardHeader>
@@ -197,39 +197,70 @@ export default function BudtenderDashboard() {
                   <CardDescription>A list of the most recent customer orders.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Order ID</TableHead>
-                        <TableHead>Customer</TableHead>
-                        <TableHead>Items</TableHead>
-                        <TableHead className="text-right">Total</TableHead>
-                        <TableHead className="text-center">Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {recentOrders.map((order) => (
-                        <TableRow key={order.id}>
-                          <TableCell className="font-medium">{order.id}</TableCell>
-                          <TableCell>{order.customer}</TableCell>
-                          <TableCell className="text-center">{totalItemsInOrder(order.items)}</TableCell>
-                          <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
-                          <TableCell className="text-center">
-                              <Badge 
-                                  variant={order.status === 'Pending' ? 'destructive' : (order.status === 'Completed' ? 'default' : 'secondary')}
-                                  className={order.status === 'Pending' ? 'animate-pulse' : ''}
-                              >
-                                  {order.status}
-                              </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                              <Button variant="outline" size="sm" onClick={() => setSelectedOrder(order)}>View</Button>
-                          </TableCell>
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Order ID</TableHead>
+                          <TableHead>Customer</TableHead>
+                          <TableHead>Items</TableHead>
+                          <TableHead className="text-right">Total</TableHead>
+                          <TableHead className="text-center">Status</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {recentOrders.map((order) => (
+                          <TableRow key={order.id}>
+                            <TableCell className="font-medium">{order.id}</TableCell>
+                            <TableCell>{order.customer}</TableCell>
+                            <TableCell className="text-center">{totalItemsInOrder(order.items)}</TableCell>
+                            <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
+                            <TableCell className="text-center">
+                                <Badge 
+                                    variant={order.status === 'Pending' ? 'destructive' : (order.status === 'Completed' ? 'default' : 'secondary')}
+                                    className={order.status === 'Pending' ? 'animate-pulse' : ''}
+                                >
+                                    {order.status}
+                                </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                                <Button variant="outline" size="sm" onClick={() => setSelectedOrder(order)}>View</Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  {/* Mobile Card View */}
+                  <div className="space-y-4 md:hidden">
+                    {recentOrders.map((order) => (
+                       <Card key={order.id} className="border-border/60">
+                         <CardHeader className="flex flex-row items-center justify-between p-4">
+                            <div>
+                                <h3 className="font-semibold">{order.id}</h3>
+                                <p className="text-sm text-muted-foreground">{order.customer}</p>
+                            </div>
+                            <Badge 
+                                variant={order.status === 'Pending' ? 'destructive' : (order.status === 'Completed' ? 'default' : 'secondary')}
+                                className={`${order.status === 'Pending' ? 'animate-pulse' : ''} shrink-0`}
+                            >
+                                {order.status}
+                            </Badge>
+                         </CardHeader>
+                         <CardContent className="p-4 pt-0">
+                           <div className="flex justify-between items-center text-sm">
+                               <span className="text-muted-foreground">{totalItemsInOrder(order.items)} items</span>
+                               <span className="font-bold">${order.total.toFixed(2)}</span>
+                           </div>
+                         </CardContent>
+                         <CardFooter className="p-4 pt-0">
+                            <Button variant="outline" className="w-full" onClick={() => setSelectedOrder(order)}>View Details</Button>
+                         </CardFooter>
+                       </Card>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </div>

@@ -387,7 +387,7 @@ export default function AdminDashboardPage() {
     <div className="flex flex-col min-h-screen bg-muted/40">
         <Header />
         <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold font-cursive tracking-tight">Admin Portal</h1>
                     <p className="text-muted-foreground">Welcome, {user.name}. Manage your store.</p>
@@ -404,14 +404,14 @@ export default function AdminDashboardPage() {
             </div>
 
             <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-4">
-                <TabsTrigger value="dashboard">
+              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 mb-4 h-auto sm:h-10">
+                <TabsTrigger value="dashboard" className="py-2 sm:py-1.5">
                   <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
                 </TabsTrigger>
-                <TabsTrigger value="customers">
+                <TabsTrigger value="customers" className="py-2 sm:py-1.5">
                   <Users className="mr-2 h-4 w-4" /> Customers
                 </TabsTrigger>
-                <TabsTrigger value="inventory">
+                <TabsTrigger value="inventory" className="py-2 sm:py-1.5">
                   <Package className="mr-2 h-4 w-4" /> Inventory
                 </TabsTrigger>
               </TabsList>

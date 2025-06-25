@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Package, PlusCircle, Edit3, Trash2, PackageSearch, Tag, Layers3 } from 'lucide-react';
+import { Package, PlusCircle, Edit3, Trash2, PackageSearch, Tag, Layers3, MoreVertical } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from "@/hooks/use-toast";
 import type { Product } from '@/types/product';
 import { allProductsFlat, categories } from '@/lib/products';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const getStockStatus = (stock: number): { text: string; variant: "default" | "secondary" | "destructive" | "outline" } => {
   if (stock <= 0) return { text: 'Out of Stock', variant: 'destructive' };
@@ -133,7 +139,7 @@ export function InventoryManagement() {
   return (
     <>
       <div className="flex flex-col gap-8">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <h1 className="text-3xl font-bold font-cursive text-primary flex items-center">
             <Package className="mr-3 h-8 w-8" />
             Inventory Management
@@ -245,51 +251,97 @@ export function InventoryManagement() {
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="hidden md:table-cell w-[120px]">Product ID</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead><Layers3 className="inline-block mr-1 h-4 w-4" />Category</TableHead>
-                  <TableHead className="text-center">Stock</TableHead>
-                  <TableHead className="text-right"><Tag className="inline-block mr-1 h-4 w-4" />Price</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedInventory.map((item) => {
-                  const stockInfo = getStockStatus(item.stock ?? 0);
-                  return (
-                    <TableRow key={item.id}>
-                      <TableCell className="hidden md:table-cell font-medium text-xs">{item.id}</TableCell>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.category}</TableCell>
-                      <TableCell className="text-center">{item.stock ?? 0}</TableCell>
-                      <TableCell className="text-right">${(item.price ?? 0).toFixed(2)}</TableCell>
-                      <TableCell>
-                        <Badge variant={stockInfo.variant}>{stockInfo.text}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenForm(item)}>
-                          <Edit3 className="h-4 w-4" /> <span className="sr-only">Edit</span>
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => openDeleteConfirm(item)}>
-                          <Trash2 className="h-4 w-4" /> <span className="sr-only">Delete</span>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-                {paginatedInventory.length === 0 && (
+            {/* Desktop View */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                      No products found matching your criteria.
-                    </TableCell>
+                    <TableHead className="hidden lg:table-cell w-[120px]">Product ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead><Layers3 className="inline-block mr-1 h-4 w-4" />Category</TableHead>
+                    <TableHead className="text-center">Stock</TableHead>
+                    <TableHead className="text-right"><Tag className="inline-block mr-1 h-4 w-4" />Price</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {paginatedInventory.map((item) => {
+                    const stockInfo = getStockStatus(item.stock ?? 0);
+                    return (
+                      <TableRow key={item.id}>
+                        <TableCell className="hidden lg:table-cell font-medium text-xs">{item.id}</TableCell>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.category}</TableCell>
+                        <TableCell className="text-center">{item.stock ?? 0}</TableCell>
+                        <TableCell className="text-right">${(item.price ?? 0).toFixed(2)}</TableCell>
+                        <TableCell>
+                          <Badge variant={stockInfo.variant}>{stockInfo.text}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenForm(item)}>
+                            <Edit3 className="h-4 w-4" /> <span className="sr-only">Edit</span>
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => openDeleteConfirm(item)}>
+                            <Trash2 className="h-4 w-4" /> <span className="sr-only">Delete</span>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+            {/* Mobile View */}
+            <div className="space-y-4 md:hidden">
+              {paginatedInventory.map((item) => {
+                const stockInfo = getStockStatus(item.stock ?? 0);
+                 return (
+                  <Card key={item.id} className="border-border/60">
+                    <CardHeader className="flex flex-row items-start justify-between p-4">
+                      <div>
+                        <p className="font-semibold">{item.name}</p>
+                        <p className="text-sm text-muted-foreground">{item.category}</p>
+                      </div>
+                      <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 -mt-2"><MoreVertical className="h-4 w-4" /></Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleOpenForm(item)}>
+                              <Edit3 className="mr-2 h-4 w-4" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openDeleteConfirm(item)} className="text-destructive">
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-0">
+                      <div className="flex justify-between items-center text-sm border-t pt-4">
+                          <div className="text-muted-foreground">
+                            <p>Price</p>
+                            <p className="font-bold text-foreground">${(item.price ?? 0).toFixed(2)}</p>
+                          </div>
+                          <div className="text-muted-foreground text-center">
+                            <p>Stock</p>
+                            <p className="font-bold text-foreground">{item.stock ?? 0}</p>
+                          </div>
+                          <div className="text-muted-foreground text-right">
+                            <p>Status</p>
+                            <Badge variant={stockInfo.variant} className="mt-1">{stockInfo.text}</Badge>
+                          </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                 )
+              })}
+            </div>
+             {paginatedInventory.length === 0 && (
+                <div className="h-24 text-center flex items-center justify-center text-muted-foreground">
+                  No products found matching your criteria.
+                </div>
+              )}
           </CardContent>
           {totalPages > 1 && (
             <div className="p-4 border-t flex items-center justify-between">
