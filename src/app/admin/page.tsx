@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { LayoutDashboard, Users, DollarSign, Package, ShoppingCart, Activity, CalendarDays, Percent, TrendingUp, TrendingDown, LogOut, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Pie, PieChart, Cell } from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Pie, PieChart, Cell } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from '@/components/ui/skeleton';
@@ -50,6 +50,7 @@ interface DashboardData {
     customerData: { date: string; customers: number }[];
     topProducts: { id: string; name: string; unitsSold: number; revenue: number }[];
     salesByCatData: { name: string; value: number }[];
+    salesByProductTypeData: { name: string; value: number; fill: string }[];
 }
 
 // --- Data Generation --- //
@@ -105,11 +106,11 @@ const generateDashboardData = (period: string): DashboardData => {
     };
 
     const topProducts = [
-        { id: 'P001', name: 'OG Kush Flower', unitsSold: Math.floor(Math.random() * 150) + 50, revenue: Math.floor(Math.random() * 2000) + 1000 },
         { id: 'P002', name: 'Blue Dream Vape', unitsSold: Math.floor(Math.random() * 120) + 40, revenue: Math.floor(Math.random() * 5000) + 2000 },
         { id: 'P003', name: 'Gourmet Gummies', unitsSold: Math.floor(Math.random() * 200) + 60, revenue: Math.floor(Math.random() * 4000) + 1500 },
-        { id: 'P004', name: 'Sativa Pre-Roll Pack', unitsSold: Math.floor(Math.random() * 90) + 30, revenue: Math.floor(Math.random() * 1800) + 900 },
+        { id: 'P001', name: 'OG Kush Flower', unitsSold: Math.floor(Math.random() * 150) + 50, revenue: Math.floor(Math.random() * 2000) + 1000 },
         { id: 'P005', name: 'CBD Tincture Max', unitsSold: Math.floor(Math.random() * 70) + 20, revenue: Math.floor(Math.random() * 3500) + 1200 },
+        { id: 'P004', name: 'Sativa Pre-Roll Pack', unitsSold: Math.floor(Math.random() * 90) + 30, revenue: Math.floor(Math.random() * 1800) + 900 },
     ].sort((a,b) => b.revenue - a.revenue);
     
     const salesByCatData = [
@@ -118,9 +119,15 @@ const generateDashboardData = (period: string): DashboardData => {
       { name: 'Pre-Rolls', value: Math.floor(Math.random() * 5000) + 1000 },
     ];
     
+    const salesByProductTypeData = [
+        { name: 'Hybrid', value: Math.floor(Math.random() * 12000) + 6000, fill: "hsl(var(--chart-3))" },
+        { name: 'Sativa', value: Math.floor(Math.random() * 9000) + 5000, fill: "hsl(var(--chart-1))" },
+        { name: 'Indica', value: Math.floor(Math.random() * 8000) + 4000, fill: "hsl(var(--chart-2))" },
+    ];
+
     return {
         metrics: { totalRevenue, avgOrderValue, newCustomers: totalCustomers, conversionRate, revenueChange: getChange(), aovChange: getChange(), customersChange: getChange(), conversionChange: getChange() },
-        salesData, customerData, topProducts, salesByCatData,
+        salesData, customerData, topProducts, salesByCatData, salesByProductTypeData,
     };
 };
 
@@ -189,7 +196,7 @@ function AdminAnalytics() {
         {[...Array(4)].map((_, i) => <LoadingMetricCard key={i} />)}
       </div>
       <div className="grid gap-6 mt-6 md:grid-cols-1 lg:grid-cols-2">
-        {[...Array(4)].map((_, i) => (
+        {[...Array(6)].map((_, i) => (
            <Card key={i} className="shadow-lg">
             <CardHeader>
               <Skeleton className="h-5 w-1/3 mb-2" />
@@ -209,7 +216,7 @@ function AdminAnalytics() {
         return renderLoadingState();
     }
 
-    const { metrics, salesData, customerData, topProducts, salesByCatData } = dashboardData;
+    const { metrics, salesData, customerData, topProducts, salesByCatData, salesByProductTypeData } = dashboardData;
     
     const chartConfigCategorySales = salesByCatData.reduce((acc, category, index) => {
         acc[category.name] = {
@@ -218,6 +225,16 @@ function AdminAnalytics() {
         };
         return acc;
     }, {} as ChartConfig);
+
+    const chartConfigProductType = salesByProductTypeData.reduce((acc, type) => {
+        acc[type.name] = { label: type.name, color: type.fill };
+        return acc;
+    }, {} as ChartConfig);
+    
+    const chartConfigTopProducts = {
+        revenue: { label: 'Revenue', color: 'hsl(var(--chart-2))' },
+    } satisfies ChartConfig;
+
 
     return (
        <div className="flex flex-col gap-6">
@@ -230,92 +247,100 @@ function AdminAnalytics() {
 
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
             <Card className="shadow-lg">
-            <CardHeader>
-                <CardTitle>Sales Trend</CardTitle>
-                <CardDescription>Revenue over the selected period.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfigSales} className="h-[300px] w-full">
-                <AreaChart accessibilityLayer data={salesData} margin={{ left: 0, right: 12, top:5 }}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                    <YAxis tickFormatter={(value) => `$${Number(value) / 1000}k`} />
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                    <Area dataKey="sales" type="natural" fill="var(--color-sales)" fillOpacity={0.4} stroke="var(--color-sales)" />
-                    <ChartLegend content={<ChartLegendContent />} />
-                </AreaChart>
-                </ChartContainer>
-            </CardContent>
+                <CardHeader>
+                    <CardTitle>Sales Trend</CardTitle>
+                    <CardDescription>Revenue over the selected period.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer config={chartConfigSales} className="h-[300px] w-full">
+                        <AreaChart accessibilityLayer data={salesData} margin={{ left: 0, right: 12, top:5 }}>
+                            <CartesianGrid vertical={false} />
+                            <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                            <YAxis tickFormatter={(value) => `$${Number(value) / 1000}k`} />
+                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                            <Area dataKey="sales" type="natural" fill="var(--color-sales)" fillOpacity={0.4} stroke="var(--color-sales)" />
+                            <ChartLegend content={<ChartLegendContent />} />
+                        </AreaChart>
+                    </ChartContainer>
+                </CardContent>
             </Card>
 
             <Card className="shadow-lg">
-            <CardHeader>
-                <CardTitle>Customer Acquisition</CardTitle>
-                <CardDescription>New customers over the selected period.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfigCustomers} className="h-[300px] w-full">
-                <LineChart accessibilityLayer data={customerData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false}/>
-                    <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                    <YAxis />
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
-                    <Line type="monotone" dataKey="customers" stroke="var(--color-customers)" strokeWidth={2} dot={{ r: 4, fill: "var(--color-customers)", strokeWidth:0 }} activeDot={{ r: 6 }} />
-                    <ChartLegend content={<ChartLegendContent />} />
-                </LineChart>
-                </ChartContainer>
-            </CardContent>
-            </Card>
-        </div>
-        
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-            <Card className="shadow-lg">
                 <CardHeader>
-                <CardTitle className="flex items-center"><Package className="mr-2 h-5 w-5 text-primary"/>Top Selling Products</CardTitle>
-                <CardDescription>Performance of most popular items by revenue.</CardDescription>
+                    <CardTitle>Customer Acquisition</CardTitle>
+                    <CardDescription>New customers over the selected period.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                <Table>
-                    <TableHeader>
-                    <TableRow>
-                        <TableHead>Product</TableHead>
-                        <TableHead className="text-right">Units Sold</TableHead>
-                        <TableHead className="text-right">Revenue</TableHead>
-                    </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                    {topProducts.slice(0,5).map(product => (
-                        <TableRow key={product.id}>
-                        <TableCell>{product.name}</TableCell>
-                        <TableCell className="text-right">{product.unitsSold}</TableCell>
-                        <TableCell className="text-right">${product.revenue.toLocaleString()}</TableCell>
-                        </TableRow>
-                    ))}
-                    </TableBody>
-                </Table>
+                    <ChartContainer config={chartConfigCustomers} className="h-[300px] w-full">
+                        <LineChart accessibilityLayer data={customerData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false}/>
+                            <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                            <YAxis />
+                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+                            <Line type="monotone" dataKey="customers" stroke="var(--color-customers)" strokeWidth={2} dot={{ r: 4, fill: "var(--color-customers)", strokeWidth:0 }} activeDot={{ r: 6 }} />
+                            <ChartLegend content={<ChartLegendContent />} />
+                        </LineChart>
+                    </ChartContainer>
                 </CardContent>
             </Card>
+            
+            <Card className="shadow-lg lg:col-span-2">
+                <CardHeader>
+                    <CardTitle className="flex items-center"><Package className="mr-2 h-5 w-5 text-primary"/>Top Selling Products by Revenue</CardTitle>
+                    <CardDescription>Your most popular items for the selected period.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer config={chartConfigTopProducts} className="w-full h-[250px]">
+                        <BarChart accessibilityLayer data={topProducts} layout="vertical" margin={{ left: 20, right: 20 }}>
+                            <CartesianGrid horizontal={false} />
+                            <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={10} width={120} />
+                            <XAxis dataKey="revenue" type="number" hide />
+                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                            <Bar dataKey="revenue" layout="vertical" fill="var(--color-revenue)" radius={5} />
+                        </BarChart>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+
             <Card className="shadow-lg">
                 <CardHeader>
-                <CardTitle className="flex items-center"><Activity className="mr-2 h-5 w-5 text-primary"/>Sales by Category</CardTitle>
-                <CardDescription>Revenue distribution across categories.</CardDescription>
+                    <CardTitle className="flex items-center"><Activity className="mr-2 h-5 w-5 text-primary"/>Sales by Category</CardTitle>
+                    <CardDescription>Revenue distribution across categories.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex justify-center">
-                <ChartContainer config={chartConfigCategorySales} className="h-[250px] w-full max-w-xs">
+                    <ChartContainer config={chartConfigCategorySales} className="h-[250px] w-full max-w-xs">
+                        <PieChart accessibilityLayer>
+                            <ChartTooltip content={<ChartTooltipContent hideLabel nameKey="name" />} />
+                            <Pie data={salesByCatData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} 
+                                label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                                    const RADIAN = Math.PI / 180;
+                                    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                                    return ( <text x={x} y={y} fill="hsl(var(--primary-foreground))" textAnchor="middle" dominantBaseline="central" className="text-xs font-bold"> {`${(percent * 100).toFixed(0)}%`} </text> );
+                                }}
+                            >
+                            {salesByCatData.map((_, index) => (<Cell key={`cell-${index}`} fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]} />))}
+                            </Pie>
+                            <ChartLegend content={<ChartLegendContent nameKey="name"/>} />
+                        </PieChart>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+            
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle className="flex items-center"><Package className="mr-2 h-5 w-5 text-primary"/>Sales by Product Type</CardTitle>
+                    <CardDescription>Revenue distribution across product types.</CardDescription>
+                </CardHeader>
+                <CardContent className="flex justify-center">
+                <ChartContainer config={chartConfigProductType} className="h-[250px] w-full max-w-xs">
                     <PieChart accessibilityLayer>
                         <ChartTooltip content={<ChartTooltipContent hideLabel nameKey="name" />} />
-                        <Pie data={salesByCatData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} 
-                            label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                                const RADIAN = Math.PI / 180;
-                                const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-                                const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                                const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                                return ( <text x={x} y={y} fill="hsl(var(--primary-foreground))" textAnchor="middle" dominantBaseline="central" className="text-xs"> {`${(percent * 100).toFixed(0)}%`} </text> );
-                            }}
-                        >
-                        {salesByCatData.map((_, index) => (<Cell key={`cell-${index}`} fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]} />))}
+                        <Pie data={salesByProductTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={100}>
+                            {salesByProductTypeData.map((entry) => (<Cell key={entry.name} fill={entry.fill} />))}
                         </Pie>
-                        <ChartLegend content={<ChartLegendContent nameKey="name"/>} />
+                        <ChartLegend content={<ChartLegendContent nameKey="name" />} />
                     </PieChart>
                 </ChartContainer>
                 </CardContent>
