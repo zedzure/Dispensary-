@@ -3,7 +3,7 @@
 
 /**
  * @fileOverview An AI-powered strain recommender flow.
- * This file implements a flow that asks the AI to select product IDs and then looks them up.
+ * This file implements a flow that asks the AI to select product IDs and generate a recommendation message.
  * It includes robust error handling and fallbacks to ensure it always returns a valid response.
  *
  * - strainRecommender - The main function that handles the recommendation process.
@@ -28,6 +28,7 @@ const ProductSchema = z.object({
   description: z.string(),
   image: z.string(),
   hint: z.string(),
+  stock: z.coerce.number().optional(),
 });
 export const StrainRecommenderOutputSchema = z.object({
   recommendation: z.string(),
@@ -52,26 +53,36 @@ const productListForPrompt = allProductsFlat.map(p => JSON.stringify({
     thc: p.thc,
 })).join('\n');
 
-// Prompt for the AI to select relevant product IDs.
+// Define a schema for the AI's structured response.
+const AIResponseSchema = z.object({
+    productIds: z.array(z.string()).describe("An array of up to 4 relevant product IDs from the list."),
+    recommendation: z.string().describe("A friendly and helpful recommendation message for the user, explaining why these products were chosen based on their preferences.")
+});
+
+// Prompt for the AI to select products and generate a recommendation.
 const productSelectorPrompt = ai.definePrompt({
     name: 'productSelectorPrompt',
     input: { schema: z.object({ preferences: z.string(), products: z.string() }) },
+    output: { schema: AIResponseSchema }, // Use the new structured output schema
     config: {
         safetySettings: [ { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' } ],
     },
-    prompt: `You are a cannabis expert. Based on the user's preferences, select up to 4 of the most relevant product IDs from the provided list.
-Return ONLY a single line of comma-separated product IDs and nothing else. For example: "Flower-1,Edibles-5,Pre-rolls-2"
+    prompt: `You are a friendly and knowledgeable cannabis expert at GreenLeaf Guide. A user will provide their preferences, and you will recommend up to 4 products from the provided list.
+
+Your response MUST be a valid JSON object matching this schema: { "productIds": ["id1", "id2"], "recommendation": "Your message here." }
+
+- productIds: Select up to 4 of the most relevant product IDs from the provided list based on the user's preferences.
+- recommendation: Write a brief, friendly, and helpful message to the user explaining why you chose these products for them based on their request.
 
 USER PREFERENCES:
 "{{{preferences}}}"
 
 AVAILABLE PRODUCTS (JSON format, one per line):
 {{{products}}}
-
-Selected product IDs:`,
+`,
 });
 
-// The main flow that orchestrates the logic with robust fallbacks.
+// The main flow to handle the new structured AI response.
 const strainRecommenderFlow = ai.defineFlow(
   {
     name: 'strainRecommenderFlow',
@@ -83,12 +94,10 @@ const strainRecommenderFlow = ai.defineFlow(
     let recommendation = "";
 
     try {
-        const idSelectionResponse = await productSelectorPrompt({ preferences, products: productListForPrompt });
-        const idString = idSelectionResponse.text?.trim();
+        const { output } = await productSelectorPrompt({ preferences, products: productListForPrompt });
         
-        if (idString) {
-            // Get non-empty IDs from the AI's response
-            const productIds = idString.split(',').map(id => id.trim()).filter(id => id);
+        if (output && output.productIds && output.productIds.length > 0) {
+            const productIds = output.productIds;
             
             // Create a map for efficient lookup and preserving order.
             const productMap = new Map(allProductsFlat.map(p => [p.id, p]));
@@ -96,7 +105,8 @@ const strainRecommenderFlow = ai.defineFlow(
 
             if (orderedProducts.length > 0) {
                 recommendedProducts = orderedProducts;
-                recommendation = `Based on your request for "${preferences}", we think you'll like these choices.`;
+                // Use the AI-generated recommendation text
+                recommendation = output.recommendation;
             }
         }
     } catch (e) {
