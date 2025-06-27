@@ -7,7 +7,7 @@ import { useAuth } from '@/context/auth-context';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, Users, DollarSign, Package, ShoppingCart, Activity, CalendarDays, Percent, TrendingUp, TrendingDown, LogOut, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, DollarSign, Package, ShoppingCart, Activity, CalendarDays, Percent, TrendingUp, TrendingDown, LogOut, Settings, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Pie, PieChart, Cell } from "recharts";
@@ -20,6 +20,7 @@ import { InventoryManagement } from '@/components/admin/inventory-management';
 
 const chartConfigSales = { sales: { label: "Sales", color: "hsl(var(--chart-1))" } } satisfies ChartConfig;
 const chartConfigCustomers = { customers: { label: "New Customers", color: "hsl(var(--chart-2))" } } satisfies ChartConfig;
+const chartConfigHourlySales = { sales: { label: "Sales", color: "hsl(var(--chart-5))" } } satisfies ChartConfig;
 
 const PIE_CHART_COLORS = [
   "hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))",
@@ -51,6 +52,7 @@ interface DashboardData {
     topProducts: { id: string; name: string; unitsSold: number; revenue: number }[];
     salesByCatData: { name: string; value: number }[];
     salesByProductTypeData: { name: string; value: number; fill: string }[];
+    salesByHourData: { hour: string; sales: number }[];
 }
 
 // --- Data Generation --- //
@@ -125,9 +127,16 @@ const generateDashboardData = (period: string): DashboardData => {
         { name: 'Indica', value: Math.floor(Math.random() * 8000) + 4000, fill: "hsl(var(--chart-2))" },
     ];
 
+    const salesByHourData = Array.from({ length: 12 }, (_, i) => {
+        const hour = i + 9; // 9 AM to 8 PM
+        const isPeak = (hour >= 12 && hour <= 14) || (hour >= 17 && hour <= 19);
+        const randomSales = isPeak ? Math.random() * 500 + 300 : Math.random() * 200 + 50;
+        return { hour: `${hour}:00`, sales: Math.floor(randomSales) };
+    });
+
     return {
         metrics: { totalRevenue, avgOrderValue, newCustomers: totalCustomers, conversionRate, revenueChange: getChange(), aovChange: getChange(), customersChange: getChange(), conversionChange: getChange() },
-        salesData, customerData, topProducts, salesByCatData, salesByProductTypeData,
+        salesData, customerData, topProducts, salesByCatData, salesByProductTypeData, salesByHourData,
     };
 };
 
@@ -195,7 +204,7 @@ function AdminAnalytics() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => <LoadingMetricCard key={i} />)}
       </div>
-      <div className="grid gap-6 mt-6 md:grid-cols-1 lg:grid-cols-2">
+      <div className="grid gap-6 mt-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
         {[...Array(6)].map((_, i) => (
            <Card key={i} className="shadow-lg">
             <CardHeader>
@@ -216,7 +225,7 @@ function AdminAnalytics() {
         return renderLoadingState();
     }
 
-    const { metrics, salesData, customerData, topProducts, salesByCatData, salesByProductTypeData } = dashboardData;
+    const { metrics, salesData, customerData, topProducts, salesByCatData, salesByProductTypeData, salesByHourData } = dashboardData;
     
     const chartConfigCategorySales = salesByCatData.reduce((acc, category, index) => {
         acc[category.name] = {
@@ -245,7 +254,7 @@ function AdminAnalytics() {
             <MetricCard title="Conversion Rate" value={`${metrics.conversionRate.toFixed(2)}%`} change={metrics.conversionChange.value} changeType={metrics.conversionChange.type} icon={Percent} />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             <Card className="shadow-lg">
                 <CardHeader>
                     <CardTitle>Sales Trend</CardTitle>
@@ -284,13 +293,13 @@ function AdminAnalytics() {
                 </CardContent>
             </Card>
             
-            <Card className="shadow-lg lg:col-span-2">
+            <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle className="flex items-center"><Package className="mr-2 h-5 w-5 text-primary"/>Top Selling Products by Revenue</CardTitle>
-                    <CardDescription>Your most popular items for the selected period.</CardDescription>
+                    <CardTitle className="flex items-center"><Package className="mr-2 h-5 w-5 text-primary"/>Top Selling Products</CardTitle>
+                    <CardDescription>Your most popular items by revenue.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <ChartContainer config={chartConfigTopProducts} className="w-full h-[250px]">
+                    <ChartContainer config={chartConfigTopProducts} className="w-full h-[300px]">
                         <BarChart accessibilityLayer data={topProducts} layout="vertical" margin={{ left: 20, right: 20 }}>
                             <CartesianGrid horizontal={false} />
                             <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={10} width={120} />
@@ -308,7 +317,7 @@ function AdminAnalytics() {
                     <CardDescription>Revenue distribution across categories.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex justify-center">
-                    <ChartContainer config={chartConfigCategorySales} className="h-[250px] w-full max-w-xs">
+                    <ChartContainer config={chartConfigCategorySales} className="h-[300px] w-full max-w-xs">
                         <PieChart accessibilityLayer>
                             <ChartTooltip content={<ChartTooltipContent hideLabel nameKey="name" />} />
                             <Pie data={salesByCatData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} 
@@ -334,7 +343,7 @@ function AdminAnalytics() {
                     <CardDescription>Revenue distribution across product types.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex justify-center">
-                <ChartContainer config={chartConfigProductType} className="h-[250px] w-full max-w-xs">
+                <ChartContainer config={chartConfigProductType} className="h-[300px] w-full max-w-xs">
                     <PieChart accessibilityLayer>
                         <ChartTooltip content={<ChartTooltipContent hideLabel nameKey="name" />} />
                         <Pie data={salesByProductTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={100}>
@@ -343,6 +352,24 @@ function AdminAnalytics() {
                         <ChartLegend content={<ChartLegendContent nameKey="name" />} />
                     </PieChart>
                 </ChartContainer>
+                </CardContent>
+            </Card>
+
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle className="flex items-center"><Clock className="mr-2 h-5 w-5 text-primary" />Sales by Hour</CardTitle>
+                    <CardDescription>Identify peak business hours for the period.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer config={chartConfigHourlySales} className="h-[300px] w-full">
+                        <BarChart accessibilityLayer data={salesByHourData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                            <CartesianGrid vertical={false} />
+                            <XAxis dataKey="hour" tickLine={false} axisLine={false} tickMargin={8} />
+                            <YAxis tickFormatter={(value) => `$${value}`} />
+                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                            <Bar dataKey="sales" fill="var(--color-sales)" radius={4} />
+                        </BarChart>
+                    </ChartContainer>
                 </CardContent>
             </Card>
         </div>
