@@ -202,7 +202,7 @@ function AdminAnalytics() {
               <Skeleton className="h-4 w-2/3" />
             </CardHeader>
             <CardContent>
-              <Skeleton className="h-[250px] w-full" />
+              <Skeleton className="h-[300px] w-full" />
             </CardContent>
           </Card>
         ))}
@@ -290,9 +290,9 @@ function AdminAnalytics() {
                 </CardHeader>
                 <CardContent>
                     <ChartContainer config={chartConfigTopProducts} className="w-full h-[300px]">
-                        <BarChart accessibilityLayer data={topProducts} layout="vertical" margin={{ left: 20, right: 20 }}>
+                        <BarChart accessibilityLayer data={topProducts} layout="vertical" margin={{ right: 20 }}>
                             <CartesianGrid horizontal={false} />
-                            <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={10} width={120} />
+                            <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={10} />
                             <XAxis dataKey="revenue" type="number" hide />
                             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
                             <Bar dataKey="revenue" layout="vertical" fill="var(--color-revenue)" radius={5} />
@@ -369,7 +369,7 @@ function AdminAnalytics() {
 
   return (
     <div className="flex flex-col gap-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <h1 className="text-3xl font-bold font-cursive text-primary flex items-center">
                 <LayoutDashboard className="mr-3 h-8 w-8" />
                 Admin Dashboard
@@ -398,4 +398,5 @@ function AdminAnalytics() {
 export default function AdminDashboardPage() {
   return <AdminAnalytics />;
 }
+
 
