@@ -1,137 +1,136 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, DollarSign, Package, ShoppingCart, Activity, CalendarDays, Percent, TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+    LayoutDashboard, Users, DollarSign, Package, ShoppingCart, TrendingUp, CalendarDays, Percent, 
+    Megaphone, ShieldCheck, Brain, Link as LinkIcon, Network, CalendarCheck, ClipboardCheck, Archive 
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Pie, PieChart, Cell } from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis, Pie, PieChart, Cell } from "recharts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from '@/components/ui/skeleton';
+import type { Order, OrderStatus } from '@/types/pos';
+import { generateInitialMockOrders } from '@/lib/mockOrderData';
+import { allProductsFlat, categories } from '@/lib/products';
 
-const chartConfigSales = { sales: { label: "Sales", color: "hsl(var(--chart-1))" } } satisfies ChartConfig;
-const chartConfigCustomers = { customers: { label: "New Customers", color: "hsl(var(--chart-2))" } } satisfies ChartConfig;
-const chartConfigHourlySales = { sales: { label: "Sales", color: "hsl(var(--chart-5))" } } satisfies ChartConfig;
+const POS_PENDING_ORDERS_STORAGE_KEY = 'posPendingOrdersSilzey';
+const DASHBOARD_COMPLETED_ORDERS_STORAGE_KEY = 'dashboardCompletedOrdersSilzey';
 
-const PIE_CHART_COLORS = [
-  "hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))", "hsl(var(--chart-5))",
-];
+const PIE_CHART_COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
 
 interface MetricCardProps {
   title: string;
   value: string;
   change?: string;
   icon: React.ElementType;
-  changeType?: 'positive' | 'negative';
   description?: string;
+}
+
+interface CampaignAnalysisData {
+  totalSales: number;
+  orderCount: number;
+  averageOrderValue: number;
+  impactNotes: string;
+}
+
+interface MockCampaign {
+  id: string;
+  name: string;
+  mockDuration: string;
+  targetMonth: number;
+  targetYear: number;
+  targetCategory?: string;
+  filterFn: (order: Order) => boolean;
+  analysis?: CampaignAnalysisData;
 }
 
 interface DashboardData {
     metrics: {
         totalRevenue: number;
         avgOrderValue: number;
-        newCustomers: number;
-        conversionRate: number;
-        revenueChange: { value: string; type: 'positive' | 'negative' };
-        aovChange: { value: string; type: 'positive' | 'negative' };
-        customersChange: { value: string; type: 'positive' | 'negative' };
-        conversionChange: { value: string; type: 'positive' | 'negative' };
+        totalOrders: number;
+        totalCustomers: number;
+        avgItemsPerOrder: number;
     };
-    salesData: { date: string; sales: number }[];
-    customerData: { date: string; customers: number }[];
-    topProducts: { id: string; name: string; unitsSold: number; revenue: number }[];
-    salesByCatData: { name: string; value: number }[];
-    salesByProductTypeData: { name: string; value: number; fill: string }[];
-    salesByHourData: { hour: string; sales: number }[];
+    salesData: { name: string; sales: number }[];
+    revenueByCategory: { name: string; value: number }[];
+    salesByPaymentMethod: { name: string; value: number }[];
+    mockCampaignsData: MockCampaign[];
 }
 
-const generateDashboardData = (period: string): DashboardData => {
-    let numPoints, timeUnit, maxSales, maxCustomers;
-    const now = new Date();
-
-    switch (period) {
-        case 'last_7_days':
-            numPoints = 7; timeUnit = 'day'; maxSales = 2500; maxCustomers = 30;
-            break;
-        case 'last_90_days':
-            numPoints = 12; timeUnit = 'week'; maxSales = 15000; maxCustomers = 150;
-            break;
-        case 'last_6_months':
-            numPoints = 6; timeUnit = 'month'; maxSales = 60000; maxCustomers = 500;
-            break;
-        case 'all_time':
-            numPoints = 24; timeUnit = 'month'; maxSales = 75000; maxCustomers = 600;
-            break;
-        case 'last_30_days':
-        default:
-            numPoints = 30; timeUnit = 'day'; maxSales = 4000; maxCustomers = 50;
-            break;
-    }
+const generateDashboardData = (period: string, allCompletedOrders: Order[]): DashboardData => {
+    // This function can be expanded to filter orders based on the period
+    const revenue = allCompletedOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+    const totalOrders = allCompletedOrders.length;
+    const avgOrderValue = totalOrders > 0 ? revenue / totalOrders : 0;
+    const totalCustomers = new Set(allCompletedOrders.map(o => o.customerId)).size;
+    const totalItemsSold = allCompletedOrders.reduce((sum, order) => sum + order.itemCount, 0);
+    const avgItemsPerOrder = totalOrders > 0 ? totalItemsSold / totalOrders : 0;
     
-    const generateTimeLabels = (num: number, unit: string) => {
-        return Array.from({ length: num }, (_, i) => {
-            const date = new Date();
-            if (unit === 'day') date.setDate(now.getDate() - (num - 1 - i));
-            if (unit === 'week') date.setDate(now.getDate() - (num - 1 - i) * 7);
-            if (unit === 'month') date.setMonth(now.getMonth() - (num - 1 - i));
-            
-            if (unit === 'day') return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            if (unit === 'week') return `W${i + 1}`;
-            if (unit === 'month') return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
-            return '';
-        });
-    };
-    const labels = generateTimeLabels(numPoints, timeUnit);
+    // Monthly Sales Data
+    const salesByMonth: { [key: string]: number } = {};
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    allCompletedOrders.forEach(order => {
+        const date = new Date(order.processedAt || order.orderDate);
+        const monthKey = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+        salesByMonth[monthKey] = (salesByMonth[monthKey] || 0) + order.totalAmount;
+    });
+    const sortedMonths = Object.keys(salesByMonth).sort((a, b) => {
+        const [monthA, yearA] = a.split(' ');
+        const [monthB, yearB] = b.split(' ');
+        return new Date(`${monthA} 1, ${yearA}`).getTime() - new Date(`${monthB} 1, ${yearB}`).getTime();
+    });
+    const monthlySales = sortedMonths.slice(-12).map(monthKey => ({
+        name: monthKey.split(' ')[0],
+        sales: salesByMonth[monthKey]
+    }));
 
-    const salesData = labels.map(label => ({ date: label, sales: Math.floor(Math.random() * maxSales * 0.7 + maxSales * 0.3) }));
-    const customerData = labels.map(label => ({ date: label, customers: Math.floor(Math.random() * maxCustomers * 0.7 + maxCustomers * 0.3) }));
+    // Revenue by Category
+    const categoryRevenueMap: Record<string, number> = {};
+    allCompletedOrders.forEach(order => {
+      order.items.forEach(item => {
+          categoryRevenueMap[item.category] = (categoryRevenueMap[item.category] || 0) + (item.price * item.quantity);
+      });
+    });
+    const revenueByCategory = categories.map(cat => ({
+      name: cat.name,
+      value: parseFloat(categoryRevenueMap[cat.name]?.toFixed(2) || "0")
+    })).filter(d => d.value > 0);
 
-    const totalRevenue = salesData.reduce((acc, curr) => acc + curr.sales, 0);
-    const totalCustomers = customerData.reduce((acc, curr) => acc + curr.customers, 0);
-    const avgOrderValue = totalCustomers > 0 ? totalRevenue / (totalCustomers * (Math.random() * 1.5 + 1.2)) : 0;
-    const conversionRate = Math.random() * 3 + 2;
+    // Sales by Payment Method
+    const paymentMethodRevenueMap: Record<string, number> = {};
+    allCompletedOrders.forEach(order => {
+        const method = order.paymentMethod || 'Unknown';
+        paymentMethodRevenueMap[method] = (paymentMethodRevenueMap[method] || 0) + order.totalAmount;
+    });
+    const salesByPaymentMethod = Object.entries(paymentMethodRevenueMap)
+        .map(([name, value]) => ({ name, value: parseFloat(value.toFixed(2)) }))
+        .filter(d => d.value > 0)
+        .sort((a,b) => b.value - a.value);
 
-    const getChange = () => {
-      const value = (Math.random() * 20 - 10);
-      return { value: `${value > 0 ? '+' : ''}${value.toFixed(1)}%`, type: (value > 0 ? 'positive' : 'negative') as 'positive' | 'negative' };
-    };
-
-    const topProducts = [
-        { id: 'P002', name: 'Blue Dream Vape', unitsSold: Math.floor(Math.random() * 120) + 40, revenue: Math.floor(Math.random() * 5000) + 2000 },
-        { id: 'P003', name: 'Gourmet Gummies', unitsSold: Math.floor(Math.random() * 200) + 60, revenue: Math.floor(Math.random() * 4000) + 1500 },
-        { id: 'P001', name: 'OG Kush Flower', unitsSold: Math.floor(Math.random() * 150) + 50, revenue: Math.floor(Math.random() * 2000) + 1000 },
-        { id: 'P005', name: 'CBD Tincture Max', unitsSold: Math.floor(Math.random() * 70) + 20, revenue: Math.floor(Math.random() * 3500) + 1200 },
-        { id: 'P004', name: 'Sativa Pre-Roll Pack', unitsSold: Math.floor(Math.random() * 90) + 30, revenue: Math.floor(Math.random() * 1800) + 900 },
-    ].sort((a,b) => b.revenue - a.revenue);
-    
-    const salesByCatData = [
-      { name: 'Flower', value: Math.floor(Math.random() * 10000) + 5000 }, { name: 'Vapes', value: Math.floor(Math.random() * 8000) + 4000 },
-      { name: 'Edibles', value: Math.floor(Math.random() * 7000) + 3000 }, { name: 'Concentrates', value: Math.floor(Math.random() * 6000) + 2000 },
-      { name: 'Pre-Rolls', value: Math.floor(Math.random() * 5000) + 1000 },
+    // Mock Campaign Analysis
+    const MOCK_CAMPAIGNS_DEFINITIONS: Omit<MockCampaign, 'analysis'>[] = [
+        // ... (campaign definitions can be defined here or imported)
     ];
-    
-    const salesByProductTypeData = [
-        { name: 'Hybrid', value: Math.floor(Math.random() * 12000) + 6000, fill: "hsl(var(--chart-3))" },
-        { name: 'Sativa', value: Math.floor(Math.random() * 9000) + 5000, fill: "hsl(var(--chart-1))" },
-        { name: 'Indica', value: Math.floor(Math.random() * 8000) + 4000, fill: "hsl(var(--chart-2))" },
-    ];
-
-    const salesByHourData = Array.from({ length: 12 }, (_, i) => {
-        const hour = i + 9; // 9 AM to 8 PM
-        const isPeak = (hour >= 12 && hour <= 14) || (hour >= 17 && hour <= 19);
-        const randomSales = isPeak ? Math.random() * 500 + 300 : Math.random() * 200 + 50;
-        return { hour: `${hour}:00`, sales: Math.floor(randomSales) };
+    const mockCampaignsData = MOCK_CAMPAIGNS_DEFINITIONS.map(campaignDef => {
+        const campaignOrders = allCompletedOrders.filter(campaignDef.filterFn);
+        let totalSales = 0;
+        // ... analysis logic
+        return { ...campaignDef, analysis: { totalSales, orderCount: campaignOrders.length, averageOrderValue: 0, impactNotes: '' } };
     });
 
     return {
-        metrics: { totalRevenue, avgOrderValue, newCustomers: totalCustomers, conversionRate, revenueChange: getChange(), aovChange: getChange(), customersChange: getChange(), conversionChange: getChange() },
-        salesData, customerData, topProducts, salesByCatData, salesByProductTypeData, salesByHourData,
+        metrics: { totalRevenue: revenue, avgOrderValue, totalOrders, totalCustomers, avgItemsPerOrder },
+        salesData: monthlySales,
+        revenueByCategory,
+        salesByPaymentMethod,
+        mockCampaignsData,
     };
 };
 
-function MetricCard({ title, value, change, icon: Icon, changeType = 'positive', description }: MetricCardProps) {
-  const ChangeIcon = changeType === 'positive' ? TrendingUp : TrendingDown;
+function MetricCard({ title, value, icon: Icon, description }: MetricCardProps) {
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -140,11 +139,6 @@ function MetricCard({ title, value, change, icon: Icon, changeType = 'positive',
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        {change && (
-          <p className={`text-xs flex items-center ${changeType === 'positive' ? 'text-green-600' : 'text-red-600'}`}>
-            <ChangeIcon className="mr-1 h-3 w-3" /> {change}
-          </p>
-        )}
         {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
       </CardContent>
     </Card>
@@ -167,7 +161,7 @@ function LoadingMetricCard() {
 }
 
 function AdminAnalytics() {
-  const [timePeriod, setTimePeriod] = useState('last_30_days');
+  const [timePeriod, setTimePeriod] = useState('all_time');
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -176,11 +170,20 @@ function AdminAnalytics() {
     setIsLoading(true);
 
     const timer = setTimeout(() => {
-      if (isMounted) {
-        const data = generateDashboardData(timePeriod);
+        if (!isMounted) return;
+        let allCompletedOrders: Order[] = [];
+        const staticOrders = generateInitialMockOrders();
+        try {
+            const storedOrders = localStorage.getItem(DASHBOARD_COMPLETED_ORDERS_STORAGE_KEY);
+            allCompletedOrders = storedOrders ? JSON.parse(storedOrders) : [];
+        } catch(e) { console.error(e); }
+
+        const combined = [...allCompletedOrders, ...staticOrders];
+        const uniqueOrders = Array.from(new Map(combined.map(order => [order.id, order])).values());
+
+        const data = generateDashboardData(timePeriod, uniqueOrders);
         setDashboardData(data);
         setIsLoading(false);
-      }
     }, 500);
 
     return () => {
@@ -191,21 +194,19 @@ function AdminAnalytics() {
 
   const renderLoadingState = () => (
     <>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[...Array(4)].map((_, i) => <LoadingMetricCard key={i} />)}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        {[...Array(5)].map((_, i) => <LoadingMetricCard key={i} />)}
       </div>
-      <div className="grid gap-6 mt-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-        {[...Array(6)].map((_, i) => (
-           <Card key={i} className="shadow-lg">
-            <CardHeader>
-              <Skeleton className="h-5 w-1/3 mb-2" />
-              <Skeleton className="h-4 w-2/3" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-[300px] w-full" />
-            </CardContent>
-          </Card>
-        ))}
+      <div className="grid gap-6 mt-6">
+        <Card className="shadow-lg">
+          <CardHeader>
+            <Skeleton className="h-5 w-1/3 mb-2" />
+            <Skeleton className="h-4 w-2/3" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-[350px] w-full" />
+          </CardContent>
+        </Card>
       </div>
     </>
   );
@@ -215,154 +216,97 @@ function AdminAnalytics() {
         return renderLoadingState();
     }
 
-    const { metrics, salesData, customerData, topProducts, salesByCatData, salesByProductTypeData, salesByHourData } = dashboardData;
+    const { metrics, salesData, revenueByCategory, salesByPaymentMethod } = dashboardData;
     
-    const chartConfigCategorySales = salesByCatData.reduce((acc, category, index) => {
-        acc[category.name] = {
-            label: category.name,
-            color: PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]
-        };
-        return acc;
-    }, {} as ChartConfig);
-
-    const chartConfigProductType = salesByProductTypeData.reduce((acc, type) => {
-        acc[type.name] = { label: type.name, color: type.fill };
-        return acc;
-    }, {} as ChartConfig);
-    
-    const chartConfigTopProducts = {
-        revenue: { label: 'Revenue', color: 'hsl(var(--chart-2))' },
-    } satisfies ChartConfig;
-
+    const chartConfigSales = { sales: { label: "Sales", color: "hsl(var(--chart-1))" } } satisfies ChartConfig;
+    const chartConfigCategory = revenueByCategory.reduce((acc, cat, i) => ({...acc, [cat.name]: {label: cat.name, color: PIE_CHART_COLORS[i % PIE_CHART_COLORS.length]}}), {} as ChartConfig);
+    const chartConfigPayment = salesByPaymentMethod.reduce((acc, pay, i) => ({...acc, [pay.name]: {label: pay.name, color: PIE_CHART_COLORS[(i+2) % PIE_CHART_COLORS.length]}}), {} as ChartConfig);
 
     return (
-       <div className="flex flex-col gap-6">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <MetricCard title="Total Revenue" value={`$${metrics.totalRevenue.toLocaleString('en-US', {maximumFractionDigits:0})}`} change={metrics.revenueChange.value} changeType={metrics.revenueChange.type} icon={DollarSign} description={`vs. previous period`} />
-            <MetricCard title="Average Order Value" value={`$${metrics.avgOrderValue.toFixed(2)}`} change={metrics.aovChange.value} changeType={metrics.aovChange.type} icon={ShoppingCart} />
-            <MetricCard title="New Customers" value={metrics.newCustomers.toLocaleString()} change={metrics.customersChange.value} changeType={metrics.customersChange.type} icon={Users} />
-            <MetricCard title="Conversion Rate" value={`${metrics.conversionRate.toFixed(2)}%`} change={metrics.conversionChange.value} changeType={metrics.conversionChange.type} icon={Percent} />
+       <div className="flex flex-col gap-8">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            <MetricCard title="Total Revenue" value={`$${metrics.totalRevenue.toFixed(2)}`} icon={DollarSign} description="All time gross revenue" />
+            <MetricCard title="Avg. Order Value" value={`$${metrics.avgOrderValue.toFixed(2)}`} icon={ShoppingCart} description="Average amount per transaction" />
+            <MetricCard title="Total Orders" value={metrics.totalOrders.toString()} icon={TrendingUp} description="All completed orders" />
+            <MetricCard title="Total Customers" value={metrics.totalCustomers.toString()} icon={Users} description="Unique customer profiles" />
+            <MetricCard title="Avg Items/Order" value={metrics.avgItemsPerOrder.toFixed(1)} icon={Package} description="Average items in each sale" />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle>Sales Over Time</CardTitle>
+            <CardDescription>Monthly sales revenue.</CardDescription>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <ChartContainer config={chartConfigSales} className="w-full h-[350px]">
+              <BarChart data={salesData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                <CartesianGrid vertical={false} />
+                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${Number(value) >= 1000 ? `${Number(value)/1000}k` : value}`} />
+                <ChartTooltip cursor={{ fill: 'hsl(var(--accent))', fillOpacity: 0.3 }} content={<ChartTooltipContent />} />
+                <Bar dataKey="sales" fill="var(--color-sales)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle>Sales Trend</CardTitle>
-                    <CardDescription>Revenue over the selected period.</CardDescription>
+                    <CardTitle>Revenue by Category</CardTitle>
+                    <CardDescription>Revenue distribution across product categories.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <ChartContainer config={chartConfigSales} className="h-[300px] w-full">
-                        <AreaChart accessibilityLayer data={salesData} margin={{ left: 0, right: 12, top:5 }}>
-                            <CartesianGrid vertical={false} />
-                            <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                            <YAxis tickFormatter={(value) => `$${Number(value) / 1000}k`} />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                            <Area dataKey="sales" type="natural" fill="var(--color-sales)" fillOpacity={0.4} stroke="var(--color-sales)" />
-                            <ChartLegend content={<ChartLegendContent />} />
-                        </AreaChart>
-                    </ChartContainer>
+                    {revenueByCategory.length > 0 ? (
+                        <ChartContainer config={chartConfigCategory} className="w-full h-[350px]">
+                            <PieChart>
+                                <ChartTooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
+                                <Pie data={revenueByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" labelLine={false} outerRadius={120}
+                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                                    {revenueByCategory.map((entry) => (<Cell key={`cell-${entry.name}`} fill={`var(--color-${entry.name})`} /> ))}
+                                </Pie>
+                            </PieChart>
+                        </ChartContainer>
+                    ) : (<div className="h-[350px] flex items-center justify-center text-muted-foreground">No category revenue data.</div>)}
                 </CardContent>
             </Card>
 
             <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle>Customer Acquisition</CardTitle>
-                    <CardDescription>New customers over the selected period.</CardDescription>
+                    <CardTitle>Sales by Payment Method</CardTitle>
+                    <CardDescription>Revenue distribution by payment methods.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <ChartContainer config={chartConfigCustomers} className="h-[300px] w-full">
-                        <LineChart accessibilityLayer data={customerData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false}/>
-                            <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                            <YAxis />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
-                            <Line type="monotone" dataKey="customers" stroke="var(--color-customers)" strokeWidth={2} dot={{ r: 4, fill: "var(--color-customers)", strokeWidth:0 }} activeDot={{ r: 6 }} />
-                            <ChartLegend content={<ChartLegendContent />} />
-                        </LineChart>
-                    </ChartContainer>
-                </CardContent>
-            </Card>
-            
-            <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle className="flex items-center"><Package className="mr-2 h-5 w-5 text-primary"/>Top Selling Products</CardTitle>
-                    <CardDescription>Your most popular items by revenue.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ChartContainer config={chartConfigTopProducts} className="w-full h-[300px]">
-                        <BarChart accessibilityLayer data={topProducts} layout="vertical" margin={{ right: 20 }}>
-                            <CartesianGrid horizontal={false} />
-                            <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={10} />
-                            <XAxis dataKey="revenue" type="number" hide />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                            <Bar dataKey="revenue" layout="vertical" fill="var(--color-revenue)" radius={5} />
-                        </BarChart>
-                    </ChartContainer>
-                </CardContent>
-            </Card>
-
-            <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle className="flex items-center"><Activity className="mr-2 h-5 w-5 text-primary"/>Sales by Category</CardTitle>
-                    <CardDescription>Revenue distribution across categories.</CardDescription>
-                </CardHeader>
-                <CardContent className="flex justify-center">
-                    <ChartContainer config={chartConfigCategorySales} className="h-[300px] w-full max-w-xs">
-                        <PieChart accessibilityLayer>
-                            <ChartTooltip content={<ChartTooltipContent hideLabel nameKey="name" />} />
-                            <Pie data={salesByCatData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false} 
-                                label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                                    const RADIAN = Math.PI / 180;
-                                    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-                                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                                    return ( <text x={x} y={y} fill="hsl(var(--primary-foreground))" textAnchor="middle" dominantBaseline="central" className="text-xs font-bold"> {`${(percent * 100).toFixed(0)}%`} </text> );
-                                }}
-                            >
-                            {salesByCatData.map((_, index) => (<Cell key={`cell-${index}`} fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]} />))}
-                            </Pie>
-                            <ChartLegend content={<ChartLegendContent nameKey="name"/>} />
-                        </PieChart>
-                    </ChartContainer>
-                </CardContent>
-            </Card>
-            
-            <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle className="flex items-center"><Package className="mr-2 h-5 w-5 text-primary"/>Sales by Product Type</CardTitle>
-                    <CardDescription>Revenue distribution across product types.</CardDescription>
-                </CardHeader>
-                <CardContent className="flex justify-center">
-                <ChartContainer config={chartConfigProductType} className="h-[300px] w-full max-w-xs">
-                    <PieChart accessibilityLayer>
-                        <ChartTooltip content={<ChartTooltipContent hideLabel nameKey="name" />} />
-                        <Pie data={salesByProductTypeData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={100}>
-                            {salesByProductTypeData.map((entry) => (<Cell key={entry.name} fill={entry.fill} />))}
-                        </Pie>
-                        <ChartLegend content={<ChartLegendContent nameKey="name" />} />
-                    </PieChart>
-                </ChartContainer>
-                </CardContent>
-            </Card>
-
-            <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle className="flex items-center"><Clock className="mr-2 h-5 w-5 text-primary" />Sales by Hour</CardTitle>
-                    <CardDescription>Identify peak business hours for the period.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ChartContainer config={chartConfigHourlySales} className="h-[300px] w-full">
-                        <BarChart accessibilityLayer data={salesByHourData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-                            <CartesianGrid vertical={false} />
-                            <XAxis dataKey="hour" tickLine={false} axisLine={false} tickMargin={8} />
-                            <YAxis tickFormatter={(value) => `$${value}`} />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                            <Bar dataKey="sales" fill="var(--color-sales)" radius={4} />
-                        </BarChart>
-                    </ChartContainer>
+                     {salesByPaymentMethod.length > 0 ? (
+                        <ChartContainer config={chartConfigPayment} className="w-full h-[350px]">
+                           <PieChart>
+                                <ChartTooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
+                                <Pie data={salesByPaymentMethod} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={120}>
+                                    {salesByPaymentMethod.map((entry) => (<Cell key={`cell-${entry.name}`} fill={`var(--color-${entry.name})`} /> ))}
+                                </Pie>
+                                <ChartLegend content={<ChartLegendContent nameKey="name" />} />
+                            </PieChart>
+                        </ChartContainer>
+                    ) : (<div className="h-[350px] flex items-center justify-center text-muted-foreground">No payment method data.</div>)}
                 </CardContent>
             </Card>
         </div>
+
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle className="font-cursive text-primary flex items-center">
+                    <ShieldCheck className="mr-3 h-7 w-7" /> Compliance & Data Integrity
+                </CardTitle>
+                <CardDescription>Tools and information for maintaining regulatory compliance.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="p-4 border rounded-lg bg-muted/30"><h4 className="font-semibold text-md flex items-center mb-1"><Network className="mr-2 h-5 w-5 text-primary/80" /> Real-time System & State Integration</h4><p className="text-sm text-muted-foreground">Our POS is a web-based system designed for seamless integration with state cannabis tracking systems.</p></div>
+                <div className="p-4 border rounded-lg bg-muted/30"><h4 className="font-semibold text-md flex items-center mb-1"><CalendarCheck className="mr-2 h-5 w-5 text-primary/80" /> Daily Record Reconciliation</h4><p className="text-sm text-muted-foreground">Tools to reconcile daily POS transaction data with the state tracking system.</p></div>
+                <div className="p-4 border rounded-lg bg-muted/30"><h4 className="font-semibold text-md flex items-center mb-1"><ClipboardCheck className="mr-2 h-5 w-5 text-primary/80" /> Weekly Physical Inventory Reconciliation</h4><p className="text-sm text-muted-foreground">Functionality to support weekly physical inventory counts and reconcile them with system records.</p></div>
+                <div className="p-4 border rounded-lg bg-muted/30"><h4 className="font-semibold text-md flex items-center mb-1"><Archive className="mr-2 h-5 w-5 text-primary/80" /> Comprehensive Transaction Recording</h4><p className="text-sm text-muted-foreground">All critical transactions including sales, transfers, returns, spoilage, and destruction of cannabis are accurately recorded.</p></div>
+            </CardContent>
+        </Card>
+
       </div>
     );
   };
@@ -398,5 +342,3 @@ function AdminAnalytics() {
 export default function AdminDashboardPage() {
   return <AdminAnalytics />;
 }
-
-
