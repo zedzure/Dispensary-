@@ -7,13 +7,11 @@ const INVENTORY_STORAGE_KEY = 'silzeyPosInventory';
 
 
 export const generateMockInventory = (): InventoryItem[] => {
-  // Attempt to load from localStorage first
   const storedInventoryRaw = typeof window !== 'undefined' ? localStorage.getItem(INVENTORY_STORAGE_KEY) : null;
   if (storedInventoryRaw) {
     try {
       const storedInventory = JSON.parse(storedInventoryRaw);
-      // Basic validation to ensure it's an array of what we expect
-      if (Array.isArray(storedInventory) && storedInventory.length > 0 && 'salePrice' in storedInventory[0]) {
+      if (Array.isArray(storedInventory) && storedInventory.length > 0 && 'purchasePrice' in storedInventory[0]) {
         return storedInventory;
       }
     } catch (e) {
@@ -21,21 +19,31 @@ export const generateMockInventory = (): InventoryItem[] => {
     }
   }
 
-  // If nothing in storage or parsing fails, generate fresh mock data
-  const freshInventory = allProductsFlat.map((product, index) => ({
-    id: product.id,
-    name: product.name,
-    sku: `SKU-${String(product.id).padStart(5, '0').slice(-5)}`,
-    category: product.category,
-    supplier: suppliers[index % suppliers.length],
-    stock: product.stock ?? 0,
-    salePrice: product.price ?? 0,
-    image: product.image,
-    hint: product.hint,
-    description: product.description,
-  }));
+  const freshInventory = allProductsFlat.map((product, index) => {
+    const lastRestock = new Date();
+    lastRestock.setDate(lastRestock.getDate() - (index % 30));
+    
+    return {
+      id: product.id,
+      name: product.name,
+      sku: `SKU-${String(product.id).padStart(5, '0').slice(-5)}`,
+      category: product.category,
+      supplier: suppliers[index % suppliers.length],
+      stock: product.stock ?? 0,
+      salePrice: product.price ?? 0,
+      image: product.image,
+      hint: product.hint,
+      description: product.description,
+      // New fields
+      lowStockThreshold: 20,
+      purchasePrice: (product.price ?? 0) * (Math.random() * 0.2 + 0.5), // 50-70% of sale price
+      rating: parseFloat((Math.random() * 1.5 + 3.5).toFixed(1)), // 3.5 to 5.0
+      tags: index % 3 === 0 ? 'Best Seller' : (index % 5 === 0 ? 'New Arrival,Organic' : 'Staff Pick'),
+      notes: index % 7 === 0 ? `Received new shipment on ${new Date().toLocaleDateString()}. Watch for discoloration.` : '',
+      lastRestockDate: lastRestock.toISOString(),
+    };
+  });
   
-  // Save the freshly generated data to localStorage for persistence
   if (typeof window !== 'undefined') {
     localStorage.setItem(INVENTORY_STORAGE_KEY, JSON.stringify(freshInventory));
   }
@@ -44,7 +52,4 @@ export const generateMockInventory = (): InventoryItem[] => {
 };
 
 export const saveInventory = (inventory: InventoryItem[]) => {
-    if (typeof window !== 'undefined') {
-        localStorage.setItem(INVENTORY_STORAGE_KEY, JSON.stringify(inventory));
-    }
-}
+    if (typeof window !== 'undefined')

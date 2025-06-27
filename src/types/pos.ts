@@ -23,7 +23,6 @@ export interface CustomerMetrics extends UserProfile {
 }
 
 
-// Omit price and stock from Product to redefine price, and stock is not needed here.
 export interface OrderItem extends Omit<Product, 'price' | 'stock'> {
   quantity: number;
   price: number;
@@ -53,11 +52,18 @@ export interface InventoryItem {
   category: string;
   supplier: string;
   stock: number;
+  lowStockThreshold: number;
+  purchasePrice: number;
   salePrice: number;
+  rating: number;
+  tags?: string; // Comma-separated
+  notes?: string;
+  lastRestockDate: string; // ISO String
   image: string;
   hint: string;
   description: string;
 }
+
 
 export type TransactionStatus = 'Completed' | 'Pending' | 'Failed';
 
@@ -69,7 +75,3 @@ export interface TransactionItem {
 }
 
 export interface ReelConfigItem {
-  inventoryItemId: string;
-  badgeType: string;
-  pulsatingBorder: boolean;
-}
