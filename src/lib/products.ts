@@ -6,7 +6,7 @@ const placeholderHint = 'cannabis product';
 export const categories = [
   { name: 'Pre-rolls', hint: 'cannabis joint', image: placeholderImage },
   { name: 'Flower', hint: 'cannabis bud', image: placeholderImage },
-  { name: 'Seeds', hint: 'cannabis seeds', image: placeholderImage },
+  { name: 'Medical', hint: 'medical cannabis', image: placeholderImage },
   { name: 'Edibles', hint: 'gummy candy', image: placeholderImage },
   { name: 'Concentrates', hint: 'cannabis oil', image: placeholderImage },
   { name: 'Tinctures', hint: 'dropper bottle', image: placeholderImage },
@@ -44,7 +44,8 @@ export const generateProducts = (category: { name: string, hint: string }, count
 
 export const allProducts = categories.reduce((acc, category) => {
   if (category.name !== 'Coming Soon') {
-    acc[category.name] = generateProducts(category, 10);
+    const productCount = category.name === 'Medical' ? 30 : 10;
+    acc[category.name] = generateProducts(category, productCount);
   }
   return acc;
 }, {} as Record<string, Product[]>);
