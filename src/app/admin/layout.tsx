@@ -106,7 +106,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
       const Icon = icon;
       return (
         <AccordionItem value={title.toLowerCase()} className="border-b-0">
-            <AccordionTrigger className="w-full flex items-center gap-2 rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg:last-child]:rotate-180 hover:no-underline justify-start">
+            <AccordionTrigger className="w-full flex items-center gap-2 rounded-md p-2 text-left text-base outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg:last-child]:rotate-180 hover:no-underline justify-start">
             <Icon className="h-4 w-4 shrink-0" />
             <span className="flex-1 text-left">{title}</span>
             <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
