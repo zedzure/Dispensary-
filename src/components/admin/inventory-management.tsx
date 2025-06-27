@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Package, PlusCircle, Edit3, Trash2, PackageSearch, Tag, Layers3, MoreVertical } from 'lucide-react';
+import { Package, PlusCircle, Edit3, Trash2, PackageSearch, Tag, Layers3, MoreVertical, Printer } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
 
 const getStockStatus = (stock: number): { text: string; variant: "default" | "secondary" | "destructive" | "outline" } => {
   if (stock <= 0) return { text: 'Out of Stock', variant: 'destructive' };
@@ -144,9 +145,16 @@ export function InventoryManagement() {
             <Package className="mr-3 h-8 w-8" />
             Inventory Management
           </h1>
-          <Button onClick={() => handleOpenForm()}>
-            <PlusCircle className="mr-2 h-5 w-5" /> Add New Product
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outline">
+              <Link href="/admin/products/print" target="_blank" rel="noopener noreferrer">
+                  <Printer className="mr-2 h-5 w-5" /> Print List
+              </Link>
+            </Button>
+            <Button onClick={() => handleOpenForm()}>
+              <PlusCircle className="mr-2 h-5 w-5" /> Add New Product
+            </Button>
+          </div>
         </div>
 
         {/* Product Form Dialog */}

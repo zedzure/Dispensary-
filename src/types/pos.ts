@@ -23,3 +23,13 @@ export interface Order {
   paymentMethod?: string;
   submittedByPOS?: boolean;
 }
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  sku: string;
+  category: string;
+  supplier: string;
+  stock: number;
+  salePrice: number;
+}
