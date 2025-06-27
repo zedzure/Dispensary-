@@ -2,21 +2,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/auth-context';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
-import { Button } from '@/components/ui/button';
-import { LayoutDashboard, Users, DollarSign, Package, ShoppingCart, Activity, CalendarDays, Percent, TrendingUp, TrendingDown, LogOut, Settings, Clock } from 'lucide-react';
+import { LayoutDashboard, Users, DollarSign, Package, ShoppingCart, Activity, CalendarDays, Percent, TrendingUp, TrendingDown, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Pie, PieChart, Cell } from "recharts";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CustomerManagement } from '@/components/admin/customer-management';
-import { InventoryManagement } from '@/components/admin/inventory-management';
 
 const chartConfigSales = { sales: { label: "Sales", color: "hsl(var(--chart-1))" } } satisfies ChartConfig;
 const chartConfigCustomers = { customers: { label: "New Customers", color: "hsl(var(--chart-2))" } } satisfies ChartConfig;
@@ -55,7 +46,6 @@ interface DashboardData {
     salesByHourData: { hour: string; sales: number }[];
 }
 
-// --- Data Generation --- //
 const generateDashboardData = (period: string): DashboardData => {
     let numPoints, timeUnit, maxSales, maxCustomers;
     const now = new Date();
@@ -405,81 +395,7 @@ function AdminAnalytics() {
   );
 }
 
-
 export default function AdminDashboardPage() {
-  const { user, logout, isLoading: isAuthLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isAuthLoading && (!user || user.role !== 'admin')) {
-      router.replace('/login');
-    }
-  }, [user, isAuthLoading, router]);
-
-  if (isAuthLoading || !user || user.role !== 'admin') {
-    return (
-      <div className="flex flex-col min-h-screen bg-muted/40">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
-            <Skeleton className="h-8 w-48 mb-8" />
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-                <Skeleton className="h-32 w-full rounded-lg" />
-                <Skeleton className="h-32 w-full rounded-lg" />
-                <Skeleton className="h-32 w-full rounded-lg" />
-                <Skeleton className="h-32 w-full rounded-lg" />
-            </div>
-            <Skeleton className="h-96 w-full rounded-lg" />
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col min-h-screen bg-muted/40">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold font-cursive tracking-tight">Admin Portal</h1>
-                    <p className="text-muted-foreground">Welcome, {user.name}. Manage your store.</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon">
-                        <Settings className="h-5 w-5" />
-                        <span className="sr-only">System Settings</span>
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={logout}>
-                        <LogOut className="mr-2 h-4 w-4" /> Logout
-                    </Button>
-                </div>
-            </div>
-
-            <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 mb-4 h-auto sm:h-10">
-                <TabsTrigger value="dashboard" className="py-2 sm:py-1.5">
-                  <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
-                </TabsTrigger>
-                <TabsTrigger value="customers" className="py-2 sm:py-1.5">
-                  <Users className="mr-2 h-4 w-4" /> Customers
-                </TabsTrigger>
-                <TabsTrigger value="inventory" className="py-2 sm:py-1.5">
-                  <Package className="mr-2 h-4 w-4" /> Inventory
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="dashboard">
-                <AdminAnalytics />
-              </TabsContent>
-              <TabsContent value="customers">
-                <CustomerManagement />
-              </TabsContent>
-              <TabsContent value="inventory">
-                <InventoryManagement />
-              </TabsContent>
-            </Tabs>
-            
-        </main>
-        <Footer />
-    </div>
-  );
+  return <AdminAnalytics />;
 }
+
