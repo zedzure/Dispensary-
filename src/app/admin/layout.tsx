@@ -77,7 +77,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 group-data-[state=collapsed]:hidden">
                 <Avatar className="h-9 w-9">
                   <AvatarImage src={user.avatarUrl} alt={user.name} />
                   <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
@@ -87,7 +87,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
                   <span className="text-muted-foreground">Admin</span>
                 </div>
               </div>
-              <SidebarTrigger />
+              <SidebarTrigger className="group-data-[state=collapsed]:mx-auto" />
           </div>
         </SidebarHeader>
         <SidebarContent className="p-0">
