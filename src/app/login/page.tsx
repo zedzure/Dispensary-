@@ -51,6 +51,7 @@ export default function LoginPage() {
             points: 0,
             nextReward: 0,
             role: 'admin',
+            bio: 'Overseeing operations and ensuring the best customer experience.'
         };
     } else if (email === "budtenderone@gmsil.com" && loginPassword === "Dancer$5109") {
         loggedInUser = {
@@ -61,6 +62,7 @@ export default function LoginPage() {
             points: 0,
             nextReward: 0,
             role: 'budtender',
+            bio: 'Passionate about cannabis and helping people find the right product for their needs.'
         };
     } else if (email === "kim.l@silzeypos.com" && loginPassword === "Dancer$5109") {
         loggedInUser = {
@@ -71,6 +73,7 @@ export default function LoginPage() {
             points: 2500,
             nextReward: 3000,
             role: 'customer',
+            bio: 'Exploring different strains for relaxation and creativity. Big fan of fruity edibles!'
         };
     }
     

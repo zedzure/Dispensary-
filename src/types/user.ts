@@ -1,3 +1,4 @@
+
 export interface User {
   name: string;
   email: string;
@@ -6,4 +7,5 @@ export interface User {
   points: number;
   nextReward: number;
   role: 'customer' | 'budtender' | 'admin';
+  bio?: string;
 }
