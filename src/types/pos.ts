@@ -7,6 +7,8 @@ export interface OrderItem extends Omit<Product, 'price' | 'stock'> {
   price: number;
 }
 
+export type OrderStatus = 'Pending Checkout' | 'In-Store' | 'Completed' | 'Shipped' | 'Cancelled';
+
 export interface Order {
   id: string;
   customerName: string;
@@ -15,6 +17,9 @@ export interface Order {
   itemCount: number;
   items: OrderItem[];
   totalAmount: number;
-  status: 'Pending Checkout' | 'In-Store' | 'Completed' | 'Cancelled';
+  status: OrderStatus;
   processedAt?: string; // ISO string
+  shippingAddress?: string;
+  paymentMethod?: string;
+  submittedByPOS?: boolean;
 }
