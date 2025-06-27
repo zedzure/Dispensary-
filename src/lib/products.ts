@@ -44,7 +44,7 @@ export const generateProducts = (category: { name: string, hint: string }, count
 
 export const allProducts = categories.reduce((acc, category) => {
   if (category.name !== 'Coming Soon') {
-    const productCount = category.name === 'Medical' ? 30 : 10;
+    const productCount = category.name === 'Medical' ? 40 : 10;
     acc[category.name] = generateProducts(category, productCount);
   }
   return acc;
