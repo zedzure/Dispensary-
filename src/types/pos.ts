@@ -55,3 +55,12 @@ export interface InventoryItem {
   stock: number;
   salePrice: number;
 }
+
+export type TransactionStatus = 'Completed' | 'Pending' | 'Failed';
+
+export interface TransactionItem {
+  id: string;
+  name: string;
+  qty: number;
+  price: number;
+}

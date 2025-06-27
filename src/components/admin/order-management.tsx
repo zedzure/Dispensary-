@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Download, Eye, Edit, PackageSearch } from 'lucide-react';
+import { Download, Eye, Edit, PackageSearch, Printer } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -14,6 +14,7 @@ import type { Order, OrderStatus } from '@/types/pos';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { OrderReceiptModal } from '@/components/order-receipt-modal';
 import { generateInitialMockOrders } from '@/lib/mockOrderData';
+import Link from 'next/link';
 
 const POS_PENDING_ORDERS_STORAGE_KEY = 'posPendingOrdersSilzey';
 const DASHBOARD_COMPLETED_ORDERS_STORAGE_KEY = 'dashboardCompletedOrdersSilzey';
@@ -234,6 +235,11 @@ export function OrderManagement() {
                            onClick={() => handleShowOrderReceipt(order)}
                         >
                           <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" asChild>
+                           <Link href={`/admin/print/receipt/${order.id}?type=order`} target="_blank" rel="noopener noreferrer">
+                              <Printer className="h-4 w-4" />
+                           </Link>
                         </Button>
                         <Button variant="ghost" size="icon" onClick={() => alert('Editing order ' + order.id + ' (mock)')} aria-label="Edit order" disabled={order.status === 'Pending Checkout'}>
                           <Edit className="h-4 w-4" />
