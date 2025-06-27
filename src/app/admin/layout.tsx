@@ -44,6 +44,7 @@ import {
   CreditCard,
   Landmark,
   Link2,
+  ListChecks,
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -72,6 +73,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/admin/pos', label: 'POS Queue', icon: ListChecks },
     { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
     { href: '/admin/products', label: 'Products', icon: Package },
     { href: '/admin/promotions', label: 'Promotions', icon: Tag },
