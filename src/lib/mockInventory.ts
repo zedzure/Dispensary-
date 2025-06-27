@@ -52,4 +52,7 @@ export const generateMockInventory = (): InventoryItem[] => {
 };
 
 export const saveInventory = (inventory: InventoryItem[]) => {
-    if (typeof window !== 'undefined')
+    if (typeof window !== 'undefined') {
+        localStorage.setItem(INVENTORY_STORAGE_KEY, JSON.stringify(inventory));
+    }
+};
