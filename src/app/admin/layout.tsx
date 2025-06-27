@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { 
     Home, ShoppingBag, Users, BarChart3, LogOut, Menu, Terminal, Package, Ticket, 
     Settings, Store, CreditCard, UserCog, Leaf, Cog, UsersRound, FileText, Gift,
-    History, Map, Landmark, Link2, ListChecks, Sparkles, FlaskConical, Briefcase, ShieldCheck, Tag
+    History, Map, Landmark, Link2, ListChecks, Sparkles, FlaskConical, Briefcase, ShieldCheck, Tag, Trash2
 } from 'lucide-react';
 import {
   Sheet,
@@ -26,7 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const navItems = [
     { href: '/admin', label: 'Dashboard', icon: Home },
