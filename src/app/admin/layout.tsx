@@ -32,7 +32,18 @@ import {
   Gift,
   Settings,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Tag,
+  Briefcase,
+  ShieldCheck,
+  Warehouse,
+  FileText,
+  Trash2,
+  History,
+  Map,
+  CreditCard,
+  Landmark,
+  Link2,
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -61,16 +72,59 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/admin/users', label: 'Users', icon: Users },
-    { href: '/admin/budtenders', label: 'Budtenders', icon: UserCog },
-    { href: '/admin/products', label: 'Products', icon: Package },
     { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+    { href: '/admin/products', label: 'Products', icon: Package },
+    { href: '/admin/promotions', label: 'Promotions', icon: Tag },
   ];
   
-  const settingItems = [
-      { href: '/admin/points', label: 'Points Engine', icon: Gift },
-      { href: '/admin/settings', label: 'Settings', icon: Settings },
+  const managementItems = [
+      { href: '/admin/users', label: 'Customers', icon: Users },
+      { href: '/admin/staff', label: 'Staff', icon: Briefcase },
+      { href: '/admin/budtenders', label: 'Budtenders', icon: UserCog },
+      { href: '/admin/roles', label: 'Roles & Permissions', icon: ShieldCheck },
   ];
+
+  const reportItems = [
+    { href: '/admin/reports/sales', label: 'Sales Reports', icon: BarChart3 },
+    { href: '/admin/reports/inventory', label: 'Inventory Reports', icon: Warehouse },
+    { href: '/admin/reports/loyalty', label: 'Loyalty Reports', icon: Gift },
+    { href: '/admin/reports/usage', label: 'Usage Reports', icon: FileText },
+    { href: '/admin/reports/waste', label: 'Waste Reports', icon: Trash2 },
+    { href: '/admin/activity-log', label: 'Activity Log', icon: History },
+  ];
+
+  const settingsItems = [
+    { href: '/admin/settings', label: 'General', icon: Settings },
+    { href: '/admin/settings/locations', label: 'Locations', icon: Map },
+    { href: '/admin/settings/payment', label: 'Payment Gateways', icon: CreditCard },
+    { href: '/admin/settings/taxes', label: 'Tax Rules', icon: Landmark },
+    { href: '/admin/points', label: 'Loyalty Engine', icon: Gift },
+    { href: '/admin/settings/compliance', label: 'Compliance', icon: Link2 },
+  ];
+
+  const createAccordion = (title: string, icon: React.ElementType, items: typeof navItems) => {
+      const Icon = icon;
+      return (
+        <AccordionItem value={title.toLowerCase()} className="border-b-0">
+            <AccordionTrigger className="w-full flex items-center gap-2 rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg:last-child]:rotate-180 hover:no-underline justify-start">
+            <Icon className="h-4 w-4 shrink-0" />
+            <span className="flex-1 text-left">{title}</span>
+            <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+            </AccordionTrigger>
+            <AccordionContent className="pb-1 pl-5">
+            <SidebarMenu>
+                {items.map((item) => (
+                    <SidebarMenuItem key={item.label}>
+                        <SidebarMenuButton asChild size="sm" isActive={pathname === item.href}>
+                            <Link href={item.href}>{item.label}</Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+            </AccordionContent>
+        </AccordionItem>
+      );
+  }
 
   return (
     <SidebarProvider>
@@ -102,46 +156,17 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 ))}
-                <Accordion type="single" collapsible className="w-full px-2">
-                  <AccordionItem value="reports" className="border-b-0">
-                    <AccordionTrigger className="w-full flex items-center gap-2 rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg:last-child]:rotate-180 hover:no-underline justify-start">
-                      <BarChart3 className="h-4 w-4 shrink-0" />
-                      <span className="flex-1 text-left">Reports</span>
-                      <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-1 pl-5">
-                      <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild size="sm" isActive={pathname === '/admin/reports/sales'}>
-                                <Link href="/admin/reports/sales">Sales Reports</Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild size="sm" isActive={pathname === '/admin/reports/loyalty'}>
-                                <Link href="/admin/reports/loyalty">Loyalty Reports</Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      </SidebarMenu>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
             </SidebarMenu>
+             <Accordion type="multiple" className="w-full px-2 space-y-1">
+                {createAccordion("Management", Users, managementItems)}
+                {createAccordion("Reports", BarChart3, reportItems)}
+                {createAccordion("Settings", Settings, settingsItems)}
+            </Accordion>
         </SidebarContent>
         <SidebarFooter className="p-2">
-          <SidebarMenu>
-            {settingItems.map((item) => (
-                <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButton asChild isActive={pathname === item.href}>
-                        <Link href={item.href}>
-                            <item.icon />
-                            <span>{item.label}</span>
-                        </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
           <Button variant="outline" size="sm" onClick={logout} className="mt-4">
-            <LogOut className="mr-2 h-4 w-4" /> Logout
+            <LogOut className="mr-2 h-4 w-4" /> 
+            <span className="group-data-[state=collapsed]:hidden">Logout</span>
           </Button>
         </SidebarFooter>
       </Sidebar>
