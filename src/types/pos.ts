@@ -54,6 +54,9 @@ export interface InventoryItem {
   supplier: string;
   stock: number;
   salePrice: number;
+  image: string;
+  hint: string;
+  description: string;
 }
 
 export type TransactionStatus = 'Completed' | 'Pending' | 'Failed';
@@ -63,4 +66,10 @@ export interface TransactionItem {
   name: string;
   qty: number;
   price: number;
+}
+
+export interface ReelConfigItem {
+  inventoryItemId: string;
+  badgeType: string;
+  pulsatingBorder: boolean;
 }
