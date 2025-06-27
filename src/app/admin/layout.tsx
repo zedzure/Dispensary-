@@ -45,6 +45,7 @@ import {
   Landmark,
   Link2,
   ListChecks,
+  Sparkles,
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -91,6 +92,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
     { href: '/admin/reports/inventory', label: 'Inventory Reports', icon: Warehouse },
     { href: '/admin/reports/loyalty', label: 'Loyalty Reports', icon: Gift },
     { href: '/admin/reports/usage', label: 'Usage Reports', icon: FileText },
+    { href: '/admin/reports/customer-insights', label: 'Customer Insights', icon: Sparkles },
     { href: '/admin/reports/waste', label: 'Waste Reports', icon: Trash2 },
     { href: '/admin/activity-log', label: 'Activity Log', icon: History },
   ];
@@ -108,7 +110,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
       const Icon = icon;
       return (
         <AccordionItem value={title.toLowerCase()} className="border-b-0">
-            <AccordionTrigger className="w-full flex items-center gap-2 rounded-md p-2 text-left text-base outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg:last-child]:rotate-180 hover:no-underline justify-start">
+            <AccordionTrigger className="w-full flex items-center gap-2 rounded-md p-2 text-left text-lg outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg:last-child]:rotate-180 hover:no-underline justify-start">
             <Icon className="h-4 w-4 shrink-0" />
             <span className="flex-1 text-left">{title}</span>
             <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
@@ -153,7 +155,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
                         <SidebarMenuButton asChild isActive={pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))}>
                             <Link href={item.href}>
                                 <item.icon />
-                                <span>{item.label}</span>
+                                <span className='text-lg'>{item.label}</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

@@ -1,6 +1,28 @@
 
 import type { Product } from './product';
 
+export type Category = "Flower" | "Concentrates" | "Vapes" | "Edibles" | "Pre-rolls" | "Medical" | "Tinctures" | "Topicals" | "Gear" | "Deals";
+
+export interface UserProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  memberSince: string; // ISO String
+  avatarUrl: string;
+  dataAiHint?: string;
+  orderHistory?: Order[];
+}
+
+export interface CustomerMetrics extends UserProfile {
+  totalSpent: number;
+  orderCount: number;
+  averageOrderValue: number;
+  preferredCategories: { category: Category; count: number }[];
+  lastOrderDate?: Date;
+}
+
+
 // Omit price and stock from Product to redefine price, and stock is not needed here.
 export interface OrderItem extends Omit<Product, 'price' | 'stock'> {
   quantity: number;
