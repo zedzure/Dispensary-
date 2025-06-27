@@ -46,6 +46,7 @@ import {
   Link2,
   ListChecks,
   Sparkles,
+  FlaskConical,
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -85,6 +86,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
       { href: '/admin/staff', label: 'Staff', icon: Briefcase },
       { href: '/admin/budtenders', label: 'Budtenders', icon: UserCog },
       { href: '/admin/roles', label: 'Roles & Permissions', icon: ShieldCheck },
+      { href: '/admin/processing', label: 'Processing & Mfg.', icon: FlaskConical },
   ];
 
   const reportItems = [
