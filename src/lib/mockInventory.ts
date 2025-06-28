@@ -11,7 +11,7 @@ export const generateMockInventory = (): InventoryItem[] => {
   if (storedInventoryRaw) {
     try {
       const storedInventory = JSON.parse(storedInventoryRaw);
-      if (Array.isArray(storedInventory) && storedInventory.length > 0 && 'purchasePrice' in storedInventory[0]) {
+      if (Array.isArray(storedInventory) && storedInventory.length > 0 && 'active' in storedInventory[0]) {
         return storedInventory;
       }
     } catch (e) {
@@ -41,6 +41,7 @@ export const generateMockInventory = (): InventoryItem[] => {
       tags: index % 3 === 0 ? 'Best Seller' : (index % 5 === 0 ? 'New Arrival,Organic' : 'Staff Pick'),
       notes: index % 7 === 0 ? `Received new shipment on ${new Date().toLocaleDateString()}. Watch for discoloration.` : '',
       lastRestockDate: lastRestock.toISOString(),
+      active: index % 10 !== 0, // Make about 10% inactive
     };
   });
   

@@ -12,9 +12,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { X, Package, Tag, Building, BarChartBig, DollarSign, CalendarDays, Info, AlertTriangle, Save, Edit, StarIcon, ImagePlus } from 'lucide-react';
+import { X, Package, Tag, Building, BarChartBig, DollarSign, CalendarDays, Info, AlertTriangle, Save, Edit, StarIcon, ImagePlus, Power } from 'lucide-react';
 import type { InventoryItem } from '@/types/pos';
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from '../ui/switch';
 
 interface InventoryItemDetailModalProps {
   item: InventoryItem | null;
@@ -61,7 +62,7 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
   useEffect(() => {
     if (item) {
       setEditableItem({ ...item });
-      setIsEditing(false);
+      setIsEditing(item.id.startsWith('NEW-')); // Automatically enter edit mode for new items
     } else {
       setEditableItem(null);
     }
@@ -86,6 +87,10 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
     }
     setEditableItem(prev => prev ? { ...prev, [name]: processedValue } : null);
   };
+  
+  const handleSwitchChange = (checked: boolean) => {
+    setEditableItem(prev => prev ? { ...prev, active: checked } : null);
+  };
 
   const handleSaveClick = () => {
     if (editableItem) {
@@ -108,6 +113,11 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
          toast({ variant: 'destructive', title: "Validation Error", description: "Rating cannot be more than 5." });
          return;
       }
+      
+      if(!editableItem.name.trim()) {
+        toast({ variant: 'destructive', title: "Validation Error", description: "Product name is required." });
+        return;
+      }
 
       onSave(editableItem);
       setIsEditing(false);
@@ -115,8 +125,12 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
   };
   
   const handleCancelEdit = () => {
-    if (item) setEditableItem({...item});
-    setIsEditing(false);
+    if (item && !item.id.startsWith('NEW-')) {
+       setEditableItem({...item});
+       setIsEditing(false);
+    } else {
+        onClose(); // Close modal if it was a new item
+    }
   }
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -155,10 +169,10 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
         <DialogHeader className="p-6 border-b border-border flex flex-row justify-between items-center">
           <div>
             <DialogTitle className="text-2xl font-cursive text-primary flex items-center">
-              <Package className="mr-3 h-6 w-6"/> {isEditing ? 'Edit: ' : ''}{editableItem.name}
+              <Package className="mr-3 h-6 w-6"/> {isEditing ? 'Edit: ' : ''}{editableItem.name || 'New Product'}
             </DialogTitle>
             <DialogDescription>
-              SKU: {editableItem.sku} (Category: {editableItem.category})
+              SKU: {editableItem.sku || 'Will be generated'} (Category: {editableItem.category})
             </DialogDescription>
           </div>
           {!isEditing ? (
@@ -167,7 +181,7 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
             </Button>
           ) : (
              <Button variant="outline" size="sm" onClick={handleCancelEdit}>
-                <X className="mr-2 h-4 w-4" /> Cancel Edit
+                <X className="mr-2 h-4 w-4" /> Cancel
             </Button>
           )}
         </DialogHeader>
@@ -256,23 +270,46 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
                     <Input id="itemRating" name="rating" type="number" step="0.1" min="0" max="5" value={String(editableItem.rating)} onChange={handleInputChange} />
                 </div>
                 <div className="md:col-span-2 space-y-1">
-                    <Label htmlFor="itemNotes">Notes</Label>
+                    <Label htmlFor="itemDescription">Description</Label>
+                    <Textarea id="itemDescription" name="description" value={editableItem.description || ''} onChange={handleInputChange} rows={3} />
+                </div>
+                <div className="md:col-span-2 space-y-1">
+                    <Label htmlFor="itemNotes">Internal Notes</Label>
                     <Textarea id="itemNotes" name="notes" value={editableItem.notes || ''} onChange={handleInputChange} rows={3} />
+                </div>
+                <Separator className="md:col-span-2 my-2" />
+                <div className="md:col-span-2 flex items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                        <Label htmlFor="itemActive" className="text-base">Active Status</Label>
+                        <p className="text-xs text-muted-foreground">Inactive products will not be visible on the storefront.</p>
+                    </div>
+                    <Switch
+                        id="itemActive"
+                        checked={editableItem.active}
+                        onCheckedChange={handleSwitchChange}
+                    />
                 </div>
               </>
             ) : (
               <>
+                <DetailItem icon={Power} label="Active Status:" value={null} isComponent value={<Badge variant={editableItem.active ? 'default' : 'outline'}>{editableItem.active ? 'Active' : 'Inactive'}</Badge>} />
                 <DetailItem icon={Tag} label="Category:" value={editableItem.category} isBadge />
                 <DetailItem icon={Building} label="Supplier:" value={editableItem.supplier} />
                 <DetailItem icon={BarChartBig} label="Current Stock:" value={`${editableItem.stock} units`} />
-                <DetailItem icon={null} label="Status:" value={<Badge variant="outline" className={`capitalize ${stockBadge.className}`}>{stockBadge.text}</Badge>} isComponent />
+                <DetailItem icon={null} label="Stock Status:" value={<Badge variant="outline" className={`capitalize ${stockBadge.className}`}>{stockBadge.text}</Badge>} isComponent />
                 <DetailItem icon={AlertTriangle} label="Low Stock Threshold:" value={`${editableItem.lowStockThreshold} units`} className="text-yellow-600" />
                 <DetailItem icon={CalendarDays} label="Last Restock:" value={new Date(editableItem.lastRestockDate).toLocaleDateString()} />
                 <DetailItem icon={DollarSign} label="Purchase Price:" value={`$${Number(editableItem.purchasePrice).toFixed(2)}`} />
                 <DetailItem icon={DollarSign} label="Sale Price:" value={`$${Number(editableItem.salePrice).toFixed(2)}`} className="text-primary" />
                  <DetailItem icon={Tag} label="Tags:" value={editableItem.tags} />
                 <DetailItem icon={StarIcon} label="Rating:" value={`${editableItem.rating} / 5`} />
-
+                
+                 {editableItem.description && (
+                    <div className="md:col-span-2 space-y-1 pt-2">
+                        <h3 className="font-semibold text-sm mb-1 flex items-center"><Info className="mr-2 h-4 w-4 text-primary" />Description:</h3>
+                        <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-md border border-border/70 whitespace-pre-wrap">{editableItem.description}</p>
+                    </div>
+                )}
                 {editableItem.notes && (
                     <div className="md:col-span-2 space-y-1 pt-2">
                         <h3 className="font-semibold text-sm mb-1 flex items-center"><Info className="mr-2 h-4 w-4 text-primary" />Notes:</h3>

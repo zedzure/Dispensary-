@@ -10,4 +10,5 @@ export interface Product {
   image: string;
   hint: string;
   stock?: number;
+  active?: boolean;
 }

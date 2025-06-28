@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Package, PlusCircle, Trash2, PackageSearch, Tag, Layers3, MoreVertical, Printer, Eye } from 'lucide-react';
+import { Package, PlusCircle, Trash2, PackageSearch, Tag, Layers3, MoreVertical, Printer, Eye, Power } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,7 +27,7 @@ const initialProductFormState: Omit<InventoryItem, 'id' | 'lastRestockDate'> = {
   name: '', sku: '', category: '', supplier: '', stock: 0,
   lowStockThreshold: 20, purchasePrice: 0, salePrice: 0, rating: 0,
   tags: '', notes: '', image: 'https://placehold.co/400x400.png', 
-  hint: 'product image', description: ''
+  hint: 'product image', description: '', active: true,
 };
 
 export function InventoryManagement() {
@@ -194,7 +194,8 @@ export function InventoryManagement() {
                     <TableHead><Layers3 className="inline-block mr-1 h-4 w-4" />Category</TableHead>
                     <TableHead className="text-center">Stock</TableHead>
                     <TableHead className="text-right"><Tag className="inline-block mr-1 h-4 w-4" />Price</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Stock Status</TableHead>
+                    <TableHead><Power className="inline-block mr-1 h-4 w-4" />Active</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -210,6 +211,9 @@ export function InventoryManagement() {
                         <TableCell className="text-right">${item.salePrice.toFixed(2)}</TableCell>
                         <TableCell>
                           <Badge variant={stockInfo.variant}>{stockInfo.text}</Badge>
+                        </TableCell>
+                         <TableCell>
+                          <Badge variant={item.active ? 'default' : 'outline'}>{item.active ? 'Active' : 'Inactive'}</Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenModal(item)}>
@@ -235,6 +239,7 @@ export function InventoryManagement() {
                       <div>
                         <p className="font-semibold">{item.name}</p>
                         <p className="text-sm text-muted-foreground">{item.category} / {item.sku}</p>
+                        <Badge variant={item.active ? 'default' : 'outline'} className="mt-2">{item.active ? 'Active' : 'Inactive'}</Badge>
                       </div>
                       <MoreVertical className="h-4 w-4 cursor-pointer" onClick={() => handleOpenModal(item)}/>
                     </CardHeader>

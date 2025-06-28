@@ -66,6 +66,7 @@ export interface InventoryItem {
   image: string;
   hint: string;
   description: string;
+  active: boolean;
 }
 
 
