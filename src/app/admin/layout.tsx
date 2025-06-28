@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { 
     Home, ShoppingBag, Users, BarChart3, LogOut, Menu, Terminal, Package, Ticket, 
     Settings, Store, CreditCard, UserCog, Leaf, Cog, UsersRound, FileText, Gift,
-    History, Map, Landmark, Link2, ListChecks, Sparkles, FlaskConical, Briefcase, ShieldCheck, Tag, Trash2
+    History, Map, Landmark, Link2, ListChecks, Sparkles, FlaskConical, Briefcase, ShieldCheck, Tag, Trash2, Database
 } from 'lucide-react';
 import {
   Sheet,
@@ -32,7 +32,8 @@ const navItems = [
     { href: '/admin', label: 'Dashboard', icon: Home },
     { href: '/admin/pos', label: 'POS Queue', icon: Terminal },
     { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
-    { href: '/admin/products', label: 'Products', icon: Package },
+    { href: '/admin/products', label: 'Products CMS', icon: Package },
+    { href: '/admin/firestore-products', label: 'Live Products', icon: Database },
     { href: '/admin/promotions', label: 'Promotions', icon: Ticket },
     { href: '/admin/users', label: 'Customers', icon: Users },
     { href: '/admin/staff', label: 'Staff', icon: Briefcase },
