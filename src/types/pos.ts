@@ -75,3 +75,18 @@ export interface TransactionItem {
 }
 
 export interface ReelConfigItem {
+  inventoryItemId: string;
+  badgeType: string;
+  pulsatingBorder: boolean;
+}
+
+export interface TransactionType {
+  id: string;
+  originalOrderId: string;
+  originalOrderType: 'order';
+  customer: string;
+  date: string; // ISO string
+  amount: string; // e.g., '$75.50'
+  status: TransactionStatus;
+  items: TransactionItem[];
+}

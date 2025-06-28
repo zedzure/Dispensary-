@@ -1,15 +1,15 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
-    DollarSign, Users, Package, LayoutDashboard, UserPlus, PackageSearch, ListChecks, FileText, Settings
+    DollarSign, Users, Package, LayoutDashboard, UserPlus, PackageSearch, ListChecks, FileText, Settings, RefreshCw, Eye, Printer, Download
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Skeleton } from '@/components/ui/skeleton';
-import type { Order, InventoryItem, UserProfile } from '@/types/pos';
+import type { Order, UserProfile, InventoryItem, OrderItem, TransactionType, TransactionStatus } from '@/types/pos';
 import { generateInitialMockOrders } from '@/lib/mockOrderData';
 import { generateMockInventory } from '@/lib/mockInventory';
 import { Button } from '@/components/ui/button';
@@ -17,11 +17,16 @@ import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { mockCustomers } from '@/lib/mockCustomers';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from "@/hooks/use-toast";
+import { OrderReceiptModal } from '@/components/order-receipt-modal';
 
 // --- STORAGE KEYS ---
 const POS_PENDING_ORDERS_STORAGE_KEY = 'posPendingOrdersSilzey';
 const DASHBOARD_COMPLETED_ORDERS_STORAGE_KEY = 'dashboardCompletedOrdersSilzey';
-const INVENTORY_STORAGE_KEY = 'silzeyPosInventory'; // Corrected key from user code
+const INVENTORY_STORAGE_KEY = 'silzeyPosInventory';
 const ALL_USERS_STORAGE_KEY = 'allUserProfilesSilzeyPOS';
 
 // --- HELPERS ---
@@ -36,9 +41,75 @@ const isToday = (isoDateString?: string) => {
   }
 };
 
+const convertOrdersToTransactions = (orders: Order[]): TransactionType[] => {
+  if (!orders || orders.length === 0) {
+    return [];
+  }
+  return orders.map(order => ({
+    id: `TRX-ORD-${order.id.substring(order.id.length - 7)}`,
+    originalOrderId: order.id,
+    originalOrderType: 'order',
+    customer: order.customerName,
+    date: order.processedAt || order.orderDate,
+    amount: `$${order.totalAmount.toFixed(2)}`,
+    status: 'Completed', 
+    items: order.items.map((item: OrderItem) => ({
+      id: item.id,
+      name: item.name,
+      qty: item.quantity,
+      price: item.price,
+    })),
+  }));
+};
+
+const convertToCSV = (data: TransactionType[]) => {
+  const headers = ['Transaction ID', 'Original Order ID', 'Customer', 'Date', 'Amount', 'Status', 'Items (Name|Qty|Price;...)'];
+  const csvRows = [
+    headers.join(','),
+    ...data.map(transaction =>
+      [
+        transaction.id,
+        transaction.originalOrderId || '',
+        `"${transaction.customer.replace(/"/g, '""')}"`,
+        new Date(transaction.date).toLocaleDateString(),
+        transaction.amount.replace('$', ''),
+        transaction.status,
+        `"${transaction.items.map(item => `${item.name}|${item.qty}|${item.price}`).join(';')}"`
+      ].join(',')
+    )
+  ];
+  return csvRows.join('\n');
+};
+
+const downloadCSV = (csvString: string, filename: string) => {
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  } else {
+    alert("CSV download is not supported in your browser.");
+  }
+};
+
+const getStatusBadgeVariant = (status: TransactionStatus): "default" | "secondary" | "destructive" => {
+    switch (status) {
+        case 'Completed': return 'default';
+        case 'Pending': return 'secondary';
+        case 'Failed': return 'destructive';
+        default: return 'default';
+    }
+};
+
+
 // --- SUB-COMPONENTS ---
 
-// Re-implementing StatCard based on user's code and existing MetricCard
 function StatCard({ title, value, icon: Icon, description }: { title: string; value: string; icon: React.ElementType; description: string; }) {
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow">
@@ -54,7 +125,6 @@ function StatCard({ title, value, icon: Icon, description }: { title: string; va
   );
 }
 
-// Loading state for the StatCard
 function LoadingStatCard() {
   return (
     <Card>
@@ -70,11 +140,245 @@ function LoadingStatCard() {
   );
 }
 
+function RecentTransactionsTable() {
+  const [allTransactions, setAllTransactions] = useState<TransactionType[]>([]);
+  const [filterCustomer, setFilterCustomer] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedOrderForModal, setSelectedOrderForModal] = useState<Order | null>(null);
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+  const { toast } = useToast();
+
+  const fetchData = useCallback(async () => {
+    await new Promise(resolve => setTimeout(resolve, 300)); 
+    let completedOrdersFromStorage: Order[] = [];
+    try {
+      const completedOrdersRaw = localStorage.getItem(DASHBOARD_COMPLETED_ORDERS_STORAGE_KEY);
+      if (completedOrdersRaw) {
+        completedOrdersFromStorage = JSON.parse(completedOrdersRaw);
+      }
+    } catch (e) {
+      console.error("Error parsing completed dashboard orders from localStorage in RTT:", e);
+      completedOrdersFromStorage = [];
+    }
+
+    if (completedOrdersFromStorage && completedOrdersFromStorage.length > 0) {
+      const converted = convertOrdersToTransactions(completedOrdersFromStorage);
+      setAllTransactions(converted.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+    } else {
+      setAllTransactions([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    const initialLoad = async () => {
+      setIsLoading(true);
+      try {
+        await fetchData();
+      } catch (error) {
+        console.error("Error during initial data load for RTT:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    initialLoad();
+  }, [fetchData]);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await fetchData();
+    } catch (error) {
+      console.error("Error during data refresh for RTT:", error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [fetchData]);
+
+  const filteredTransactions = useMemo(() => {
+    return allTransactions.filter(transaction => {
+      const customerMatch = filterCustomer ? transaction.customer.toLowerCase().includes(filterCustomer.toLowerCase()) : true;
+      return customerMatch;
+    });
+  }, [allTransactions, filterCustomer]);
+
+  const handleDownload = () => {
+    if (filteredTransactions.length === 0) {
+        toast({ variant: 'destructive', title: "No transactions to download."});
+        return;
+    }
+    const csvString = convertToCSV(filteredTransactions);
+    downloadCSV(csvString, 'recent_transactions_from_pos.csv');
+  };
+
+  const handleShowOrderReceipt = (transaction: TransactionType) => {
+    if (!transaction.originalOrderId) {
+      toast({ variant: 'destructive', title: "Cannot view details: Original order ID not found for this transaction."});
+      return;
+    }
+    try {
+      const completedOrdersRaw = localStorage.getItem(DASHBOARD_COMPLETED_ORDERS_STORAGE_KEY);
+      if (completedOrdersRaw) {
+        const completedOrders: Order[] = JSON.parse(completedOrdersRaw);
+        const orderToShow = completedOrders.find(o => o.id === transaction.originalOrderId);
+        if (orderToShow) {
+          setSelectedOrderForModal(orderToShow);
+          setIsReceiptModalOpen(true);
+        } else {
+          toast({ variant: 'destructive', title: `Original order (${transaction.originalOrderId}) not found.`});
+        }
+      } else {
+        toast({ variant: 'destructive', title: "No completed orders found in storage."});
+      }
+    } catch (e) {
+      console.error("Error loading order for modal:", e);
+      toast({ variant: 'destructive', title: "Error loading order details."});
+    }
+  };
+
+  const handleCloseOrderReceiptModal = () => {
+    setIsReceiptModalOpen(false);
+    setSelectedOrderForModal(null);
+  };
+
+  if (isLoading) {
+    return (
+        <Card className="shadow-lg">
+            <CardHeader>
+                <Skeleton className="h-7 w-48" />
+                <Skeleton className="h-4 w-64 mt-1" />
+            </CardHeader>
+            <CardContent className="py-4 border-y border-border">
+                 <Skeleton className="h-9 w-full" />
+            </CardContent>
+            <CardContent className="pt-4">
+                 <div className="space-y-3">
+                    {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
+                </div>
+            </CardContent>
+        </Card>
+    );
+  }
+
+  return (
+    <>
+      <Card className="shadow-lg">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div>
+            <CardTitle className="font-cursive text-primary">Recent POS Transactions</CardTitle>
+            <CardDescription>Transactions from completed POS checkouts. Refresh to see new ones.</CardDescription>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleDownload} className="w-full sm:w-auto" disabled={filteredTransactions.length === 0}>
+            <Download className="mr-2 h-4 w-4" />
+            Download CSV
+          </Button>
+        </CardHeader>
+
+        <CardContent className="py-4 border-y border-border">
+          <div className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex-grow sm:flex-1 min-w-[150px] sm:min-w-[200px]">
+              <Label htmlFor="filterCustomerRTT" className="text-xs text-muted-foreground block mb-1">Filter by Customer</Label>
+              <Input
+                id="filterCustomerRTT"
+                placeholder="Customer name..."
+                value={filterCustomer}
+                onChange={(e) => setFilterCustomer(e.target.value)}
+                className="h-9"
+              />
+            </div>
+            <Button variant="outline" size="sm" onClick={handleRefresh} className="h-9 md:self-end w-full md:w-auto" disabled={isRefreshing}>
+                <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} /> 
+                {isRefreshing ? 'Refreshing...' : 'Refresh List'}
+            </Button>
+          </div>
+        </CardContent>
+
+        <CardContent className="pt-4">
+          <ScrollArea className="h-[300px] w-full">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[150px]">Transaction ID</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredTransactions.length > 0 ? (
+                  filteredTransactions.map((transaction) => (
+                    <TableRow key={transaction.id} className="hover:bg-muted/50">
+                      <TableCell className="font-medium" title={transaction.originalOrderId ? `Orig. Order: ${transaction.originalOrderId}` : ''}>
+                        {transaction.id}
+                      </TableCell>
+                      <TableCell>{transaction.customer}</TableCell>
+                      <TableCell>{new Date(transaction.date).toLocaleString()}</TableCell>
+                      <TableCell className="text-right">{transaction.amount}</TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant={getStatusBadgeVariant(transaction.status)} className="capitalize">
+                          {transaction.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right space-x-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={`View Details for Order ${transaction.originalOrderId}`}
+                          aria-label={`View details for order ${transaction.originalOrderId}`}
+                          onClick={() => handleShowOrderReceipt(transaction)}
+                          disabled={!transaction.originalOrderId}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={`Print Receipt for Order ${transaction.originalOrderId}`}
+                          aria-label={`Print receipt for order ${transaction.originalOrderId}`}
+                          onClick={() => {
+                            if (transaction.originalOrderId && transaction.originalOrderType === 'order') {
+                              const url = `/admin/print/receipt/${transaction.originalOrderId}?type=order`;
+                              window.open(url, '_blank');
+                            } else {
+                               toast({ variant: 'destructive', title: 'Cannot print receipt: Original order ID not found.'});
+                            }
+                          }}
+                          disabled={!transaction.originalOrderId}
+                        >
+                          <Printer className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                      No transactions found. Process orders from the Live POS Queue to see them here.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+      {selectedOrderForModal && (
+        <OrderReceiptModal
+          order={selectedOrderForModal}
+          isOpen={isReceiptModalOpen}
+          onClose={handleCloseOrderReceiptModal}
+        />
+      )}
+    </>
+  );
+}
+
 
 // --- MAIN DASHBOARD COMPONENT ---
 
 function AdminDashboard() {
-  // State for all dashboard data
   const [stats, setStats] = useState({
     todaysRevenue: 0,
     newCustomersToday: 0,
@@ -85,7 +389,6 @@ function AdminDashboard() {
     newCustomerChange: 0,
   });
   const [salesData, setSalesData] = useState<{name: string; sales: number}[]>([]);
-  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -95,7 +398,6 @@ function AdminDashboard() {
     const timer = setTimeout(() => {
       if (!isMounted) return;
 
-      // --- Data Loading from localStorage ---
       let allCompletedOrders: Order[] = [];
       let allUsers: UserProfile[] = [...mockCustomers];
       let allInventory: InventoryItem[] = generateMockInventory();
@@ -120,7 +422,7 @@ function AdminDashboard() {
       } catch(e) { console.error("Error loading users", e); }
 
       try {
-        allInventory = generateMockInventory(); // This function handles localStorage internally
+        allInventory = generateMockInventory();
       } catch (e) { console.error("Error loading inventory", e); }
 
       try {
@@ -128,7 +430,6 @@ function AdminDashboard() {
         pendingOrders = storedPendingRaw ? JSON.parse(storedPendingRaw) : [];
       } catch (e) { console.error("Error loading pending orders", e); }
 
-      // --- Calculations ---
       const todaysRevenue = allCompletedOrders
         .filter(o => o.processedAt && isToday(o.processedAt))
         .reduce((sum, o) => sum + o.totalAmount, 0);
@@ -142,7 +443,6 @@ function AdminDashboard() {
       
       const openOrdersCount = pendingOrders.length;
       
-      // --- Monthly Sales Data ---
       const salesByMonth: { [key: string]: number } = {};
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       allCompletedOrders.forEach(order => {
@@ -160,18 +460,16 @@ function AdminDashboard() {
           sales: salesByMonth[monthKey]
       }));
 
-      // --- Set State ---
       setStats({
         todaysRevenue,
         newCustomersToday,
         totalProducts,
         productsInStock,
         openOrdersCount,
-        revenueChange: Math.floor(Math.random() * 30 - 10), // Mock
-        newCustomerChange: Math.floor(Math.random() * 5 - 2), // Mock
+        revenueChange: Math.floor(Math.random() * 30 - 10),
+        newCustomerChange: Math.floor(Math.random() * 5 - 2),
       });
       setSalesData(monthlySales);
-      setRecentOrders(allCompletedOrders.sort((a,b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()).slice(0, 5));
       setIsLoading(false);
     }, 500);
 
@@ -203,7 +501,6 @@ function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Today's Revenue" value={`$${stats.todaysRevenue.toFixed(2)}`} icon={DollarSign} description={formatRevenueChange(stats.revenueChange)} />
         <StatCard title="New Customers" value={stats.newCustomersToday.toString()} icon={UserPlus} description={formatCustomerChange(stats.newCustomerChange)} />
@@ -211,7 +508,6 @@ function AdminDashboard() {
         <StatCard title="Open Orders" value={stats.openOrdersCount.toString()} icon={ListChecks} description={`${stats.openOrdersCount} require attention`} />
       </div>
 
-      {/* Main Content Grid (Chart and Management/Reports Cards) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
             <Card className="shadow-lg h-full">
@@ -264,39 +560,8 @@ function AdminDashboard() {
         </div>
       </div>
       
-      <Card className="shadow-lg">
-        <CardHeader>
-            <CardTitle className="font-cursive text-primary">Recent Orders</CardTitle>
-            <CardDescription>A list of the most recently completed orders.</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Order ID</TableHead>
-                        <TableHead>Customer</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Amount</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                   {recentOrders.map(order => (
-                       <TableRow key={order.id}>
-                           <TableCell className="font-medium">{order.id}</TableCell>
-                           <TableCell>{order.customerName}</TableCell>
-                           <TableCell><Badge variant="default">{order.status}</Badge></TableCell>
-                           <TableCell className="text-right">${order.totalAmount.toFixed(2)}</TableCell>
-                       </TableRow>
-                   ))}
-                   {recentOrders.length === 0 && (
-                       <TableRow>
-                           <TableCell colSpan={4} className="h-24 text-center">No recent orders found.</TableCell>
-                       </TableRow>
-                   )}
-                </TableBody>
-            </Table>
-        </CardContent>
-      </Card>
+      <RecentTransactionsTable />
+
     </div>
   );
 }
