@@ -6,7 +6,7 @@ import {
     DollarSign, Users, Package, LayoutDashboard, UserPlus, PackageSearch, ListChecks, FileText, Settings, RefreshCw, Eye, Printer, Download
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Order, UserProfile, InventoryItem, OrderItem, TransactionType, TransactionStatus } from '@/types/pos';
@@ -482,7 +482,7 @@ function AdminDashboard() {
   const formatRevenueChange = (change: number) => `${change >= 0 ? '+' : ''}${change}% from yesterday`;
   const formatCustomerChange = (change: number) => `${change >= 0 ? '+' : ''}${change} today`;
 
-  const chartConfigSales = { sales: { label: "Sales", color: "hsl(var(--chart-1))" } };
+  const chartConfigSales = { sales: { label: "Sales", color: "hsl(var(--primary))" } } satisfies ChartConfig;
 
   if (isLoading) {
     return (
@@ -513,16 +513,19 @@ function AdminDashboard() {
             <Card className="shadow-lg h-full">
                 <CardHeader>
                     <CardTitle className="font-cursive text-primary">Sales Overview</CardTitle>
-                    <CardDescription>Monthly sales revenue from completed orders.</CardDescription>
+                    <CardDescription>Monthly sales data for the last 6 months (mock data).</CardDescription>
                 </CardHeader>
                 <CardContent className="pl-2">
                     <ChartContainer config={chartConfigSales} className="w-full h-[350px]">
-                    <BarChart data={salesData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                        <CartesianGrid vertical={false} />
+                    <BarChart data={salesData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
                         <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${Number(value) >= 1000 ? `${Number(value)/1000}k` : value}`} />
-                        <ChartTooltip cursor={{ fill: 'hsl(var(--accent))', fillOpacity: 0.3 }} content={<ChartTooltipContent />} />
-                        <Bar dataKey="sales" fill="var(--color-sales)" radius={[4, 4, 0, 0]} />
+                        <ChartTooltip
+                            cursor={{ fill: 'hsl(var(--accent))', fillOpacity: 0.3 }}
+                            content={<ChartTooltipContent />}
+                        />
+                        <Bar dataKey="sales" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                     </BarChart>
                     </ChartContainer>
                 </CardContent>
