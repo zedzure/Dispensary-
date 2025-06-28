@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { FC, ChangeEvent, DragEvent } from 'react';
@@ -30,7 +31,7 @@ const getStockBadgeInfo = (stock: number, threshold: number): { text: string; cl
 
 const isValidImageUrl = (url?: string): boolean => {
   if (!url || typeof url !== 'string') return false;
-  if (url.startsWith('data:')) return true;
+  if (url.startsWith('data:image/')) return true;
   if (url.startsWith('/')) return true; 
 
   if (url.startsWith('http://') || url.startsWith('https:')) {
