@@ -22,6 +22,7 @@ const mockGateways: PaymentGateway[] = [
   { id: 'paypal', name: 'PayPal', description: 'Offer PayPal checkout for a fast and secure payment experience.', logo: '/placeholder.svg', connected: false },
   { id: 'aeropay', name: 'AeroPay', description: 'ACH bank-to-bank payments for the cannabis industry.', logo: '/placeholder.svg', connected: true },
   { id: 'canpay', name: 'CanPay', description: 'The leading debit payment app for cannabis retailers.', logo: '/placeholder.svg', connected: false },
+  { id: 'plaid', name: 'Plaid', description: 'Connect customer bank accounts for ACH payments.', logo: '/placeholder.svg', connected: false },
   { id: 'cash', name: 'Cash', description: 'Accept cash payments in-store.', logo: '/placeholder.svg', connected: true },
 ];
 

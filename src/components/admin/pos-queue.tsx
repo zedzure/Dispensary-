@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, CheckCircle, ListChecks, RefreshCw, ShoppingCart, Link as LinkIcon, Separator } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
-import { UpsellSection } from './upsell-section';
+import UpsellSection from './upsell-section';
 import { upsellSuggestions, type UpsellSuggestionsOutput } from '@/ai/flows/upsell-suggestions';
 
 const POS_PENDING_ORDERS_STORAGE_KEY = 'posPendingOrdersSilzey';
@@ -139,7 +139,7 @@ export function PosQueue() {
     try {
       const processedOrder: Order = {
         ...orderToProcess,
-        status: 'In-Store', 
+        status: 'Completed', 
         processedAt: new Date().toISOString(),
       };
 
@@ -155,7 +155,7 @@ export function PosQueue() {
       
       toast({
         title: "Order Processed!",
-        description: `Order ${processedOrder.id} marked as 'In-Store'.`,
+        description: `Order ${processedOrder.id} marked as 'Completed'.`,
       });
       loadPendingOrders();
 
