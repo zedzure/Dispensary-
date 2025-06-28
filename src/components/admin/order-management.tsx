@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
@@ -12,7 +11,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Order, OrderStatus } from '@/types/pos';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { OrderReceiptModal } from '@/components/order-receipt-modal';
 import { generateInitialMockOrders } from '@/lib/mockOrderData';
 import Link from 'next/link';
 
@@ -83,8 +81,6 @@ export function OrderManagement() {
   const [filterOrderId, setFilterOrderId] = useState('');
   const [filterCustomerName, setFilterCustomerName] = useState('');
   const [filterStatus, setFilterStatus] = useState<OrderStatus | 'All'>('All');
-  const [selectedOrderForModal, setSelectedOrderForModal] = useState<Order | null>(null);
-  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
 
   useEffect(() => {
     const staticMockOrders = generateInitialMockOrders();
@@ -129,18 +125,7 @@ export function OrderManagement() {
     downloadCSV(csvString, 'orders_report.csv');
   };
 
-  const handleShowOrderReceipt = (order: Order) => {
-    setSelectedOrderForModal(order);
-    setIsReceiptModalOpen(true);
-  };
-
-  const handleCloseOrderReceiptModal = () => {
-    setIsReceiptModalOpen(false);
-    setSelectedOrderForModal(null);
-  };
-
   return (
-    <>
     <div className="space-y-6">
       <Card className="shadow-lg">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
@@ -231,13 +216,14 @@ export function OrderManagement() {
                           variant="ghost"
                           size="icon"
                           className="hover:bg-primary/10 text-primary"
-                          aria-label={`View details for order ${order.id}`}
-                           onClick={() => handleShowOrderReceipt(order)}
+                          asChild
                         >
-                          <Eye className="h-4 w-4" />
+                          <Link href={`/admin/print/receipt/${order.id}?type=order`} target="_blank" rel="noopener noreferrer" aria-label={`View details for order ${order.id}`}>
+                            <Eye className="h-4 w-4" />
+                          </Link>
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
-                           <Link href={`/admin/print/receipt/${order.id}?type=order`} target="_blank" rel="noopener noreferrer">
+                           <Link href={`/admin/print/receipt/${order.id}?type=order`} target="_blank" rel="noopener noreferrer" aria-label={`Print receipt for order ${order.id}`}>
                               <Printer className="h-4 w-4" />
                            </Link>
                         </Button>
@@ -260,13 +246,5 @@ export function OrderManagement() {
         </CardContent>
       </Card>
     </div>
-    {selectedOrderForModal && (
-        <OrderReceiptModal
-          order={selectedOrderForModal}
-          isOpen={isReceiptModalOpen}
-          onClose={handleCloseOrderReceiptModal}
-        />
-      )}
-    </>
   );
 }
