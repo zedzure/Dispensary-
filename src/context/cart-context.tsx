@@ -3,15 +3,13 @@
 
 import { createContext, useContext, useState, useMemo, type ReactNode } from "react";
 import type { Product } from "@/types/product";
-
-export interface CartItem extends Product {
-  quantity: number;
-}
+import type { CartItem } from "@/types/pos";
 
 interface CartContextType {
   items: CartItem[];
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, delta: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -40,6 +38,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const removeFromCart = (productId: string) => {
     setItems((prevItems) => prevItems.filter((item) => item.id !== productId));
   };
+  
+  const updateQuantity = (productId: string, delta: number) => {
+    setItems((prevItems) => {
+      return prevItems
+        .map(item => {
+          if (item.id === productId) {
+            const newQuantity = item.quantity + delta;
+            return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
+          }
+          return item;
+        })
+        .filter((item): item is CartItem => item !== null);
+    });
+  };
+
 
   const clearCart = () => {
     setItems([]);
@@ -57,6 +70,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     items,
     addToCart,
     removeFromCart,
+    updateQuantity,
     clearCart,
     totalItems,
     totalPrice,
