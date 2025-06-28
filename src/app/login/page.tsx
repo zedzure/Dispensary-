@@ -26,7 +26,7 @@ const GoogleIcon = () => (
 
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, signInWithGoogle } = useAuth();
   const { toast } = useToast();
   
   // Login states
@@ -171,7 +171,7 @@ export default function LoginPage() {
                     </span>
                   </div>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={signInWithGoogle}>
                   <GoogleIcon />
                   Login with Google
                 </Button>
@@ -214,7 +214,7 @@ export default function LoginPage() {
                     </span>
                   </div>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={signInWithGoogle}>
                    <GoogleIcon />
                   Sign up with Google
                 </Button>

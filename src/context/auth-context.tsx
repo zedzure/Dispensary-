@@ -4,11 +4,14 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import type { User } from '@/types/user';
+import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 interface AuthContextType {
   user: User | null;
   login: (userData: User) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -20,17 +23,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser: User = JSON.parse(storedUser);
+          if (parsedUser.email === firebaseUser.email) {
+            setUser(parsedUser);
+          } else {
+            localStorage.removeItem('user');
+            const newUserProfile = {
+              name: firebaseUser.displayName || 'New User',
+              email: firebaseUser.email!,
+              avatarUrl: firebaseUser.photoURL || "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
+              role: 'customer' as const,
+              memberSince: new Date().toISOString(),
+              points: 0,
+              nextReward: 1000,
+              bio: 'Just joined!',
+            };
+            login(newUserProfile);
+          }
+        }
+      } else {
+        setUser(null);
+        localStorage.removeItem('user');
       }
-    } catch (error) {
-      console.error("Failed to parse user from localStorage", error);
-      localStorage.removeItem('user');
-    } finally {
       setIsLoading(false);
-    }
+    });
+    return () => unsubscribe();
   }, []);
 
   const login = (userData: User) => {
@@ -45,13 +66,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await signOut(auth);
     localStorage.removeItem('user');
     setUser(null);
     router.push('/login');
   };
+  
+  const signInWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const firebaseUser = result.user;
+      
+      const newUser: User = {
+        name: firebaseUser.displayName || 'New User',
+        email: firebaseUser.email!,
+        avatarUrl: firebaseUser.photoURL || "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
+        role: 'customer',
+        memberSince: new Date().toISOString(),
+        points: 0,
+        nextReward: 1000,
+        bio: 'Just joined via Google!',
+      };
+      login(newUser);
 
-  const value = { user, login, logout, isLoading };
+    } catch (error) {
+      console.error("Error during Google sign-in:", error);
+    }
+  };
+
+
+  const value = { user, login, logout, signInWithGoogle, isLoading };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

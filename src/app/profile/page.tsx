@@ -69,7 +69,7 @@ export default function ProfilePage() {
           <h1 className="text-2xl sm:text-3xl font-bold font-cursive text-primary">
             User Profile
           </h1>
-          <Button variant="outline" onClick={logout}>
+          <Button variant="outline" onClick={async () => await logout()}>
             <LogOut className="mr-2 h-4 w-4" /> Sign Out
           </Button>
         </div>

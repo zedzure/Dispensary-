@@ -138,7 +138,7 @@ export default function BudtenderDashboard() {
                   <Settings className="h-5 w-5" />
                   <span className="sr-only">Settings</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={logout}>
+              <Button variant="outline" size="sm" onClick={async () => await logout()}>
                   <LogOut className="mr-2 h-4 w-4" /> Logout
               </Button>
             </div>

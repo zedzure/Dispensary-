@@ -160,7 +160,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           {navLinks(false)}
         </nav>
         <div className="p-4 mt-auto border-t">
-           <Button variant="outline" className="w-full justify-start" onClick={logout}>
+           <Button variant="outline" className="w-full justify-start" onClick={async () => await logout()}>
             <LogOut className="mr-3 h-5 w-5" /> Sign Out
           </Button>
         </div>
@@ -191,7 +191,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   {navLinks(true)}
                 </nav>
                  <div className="p-4 mt-auto border-t">
-                   <Button variant="outline" className="w-full justify-start" onClick={() => { logout(); setIsMobileMenuOpen(false);}}>
+                   <Button variant="outline" className="w-full justify-start" onClick={async () => { await logout(); setIsMobileMenuOpen(false);}}>
                     <LogOut className="mr-3 h-5 w-5" /> Sign Out
                   </Button>
                 </div>
