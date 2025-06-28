@@ -9,12 +9,97 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, CheckCircle, ListChecks, RefreshCw, ShoppingCart, Link as LinkIcon } from 'lucide-react';
+import { AlertTriangle, CheckCircle, ListChecks, RefreshCw, ShoppingCart, Link as LinkIcon, Separator } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
+import { UpsellSection } from './upsell-section';
+import { upsellSuggestions, type UpsellSuggestionsOutput } from '@/ai/flows/upsell-suggestions';
 
 const POS_PENDING_ORDERS_STORAGE_KEY = 'posPendingOrdersSilzey';
 const DASHBOARD_COMPLETED_ORDERS_STORAGE_KEY = 'dashboardCompletedOrdersSilzey';
+
+
+// OrderCard sub-component to encapsulate individual order logic including AI suggestions
+function OrderCard({ order, onProcess, isProcessing }: { order: Order; onProcess: (order: Order) => void; isProcessing: boolean; }) {
+  const [suggestions, setSuggestions] = useState<UpsellSuggestionsOutput | null>(null);
+  const [isUpsellLoading, setIsUpsellLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (order.items.length > 0) {
+        setIsUpsellLoading(true);
+        try {
+          const productNames = order.items.map(item => item.name);
+          const result = await upsellSuggestions({ productNames });
+          setSuggestions(result);
+        } catch (error) {
+          console.error("Failed to get upsell suggestions for order " + order.id, error);
+          setSuggestions(null);
+        } finally {
+          setIsUpsellLoading(false);
+        }
+      }
+    };
+    fetchSuggestions();
+  }, [order.id, order.items]);
+
+  return (
+    <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow">
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="text-lg font-semibold text-primary truncate" title={order.id}>
+              Order ID: {order.id.substring(order.id.length - 7)}
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Customer: {order.customerName} {order.customerId && `(${order.customerId.substring(order.customerId.length - 6)})`}
+            </CardDescription>
+          </div>
+          <Badge variant="destructive" className="bg-orange-500 text-white animate-pulse whitespace-nowrap">
+            Pending Checkout
+          </Badge>
+        </div>
+        <p className="text-xs text-muted-foreground mt-1">
+          Submitted: {new Date(order.orderDate).toLocaleString()}
+        </p>
+      </CardHeader>
+      <CardContent className="flex-grow space-y-2 text-sm">
+        <p className="font-medium">Items ({order.itemCount}):</p>
+        <ScrollArea className="h-32 pr-2">
+          <ul className="space-y-1 text-xs">
+            {order.items.map(item => (
+              <li key={item.id} className="flex items-center gap-2">
+                <Image src={item.image} alt={item.name} width={24} height={24} className="rounded-sm" data-ai-hint={item.hint || item.category.toLowerCase()} />
+                <span className="flex-grow truncate" title={item.name}>{item.name} (x{item.quantity})</span>
+                <span>${(item.price * item.quantity).toFixed(2)}</span>
+              </li>
+            ))}
+          </ul>
+        </ScrollArea>
+        <div className="font-bold text-md text-right pt-2 border-t mt-2">
+          Total: ${order.totalAmount.toFixed(2)}
+        </div>
+        <Separator className="my-3" />
+        <UpsellSection suggestions={suggestions} isLoading={isUpsellLoading} />
+      </CardContent>
+      <CardFooter>
+        <Button
+          className="w-full bg-green-600 hover:bg-green-700 text-white"
+          onClick={() => onProcess(order)}
+          disabled={isProcessing}
+        >
+          {isProcessing ? (
+            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <CheckCircle className="mr-2 h-4 w-4" />
+          )}
+          Process Checkout
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
 
 export function PosQueue() {
   const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
@@ -29,7 +114,6 @@ export function PosQueue() {
     try {
       const pendingOrdersRaw = localStorage.getItem(POS_PENDING_ORDERS_STORAGE_KEY);
       const loadedOrders = pendingOrdersRaw ? JSON.parse(pendingOrdersRaw) : [];
-      // Sort by newest first
       setPendingOrders(loadedOrders.sort((a: Order, b: Order) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()));
     } catch (e) {
       console.error("Error loading pending orders from localStorage", e);
@@ -50,24 +134,20 @@ export function PosQueue() {
 
   const handleProcessOrder = async (orderToProcess: Order) => {
     setProcessingOrderId(orderToProcess.id);
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     try {
-      // Update order status
       const processedOrder: Order = {
         ...orderToProcess,
         status: 'In-Store', 
         processedAt: new Date().toISOString(),
       };
 
-      // Remove from pending orders in localStorage
       const currentPendingOrdersRaw = localStorage.getItem(POS_PENDING_ORDERS_STORAGE_KEY);
       let currentPendingOrders: Order[] = currentPendingOrdersRaw ? JSON.parse(currentPendingOrdersRaw) : [];
       currentPendingOrders = currentPendingOrders.filter(order => order.id !== orderToProcess.id);
       localStorage.setItem(POS_PENDING_ORDERS_STORAGE_KEY, JSON.stringify(currentPendingOrders));
 
-      // Add to completed/dashboard orders in localStorage
       const completedOrdersRaw = localStorage.getItem(DASHBOARD_COMPLETED_ORDERS_STORAGE_KEY);
       let completedOrders: Order[] = completedOrdersRaw ? JSON.parse(completedOrdersRaw) : [];
       completedOrders.push(processedOrder);
@@ -77,7 +157,7 @@ export function PosQueue() {
         title: "Order Processed!",
         description: `Order ${processedOrder.id} marked as 'In-Store'.`,
       });
-      loadPendingOrders(); // Refresh the list
+      loadPendingOrders();
 
     } catch (error) {
       console.error("Error processing order:", error);
@@ -126,57 +206,12 @@ export function PosQueue() {
             <ScrollArea className="h-[calc(100vh-340px)]">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-1">
                 {pendingOrders.map(order => (
-                  <Card key={order.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow">
-                    <CardHeader className="pb-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg font-semibold text-primary truncate" title={order.id}>
-                            Order ID: {order.id.substring(order.id.length - 7)}
-                          </CardTitle>
-                          <CardDescription className="text-xs">
-                            Customer: {order.customerName} {order.customerId && `(${order.customerId.substring(order.customerId.length - 6)})`}
-                          </CardDescription>
-                        </div>
-                        <Badge variant="destructive" className="bg-orange-500 text-white animate-pulse whitespace-nowrap">
-                          Pending Checkout
-                        </Badge>
-                      </div>
-                       <p className="text-xs text-muted-foreground mt-1">
-                        Submitted: {new Date(order.orderDate).toLocaleString()}
-                      </p>
-                    </CardHeader>
-                    <CardContent className="flex-grow space-y-2 text-sm">
-                      <p className="font-medium">Items ({order.itemCount}):</p>
-                      <ScrollArea className="h-32 pr-2">
-                        <ul className="space-y-1 text-xs">
-                          {order.items.map(item => (
-                            <li key={item.id} className="flex items-center gap-2">
-                               <Image src={item.image} alt={item.name} width={24} height={24} className="rounded-sm" data-ai-hint={item.hint || item.category.toLowerCase()} />
-                               <span className="flex-grow truncate" title={item.name}>{item.name} (x{item.quantity})</span>
-                               <span>${(item.price * item.quantity).toFixed(2)}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </ScrollArea>
-                       <div className="font-bold text-md text-right pt-2 border-t mt-2">
-                        Total: ${order.totalAmount.toFixed(2)}
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Button
-                        className="w-full bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => handleProcessOrder(order)}
-                        disabled={processingOrderId === order.id}
-                      >
-                        {processingOrderId === order.id ? (
-                          <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <CheckCircle className="mr-2 h-4 w-4" />
-                        )}
-                        Process Checkout
-                      </Button>
-                    </CardFooter>
-                  </Card>
+                  <OrderCard
+                    key={order.id}
+                    order={order}
+                    onProcess={handleProcessOrder}
+                    isProcessing={processingOrderId === order.id}
+                  />
                 ))}
               </div>
             </ScrollArea>
