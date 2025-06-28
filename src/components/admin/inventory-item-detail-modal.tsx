@@ -2,7 +2,7 @@
 "use client";
 
 import type { FC, ChangeEvent, DragEvent } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { X, Package, Tag, Building, BarChartBig, DollarSign, CalendarDays, Info, AlertTriangle, Save, Edit, StarIcon, ImagePlus, Power, Loader2 } from 'lucide-react';
+import { X, Package, Tag, Building, BarChartBig, DollarSign, CalendarDays, Info, AlertTriangle, Save, Edit, StarIcon, ImagePlus, Power, Loader2, Upload } from 'lucide-react';
 import type { InventoryItem } from '@/types/pos';
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from '../ui/switch';
@@ -61,6 +61,7 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (item) {
@@ -138,7 +139,7 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setIsDraggingOver(true);
+    if (!isUploading) setIsDraggingOver(true);
   };
 
   const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
@@ -146,29 +147,44 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
     setIsDraggingOver(false);
   };
 
-  const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
+  const handleFileSelected = async (file: File | null | undefined) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({ variant: 'destructive', title: "Invalid File", description: 'Please select an image file (e.g., PNG, JPG, GIF).' });
+      return;
+    }
+    
+    setIsUploading(true);
+    try {
+      const imageUrl = await uploadImage(file);
+      if (editableItem) {
+        setEditableItem({ ...editableItem, image: imageUrl });
+      }
+      toast({ title: "Image Uploaded", description: "The new product image has been successfully uploaded." });
+    } catch (error) {
+       console.error("Image upload failed:", error);
+       toast({ variant: 'destructive', title: "Upload Failed", description: 'There was an error uploading your image. Please try again.' });
+    } finally {
+        setIsUploading(false);
+    }
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDraggingOver(false);
-    const files = e.dataTransfer.files;
-    if (files && files[0]) {
-      const file = files[0];
-      if (file.type.startsWith('image/')) {
-        setIsUploading(true);
-        try {
-          const imageUrl = await uploadImage(file);
-          if (editableItem) {
-            setEditableItem({ ...editableItem, image: imageUrl });
-          }
-          toast({ title: "Image Uploaded", description: "The new product image has been successfully uploaded." });
-        } catch (error) {
-           console.error("Image upload failed:", error);
-           toast({ variant: 'destructive', title: "Upload Failed", description: 'There was an error uploading your image. Please try again.' });
-        } finally {
-            setIsUploading(false);
-        }
-      } else {
-        toast({ variant: 'destructive', title: "Invalid File", description: 'Please drop an image file (e.g., PNG, JPG, GIF).' });
-      }
+    if (isUploading) return;
+    const file = e.dataTransfer.files?.[0];
+    handleFileSelected(file);
+  };
+  
+  const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (isUploading) return;
+    const file = e.target.files?.[0];
+    handleFileSelected(file);
+    // Reset file input to allow re-uploading the same file
+    if (e.target) {
+      e.target.value = '';
     }
   };
 
@@ -229,18 +245,37 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
                 <div className="space-y-3 pt-2">
                   <div>
                     <Label htmlFor="itemImage" className="text-xs text-muted-foreground">Image URL</Label>
-                    <Input id="itemImage" name="image" value={editableItem.image || ''} onChange={handleInputChange} placeholder="https://... or drag & drop below" className="h-9"/>
+                    <Input id="itemImage" name="image" value={editableItem.image || ''} onChange={handleInputChange} placeholder="Enter URL, or upload below" className="h-9"/>
                   </div>
+                   <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileInputChange}
+                    className="hidden"
+                    accept="image/*"
+                    disabled={isUploading}
+                  />
+                  <Button type="button" variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                    <Upload className="mr-2 h-4 w-4"/>
+                    Upload from Computer
+                  </Button>
+                  
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+                    <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Or</span></div>
+                  </div>
+
                   <div
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                     className={`p-4 py-6 border-2 border-dashed rounded-md text-center cursor-pointer transition-colors
-                                ${isDraggingOver ? 'border-primary bg-primary/10 ring-2 ring-primary ring-offset-2' : 'border-border hover:border-muted-foreground/70'}`}
+                                ${isDraggingOver ? 'border-primary bg-primary/10 ring-2 ring-primary ring-offset-2' : 'border-border hover:border-muted-foreground/70'}
+                                ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
                   >
                     <ImagePlus className={`mx-auto h-8 w-8 mb-1 ${isDraggingOver ? 'text-primary' : 'text-muted-foreground/70'}`} />
                     <p className="text-xs text-muted-foreground">
-                      {isDraggingOver ? 'Release to upload image' : 'Drag & drop image here, or use URL input'}
+                      {isDraggingOver ? 'Release to upload' : 'Drag & drop image here'}
                     </p>
                   </div>
                 </div>
