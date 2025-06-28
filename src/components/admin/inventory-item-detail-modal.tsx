@@ -12,10 +12,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { X, Package, Tag, Building, BarChartBig, DollarSign, CalendarDays, Info, AlertTriangle, Save, Edit, StarIcon, ImagePlus, Power } from 'lucide-react';
+import { X, Package, Tag, Building, BarChartBig, DollarSign, CalendarDays, Info, AlertTriangle, Save, Edit, StarIcon, ImagePlus, Power, Loader2 } from 'lucide-react';
 import type { InventoryItem } from '@/types/pos';
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from '../ui/switch';
+import { uploadImage } from '@/lib/image-upload';
 
 interface InventoryItemDetailModalProps {
   item: InventoryItem | null;
@@ -32,7 +33,8 @@ const getStockBadgeInfo = (stock: number, threshold: number): { text: string; cl
 
 const isValidImageUrl = (url?: string): boolean => {
   if (!url || typeof url !== 'string') return false;
-  if (url.startsWith('data:image/')) return true;
+  // Allow data URIs and Firebase Storage URLs
+  if (url.startsWith('data:image/') || url.startsWith('https://firebasestorage.googleapis.com')) return true;
   if (url.startsWith('/')) return true; 
 
   if (url.startsWith('http://') || url.startsWith('https:')) {
@@ -57,6 +59,7 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
   const [isEditing, setIsEditing] = useState(false);
   const [editableItem, setEditableItem] = useState<InventoryItem | null>(null);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -143,20 +146,26 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
     setIsDraggingOver(false);
   };
 
-  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDraggingOver(false);
     const files = e.dataTransfer.files;
     if (files && files[0]) {
       const file = files[0];
       if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (loadEvent) => {
-          if (loadEvent.target?.result && editableItem) {
-            setEditableItem({ ...editableItem, image: loadEvent.target.result as string });
+        setIsUploading(true);
+        try {
+          const imageUrl = await uploadImage(file);
+          if (editableItem) {
+            setEditableItem({ ...editableItem, image: imageUrl });
           }
-        };
-        reader.readAsDataURL(file);
+          toast({ title: "Image Uploaded", description: "The new product image has been successfully uploaded." });
+        } catch (error) {
+           console.error("Image upload failed:", error);
+           toast({ variant: 'destructive', title: "Upload Failed", description: 'There was an error uploading your image. Please try again.' });
+        } finally {
+            setIsUploading(false);
+        }
       } else {
         toast({ variant: 'destructive', title: "Invalid File", description: 'Please drop an image file (e.g., PNG, JPG, GIF).' });
       }
@@ -193,6 +202,11 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
               {isEditing && <Label className="mb-1 text-sm font-medium">Product Image</Label>}
               <div className="w-full flex justify-center">
                 <div className="w-40 h-40 relative border-2 border-primary/30 rounded-lg overflow-hidden shadow-md bg-muted/10 p-1">
+                  {isUploading && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 rounded-lg">
+                      <Loader2 className="h-10 w-10 text-white animate-spin" />
+                    </div>
+                  )}
                   {isValidImageUrl(editableItem.image) ? (
                     <Image
                       src={editableItem.image}
@@ -214,8 +228,8 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
               {isEditing && (
                 <div className="space-y-3 pt-2">
                   <div>
-                    <Label htmlFor="itemImage" className="text-xs text-muted-foreground">Image URL (must be a direct link to an image file, e.g., .png, .jpg)</Label>
-                    <Input id="itemImage" name="image" value={editableItem.image || ''} onChange={handleInputChange} placeholder="https://example.com/image.png" className="h-9"/>
+                    <Label htmlFor="itemImage" className="text-xs text-muted-foreground">Image URL</Label>
+                    <Input id="itemImage" name="image" value={editableItem.image || ''} onChange={handleInputChange} placeholder="https://... or drag & drop below" className="h-9"/>
                   </div>
                   <div
                     onDragOver={handleDragOver}
@@ -326,8 +340,9 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
              <X className="mr-2 h-4 w-4" /> {isEditing ? 'Cancel' : 'Close'}
           </Button>
           {isEditing && (
-            <Button onClick={handleSaveClick} className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white">
-              <Save className="mr-2 h-4 w-4" /> Save Changes
+            <Button onClick={handleSaveClick} className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white" disabled={isUploading}>
+              {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+               {isUploading ? 'Uploading...' : 'Save Changes'}
             </Button>
           )}
         </DialogFooter>
