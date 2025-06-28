@@ -44,6 +44,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             };
             login(newUserProfile);
           }
+        } else {
+            const newUserProfile = {
+              name: firebaseUser.displayName || 'New User',
+              email: firebaseUser.email!,
+              avatarUrl: firebaseUser.photoURL || "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
+              role: 'customer' as const,
+              memberSince: new Date().toISOString(),
+              points: 0,
+              nextReward: 1000,
+              bio: 'Just joined!',
+            };
+            login(newUserProfile);
         }
       } else {
         setUser(null);
@@ -51,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setIsLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
 
