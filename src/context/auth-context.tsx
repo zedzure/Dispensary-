@@ -1,7 +1,6 @@
-
 'use client';
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { User } from '@/types/user';
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
@@ -22,15 +21,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
+  const login = useCallback((userData: User) => {
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+    if (userData.role === 'budtender') {
+      router.push('/budtender');
+    } else if (userData.role === 'admin') {
+      router.push('/admin');
+    } else {
+      router.push('/profile');
+    }
+  }, [router]);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
+        // User is signed in. Check if we have a local profile.
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
           const parsedUser: User = JSON.parse(storedUser);
+          // If the stored user matches the firebase user, we are good.
           if (parsedUser.email === firebaseUser.email) {
             setUser(parsedUser);
           } else {
+             // Mismatch, clear local storage and create a new profile from Firebase.
             localStorage.removeItem('user');
             const newUserProfile = {
               name: firebaseUser.displayName || 'New User',
@@ -45,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             login(newUserProfile);
           }
         } else {
+            // No user in local storage, so this is a fresh sign-in. Create a profile.
             const newUserProfile = {
               name: firebaseUser.displayName || 'New User',
               email: firebaseUser.email!,
@@ -58,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             login(newUserProfile);
         }
       } else {
+        // User is signed out.
         setUser(null);
         localStorage.removeItem('user');
       }
@@ -65,19 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, []);
-
-  const login = (userData: User) => {
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
-    if (userData.role === 'budtender') {
-      router.push('/budtender');
-    } else if (userData.role === 'admin') {
-      router.push('/admin');
-    } else {
-      router.push('/profile');
-    }
-  };
+  }, [login]);
 
   const logout = async () => {
     await signOut(auth);
@@ -89,22 +93,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider);
-      const firebaseUser = result.user;
-      
-      const newUser: User = {
-        name: firebaseUser.displayName || 'New User',
-        email: firebaseUser.email!,
-        avatarUrl: firebaseUser.photoURL || "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
-        role: 'customer',
-        memberSince: new Date().toISOString(),
-        points: 0,
-        nextReward: 1000,
-        bio: 'Just joined via Google!',
-      };
-      login(newUser);
-
+      // The onAuthStateChanged listener will handle the result of this action.
+      await signInWithPopup(auth, provider);
     } catch (error) {
+      // You can add more robust error handling here, e.g. using toasts
       console.error("Error during Google sign-in:", error);
     }
   };
