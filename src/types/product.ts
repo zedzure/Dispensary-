@@ -11,4 +11,5 @@ export interface Product {
   hint: string;
   stock?: number;
   active?: boolean;
+  rating?: number;
 }

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Star } from 'lucide-react';
 
 export const ProductList = () => {
   const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({});
@@ -22,7 +23,6 @@ export const ProductList = () => {
       try {
         const productsRef = collection(db, 'products');
         
-        // Query for products with a price between $1 and $130, ordered by price.
         const q = query(
           productsRef,
           where('price', '>=', 1),
@@ -44,10 +44,11 @@ export const ProductList = () => {
             type: data.type,
             thc: data.thc,
             stock: data.stock,
+            rating: data.rating,
+            active: data.active,
           } as Product;
         });
         
-        // Group products by category on the client-side
         const groupedProducts = productList.reduce((acc, product) => {
             const category = product.category || 'Uncategorized';
             if (!acc[category]) {
@@ -57,10 +58,8 @@ export const ProductList = () => {
             return acc;
         }, {} as Record<string, Product[]>);
 
-        // Sort categories alphabetically
         const sortedCategories = Object.keys(groupedProducts).sort();
         const sortedGroupedProducts = sortedCategories.reduce((acc, key) => {
-            // Sort products within each category by name
             acc[key] = groupedProducts[key].sort((a, b) => a.name.localeCompare(b.name));
             return acc;
         }, {} as Record<string, Product[]>);
@@ -141,8 +140,14 @@ export const ProductList = () => {
                                     <p className="text-sm text-muted-foreground line-clamp-2 h-10">{p.description}</p>
                                      <div className="flex flex-wrap gap-1 pt-1 text-xs">
                                         {p.type && <Badge variant="secondary">{p.type}</Badge>}
-                                        {p.thc && <Badge variant="outline">THC: {p.thc}%</Badge>}
+                                        {p.thc !== undefined && <Badge variant="outline">THC: {p.thc}%</Badge>}
                                         {p.stock !== undefined && <Badge variant="outline">Stock: {p.stock}</Badge>}
+                                        {p.rating !== undefined && (
+                                            <Badge variant="outline" className="flex items-center gap-1">
+                                                <Star className="w-3 h-3 text-yellow-500 fill-yellow-500"/>{p.rating.toFixed(1)}
+                                            </Badge>
+                                        )}
+                                        {p.active !== undefined && <Badge variant={p.active ? 'default' : 'destructive'}>{p.active ? 'Active' : 'Inactive'}</Badge>}
                                     </div>
                                 </CardContent>
                                 <CardFooter className="p-4 mt-auto">
