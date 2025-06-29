@@ -1,8 +1,7 @@
-
 'use client';
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import type { Product } from '@/types/product';
 import Image from 'next/image';
@@ -19,7 +18,17 @@ export const ProductList = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const querySnapshot = await getDocs(collection(db, 'products'));
+        const productsRef = collection(db, 'products');
+        
+        // Construct the query with the specified filters and ordering
+        const q = query(
+          productsRef,
+          where('category', '==', 'flower'),
+          where('price', '<=', 50),
+          orderBy('price')
+        );
+        
+        const querySnapshot = await getDocs(q);
         const productList = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
           const data = doc.data();
           return {
@@ -33,9 +42,13 @@ export const ProductList = () => {
           } as Product;
         });
         setProducts(productList);
-      } catch (e) {
-          console.error("Error fetching from Firestore: ", e);
+      } catch (e: any) {
+        console.error("Error fetching from Firestore: ", e);
+        if (e.code === 'failed-precondition') {
+          setError("Query failed. You likely need to create a composite index in Firestore. Check your browser's developer console for a direct link to create it.");
+        } else {
           setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'products' collection exists.");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -77,7 +90,7 @@ export const ProductList = () => {
   return (
     <div>
         {products.length === 0 ? (
-            <p>No products found in the 'products' collection in Firestore.</p>
+            <p>No products found matching the criteria (Category: flower, Price: &lt;= $50) in Firestore.</p>
         ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((p) => (
