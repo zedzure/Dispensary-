@@ -5,11 +5,13 @@ import { collection, getDocs, query, where, orderBy, QueryDocumentSnapshot, Docu
 import { useEffect, useState } from 'react';
 import type { Product } from '@/types/product';
 import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 export const ProductList = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,32 +22,54 @@ export const ProductList = () => {
       try {
         const productsRef = collection(db, 'products');
         
-        // Construct the query with the specified filters and ordering
+        // Query for products with a price between $1 and $130, ordered by price.
         const q = query(
           productsRef,
-          where('category', '==', 'flower'),
-          where('price', '<=', 50),
+          where('price', '>=', 1),
+          where('price', '<=', 130),
           orderBy('price')
         );
         
         const querySnapshot = await getDocs(q);
-        const productList = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+        const productList: Product[] = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
           const data = doc.data();
           return {
             id: doc.id,
             name: data.name || 'No Name',
-            price: data.price || 0,
-            image: data.imageUrl || data.image || 'https://placehold.co/100x100.png',
+            price: data.price ?? 0,
+            image: data.imageUrl || data.image || 'https://placehold.co/400x400.png',
             category: data.category || 'Uncategorized',
             description: data.description || '',
             hint: data.hint || 'product',
+            type: data.type,
+            thc: data.thc,
+            stock: data.stock,
           } as Product;
         });
-        setProducts(productList);
+        
+        // Group products by category on the client-side
+        const groupedProducts = productList.reduce((acc, product) => {
+            const category = product.category || 'Uncategorized';
+            if (!acc[category]) {
+                acc[category] = [];
+            }
+            acc[category].push(product);
+            return acc;
+        }, {} as Record<string, Product[]>);
+
+        // Sort categories alphabetically
+        const sortedCategories = Object.keys(groupedProducts).sort();
+        const sortedGroupedProducts = sortedCategories.reduce((acc, key) => {
+            // Sort products within each category by name
+            acc[key] = groupedProducts[key].sort((a, b) => a.name.localeCompare(b.name));
+            return acc;
+        }, {} as Record<string, Product[]>);
+
+        setProductsByCategory(sortedGroupedProducts);
       } catch (e: any) {
         console.error("Error fetching from Firestore: ", e);
         if (e.code === 'failed-precondition') {
-          setError("Query failed. You likely need to create a composite index in Firestore. Check your browser's developer console for a direct link to create it.");
+          setError("Query failed. You likely need to create a composite index in Firestore. Check your browser's developer console for a direct link to create it for the query on the 'price' field.");
         } else {
           setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'products' collection exists.");
         }
@@ -60,14 +84,22 @@ export const ProductList = () => {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
-                <Card key={i}>
-                    <CardHeader>
-                        <Skeleton className="h-6 w-3/4" />
+                <Card key={i} className="flex flex-col">
+                    <CardHeader className="p-4">
+                        <Skeleton className="aspect-square w-full rounded-md" />
                     </CardHeader>
-                    <CardContent className="flex flex-col items-center gap-4">
-                        <Skeleton className="h-24 w-24 rounded-md" />
-                        <Skeleton className="h-5 w-1/4" />
+                    <CardContent className="flex-grow p-4 space-y-2">
+                        <Skeleton className="h-6 w-3/4" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-2/3" />
+                         <div className="flex gap-2 pt-2">
+                            <Skeleton className="h-5 w-16" />
+                            <Skeleton className="h-5 w-20" />
+                        </div>
                     </CardContent>
+                    <CardFooter className="p-4">
+                        <Skeleton className="h-7 w-1/3" />
+                    </CardFooter>
                 </Card>
             ))}
         </div>
@@ -88,23 +120,39 @@ export const ProductList = () => {
   }
 
   return (
-    <div>
-        {products.length === 0 ? (
-            <p>No products found matching the criteria (Category: flower, Price: &lt;= $50) in Firestore.</p>
+    <div className="space-y-12">
+        {Object.keys(productsByCategory).length === 0 ? (
+            <p>No products found matching the criteria (Price between $1 and $130) in Firestore.</p>
         ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.map((p) => (
-                <Card key={p.id}>
-                    <CardHeader>
-                         <CardTitle className="truncate text-lg">{p.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center gap-4">
-                        <Image src={p.image} alt={p.name} width={100} height={100} className="rounded-md object-cover" />
-                        <p className="font-bold text-lg text-primary">${p.price?.toFixed(2)}</p>
-                    </CardContent>
-                </Card>
-            ))}
-            </div>
+            Object.entries(productsByCategory).map(([category, products]) => (
+                <div key={category}>
+                    <h2 className="text-2xl font-bold font-cursive text-primary capitalize">{category}</h2>
+                    <Separator className="my-4" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {products.map((p) => (
+                           <Card key={p.id} className="flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+                                <CardHeader className="p-0">
+                                    <div className="aspect-square w-full relative bg-muted">
+                                        <Image src={p.image} alt={p.name} layout="fill" objectFit="cover" data-ai-hint={p.hint || 'product'} />
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="p-4 flex-grow space-y-2">
+                                    <CardTitle className="truncate text-lg" title={p.name}>{p.name}</CardTitle>
+                                    <p className="text-sm text-muted-foreground line-clamp-2 h-10">{p.description}</p>
+                                     <div className="flex flex-wrap gap-1 pt-1 text-xs">
+                                        {p.type && <Badge variant="secondary">{p.type}</Badge>}
+                                        {p.thc && <Badge variant="outline">THC: {p.thc}%</Badge>}
+                                        {p.stock !== undefined && <Badge variant="outline">Stock: {p.stock}</Badge>}
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="p-4 mt-auto">
+                                    <p className="font-bold text-xl text-primary">${p.price?.toFixed(2)}</p>
+                                </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            ))
         )}
     </div>
   );
