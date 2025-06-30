@@ -9,7 +9,6 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Star, Pin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -25,10 +24,12 @@ export const ProductList = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const productsRef = collection(db, 'Pre Rolls');
+        const productsRef = collection(db, 'products');
         
+        // Using 'catagory' with a 't' based on user-provided schema
         const q = query(
           productsRef,
+          where("catagory", "==", "Pre Rolls"),
           orderBy('name')
         );
         
@@ -41,7 +42,7 @@ export const ProductList = () => {
             name: data.name || 'No Name',
             price: data.price ?? 0,
             image: data.imageUrl || data.image || 'https://placehold.co/400x400.png',
-            category: "Pre Rolls",
+            category: data.catagory || "Pre Rolls", // Reading from 'catagory' field
             description: data.description || '',
             hint: data.hint || 'product',
             type: data.type,
@@ -53,19 +54,19 @@ export const ProductList = () => {
         });
 
         if (productList.length === 0) {
-            setError("No products found in your 'Pre Rolls' collection in Firestore. Please ensure the collection exists and contains product documents.");
+            setError("No products found with catagory 'Pre Rolls' in your 'products' collection. Please ensure your documents have the correct field and value.");
         } else {
             setProducts(productList);
         }
 
       } catch (e: any) {
         if (e.code === 'failed-precondition') {
-          setError("Query failed. You may need to create an index in Firestore. Check your browser's developer console for a direct link to create it for the query on the 'name' field in the 'Pre Rolls' collection.");
+          setError("Query failed. You may need to create a Firestore index. Check your browser's developer console for a link to create it for the query on 'catagory' and 'name' fields in the 'products' collection.");
         } else if (e.code === 'permission-denied') {
-            setError("Permission Denied. Please check your Firestore security rules to allow reading from the 'Pre Rolls' collection.");
+            setError("Permission Denied. Please check your Firestore security rules to allow reading from the 'products' collection.");
         }
         else {
-          setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'Pre Rolls' collection exists.");
+          setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'products' collection exists.");
           console.error("Firestore query failed with error:", e);
         }
       } finally {
