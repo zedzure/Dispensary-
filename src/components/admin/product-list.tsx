@@ -1,7 +1,8 @@
+
 'use client';
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, query, where, orderBy, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import type { Product } from '@/types/product';
 import Image from 'next/image';
@@ -10,6 +11,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Star, Pin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+// The specific document ID to highlight, as requested.
+const HIGHLIGHT_ID = 'NPcl8u1BqP0b4o58PpNR';
 
 export const ProductList = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -21,27 +25,23 @@ export const ProductList = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const productsRef = collection(db, 'products');
+        // Correctly querying the "Rolls" collection now.
+        const productsRef = collection(db, 'Rolls');
         
-        // Using 'catagory' with a 't' based on user-provided schema, now querying for 'flower'.
-        const q = query(
-          productsRef,
-          where("catagory", "==", "flower"),
-          orderBy('name')
-        );
+        // Order by name. This might require an index.
+        const q = query(productsRef, orderBy('name'));
         
         const querySnapshot = await getDocs(q);
 
         const productList: Product[] = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
           const data = doc.data();
-          // Handling potential variations in image field name like 'imageUrl' or 'image/Url'
           const imageUrl = data.imageUrl || data['image/Url'] || data.image || 'https://placehold.co/400x400.png';
           return {
             id: doc.id,
             name: data.name || 'No Name',
             price: data.price ?? 0,
             image: imageUrl,
-            category: data.catagory || "flower",
+            category: data.catagory || "Rolls", // Use collection name as category fallback
             description: data.description || '',
             hint: data.hint || 'product',
             type: data.type,
@@ -53,19 +53,19 @@ export const ProductList = () => {
         });
 
         if (productList.length === 0) {
-            setError("No products found with catagory 'flower' in your 'products' collection. Please ensure your documents have the correct field and value.");
+            setError("No products found in your 'Rolls' collection. Please ensure the collection is not empty and has documents.");
         } else {
             setProducts(productList);
         }
 
       } catch (e: any) {
         if (e.code === 'failed-precondition') {
-          setError("Query failed. You may need to create a Firestore index. Check your browser's developer console for a link to create it for the query on 'catagory' and 'name' fields in the 'products' collection.");
+          setError("Query failed. You may need to create a Firestore index. Check your browser's developer console for a link to create it for the 'name' field in the 'Rolls' collection.");
         } else if (e.code === 'permission-denied') {
-            setError("Permission Denied. Please check your Firestore security rules to allow reading from the 'products' collection.");
+            setError("Permission Denied. Please check your Firestore security rules to allow reading from the 'Rolls' collection.");
         }
         else {
-          setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'products' collection exists.");
+          setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'Rolls' collection exists.");
           console.error("Firestore query failed with error:", e);
         }
       } finally {
@@ -119,8 +119,16 @@ export const ProductList = () => {
         {products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {products.map((p) => (
-                    <Card key={p.id} className={cn("flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-all")}>
+                    <Card key={p.id} className={cn(
+                        "flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-all",
+                        p.id === HIGHLIGHT_ID && "ring-4 ring-offset-2 ring-blue-500"
+                    )}>
                         <CardHeader className="p-0 relative">
+                            {p.id === HIGHLIGHT_ID && (
+                                <div className="absolute top-2 right-2 z-10 p-1.5 bg-blue-500 rounded-full text-white shadow-lg">
+                                    <Pin className="w-5 h-5" />
+                                </div>
+                            )}
                             <div className="aspect-square w-full relative bg-muted">
                                 <Image src={p.image} alt={p.name} layout="fill" objectFit="cover" data-ai-hint={p.hint || 'product'} />
                             </div>
