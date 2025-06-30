@@ -19,7 +19,6 @@ export const ProductList = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log("Attempting to fetch Firestore data for 'Pre-rolls'...");
       setIsLoading(true);
       setError(null);
       try {
@@ -32,7 +31,6 @@ export const ProductList = () => {
         );
         
         const querySnapshot = await getDocs(q);
-        console.log(`Firestore query successful. Found ${querySnapshot.docs.length} documents.`);
 
         const productList: Product[] = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
           const data = doc.data();
@@ -55,7 +53,6 @@ export const ProductList = () => {
         setProducts(productList);
 
       } catch (e: any) {
-        console.error("Firestore query failed with an error:", e);
         if (e.code === 'failed-precondition') {
           setError("Query failed. You likely need to create a composite index in Firestore. Check your browser's developer console for a direct link to create it for the query on the 'category' and 'name' fields.");
         } else if (e.code === 'permission-denied') {
@@ -66,7 +63,6 @@ export const ProductList = () => {
         }
       } finally {
         setIsLoading(false);
-        console.log("Finished Firestore data fetch attempt.");
       }
     };
     fetchData();
