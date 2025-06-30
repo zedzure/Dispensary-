@@ -2,7 +2,7 @@
 'use client';
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, getDocs, QueryDocumentSnapshot, DocumentData, query, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import type { Product } from '@/types/product';
 import Image from 'next/image';
@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Star, Pin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
 
 // The specific document ID to highlight.
 const HIGHLIGHT_ID = 'NPcl8u1BqP0b4o58PpNR';
@@ -27,34 +28,40 @@ export const ProductList = () => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-      const collectionName = 'Pre Rolls';
-      console.log(`[DIAGNOSTIC] Attempting to fetch documents from collection: "${collectionName}"`);
+      const collectionName = 'products';
+      const categoryField = 'catagory';
+      const categoryValue = 'pre rolls';
+
+      console.log(`[DIAGNOSTIC] Attempting to query collection '${collectionName}' where '${categoryField}' == '${categoryValue}'`);
 
       try {
         const productsRef = collection(db, collectionName);
-        const querySnapshot = await getDocs(productsRef);
+        const q = query(productsRef, where(categoryField, "==", categoryValue));
+        const querySnapshot = await getDocs(q);
         
         console.log(`[DIAGNOSTIC] Firestore query successful. Found ${querySnapshot.size} documents.`);
 
         if (querySnapshot.empty) {
             setError(`No products found. Please verify the following in your Firebase Console:
 1. You are in the correct Firebase project: **${db.app.options.projectId}**
-2. A collection named exactly **'Pre Rolls'** (case-sensitive) exists.
-3. The **'Pre Rolls'** collection contains one or more documents.
-4. Your **Firestore Security Rules** allow read access to this collection.`);
+2. The **'products'** collection contains documents.
+3. In those documents, a field named exactly **'catagory'** exists and is set to the string **'pre rolls'** (all lowercase).
+4. Your **Firestore Security Rules** allow read access.
+5. You have created a **Firestore Index** for this query if prompted.`);
             setIsLoading(false);
             return;
         }
 
         const productList: Product[] = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
           const data = doc.data();
-          // Handle potential variations in the image URL field name
-          const imageUrl = data.imageUrl || data['image/Url'] || data.image || 'https://placehold.co/400x400.png';
+          // Handle potential variations in the image URL field name based on user schema
+          const imageUrl = data['image/Url'] || data.imageUrl || data.image || 'https://placehold.co/400x400.png';
+          
           return {
             id: doc.id,
             name: data.name || 'No Name',
             // Handle variations in category field name
-            category: data.category || data.catagory || "Pre Rolls",
+            category: data.catagory || "Unknown",
             price: data.price ?? 0,
             image: imageUrl,
             description: data.description || '',
@@ -72,9 +79,9 @@ export const ProductList = () => {
       } catch (e: any) {
         console.error("[DIAGNOSTIC] Firestore query failed with error:", e);
         if (e.code === 'permission-denied') {
-            setError(`Permission Denied. Please check your Firestore security rules to allow reading from the '${collectionName}' collection. The current project is ${db.app.options.projectId}.`);
+            setError(`Permission Denied. Please check your Firestore security rules to allow reading from the '${collectionName}' collection.`);
         } else if (e.code === 'failed-precondition') {
-             setError(`Query requires an index. Please check the browser console for a link to create the required Firestore index. The error is: ${e.message}`);
+             setError(`This query requires a Firestore Index. Please check the browser's developer console (F12) for a link to create the required index. The error is: ${e.message}`);
         }
         else {
           setError(`Failed to fetch products. Error: ${e.message}.`);
@@ -114,14 +121,10 @@ export const ProductList = () => {
 
   if (error) {
     return (
-        <Card className="bg-destructive/10 border-destructive">
-            <CardHeader>
-                <CardTitle className="text-destructive">Error Loading Products</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="whitespace-pre-wrap">{error}</p>
-            </CardContent>
-        </Card>
+        <Alert variant="destructive">
+            <AlertTitle className="font-bold text-lg">Error Loading Products</AlertTitle>
+            <AlertDescription className="whitespace-pre-wrap">{error}</AlertDescription>
+        </Alert>
     )
   }
 
