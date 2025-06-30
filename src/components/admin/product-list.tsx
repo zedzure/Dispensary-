@@ -1,4 +1,3 @@
-
 'use client';
 
 import { db } from '@/lib/firebase';
@@ -17,8 +16,6 @@ export const ProductList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const highlightedProductId = 'NPcl8u1BqP0b4o58PpNR';
-
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -26,10 +23,10 @@ export const ProductList = () => {
       try {
         const productsRef = collection(db, 'products');
         
-        // Using 'catagory' with a 't' based on user-provided schema
+        // Using 'catagory' with a 't' based on user-provided schema, now querying for 'flower'.
         const q = query(
           productsRef,
-          where("catagory", "==", "Pre Rolls"),
+          where("catagory", "==", "flower"),
           orderBy('name')
         );
         
@@ -37,12 +34,14 @@ export const ProductList = () => {
 
         const productList: Product[] = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
           const data = doc.data();
+          // Handling potential variations in image field name like 'imageUrl' or 'image/Url'
+          const imageUrl = data.imageUrl || data['image/Url'] || data.image || 'https://placehold.co/400x400.png';
           return {
             id: doc.id,
             name: data.name || 'No Name',
             price: data.price ?? 0,
-            image: data.imageUrl || data.image || 'https://placehold.co/400x400.png',
-            category: data.catagory || "Pre Rolls", // Reading from 'catagory' field
+            image: imageUrl,
+            category: data.catagory || "flower",
             description: data.description || '',
             hint: data.hint || 'product',
             type: data.type,
@@ -54,7 +53,7 @@ export const ProductList = () => {
         });
 
         if (productList.length === 0) {
-            setError("No products found with catagory 'Pre Rolls' in your 'products' collection. Please ensure your documents have the correct field and value.");
+            setError("No products found with catagory 'flower' in your 'products' collection. Please ensure your documents have the correct field and value.");
         } else {
             setProducts(productList);
         }
@@ -120,18 +119,10 @@ export const ProductList = () => {
         {products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {products.map((p) => (
-                    <Card key={p.id} className={cn(
-                        "flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-all",
-                        p.id === highlightedProductId && "ring-2 ring-offset-2 ring-primary"
-                      )}>
+                    <Card key={p.id} className={cn("flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-all")}>
                         <CardHeader className="p-0 relative">
                             <div className="aspect-square w-full relative bg-muted">
                                 <Image src={p.image} alt={p.name} layout="fill" objectFit="cover" data-ai-hint={p.hint || 'product'} />
-                                {p.id === highlightedProductId && (
-                                  <div className="absolute top-2 right-2 bg-primary p-1.5 rounded-full text-primary-foreground shadow-lg">
-                                    <Pin className="w-4 h-4" />
-                                  </div>
-                                )}
                             </div>
                         </CardHeader>
                         <CardContent className="p-4 flex-grow space-y-2">
