@@ -29,7 +29,7 @@ export const ProductList = () => {
         
         const q = query(
           productsRef,
-          where('category', '==', 'Pre-rolls'),
+          where('category', '==', 'Pre Rolls'),
           orderBy('name')
         );
         
@@ -54,7 +54,7 @@ export const ProductList = () => {
         });
 
         if (productList.length === 0) {
-            setError("No 'Pre-rolls' found in Firestore.");
+            setError("No 'Pre Rolls' found in Firestore. Please ensure your documents in the 'products' collection have the category field set to 'Pre Rolls'.");
         } else {
             setProducts(productList);
         }
