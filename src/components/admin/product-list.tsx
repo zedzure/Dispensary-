@@ -21,30 +21,38 @@ export const ProductList = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Diagnostic log to check the Firebase project ID the app is connected to.
+    console.log(`[DIAGNOSTIC] App is configured for Firebase project: ${db.app.options.projectId}`);
+    
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
+      const collectionName = 'Pre Rolls';
+      console.log(`[DIAGNOSTIC] Attempting to fetch documents from collection: "${collectionName}"`);
+
       try {
-        const productsRef = collection(db, 'Pre Rolls');
-        
-        // Simplest query: get all documents without ordering.
+        const productsRef = collection(db, collectionName);
         const querySnapshot = await getDocs(productsRef);
+        
+        console.log(`[DIAGNOSTIC] Firestore query successful. Found ${querySnapshot.size} documents.`);
 
         if (querySnapshot.empty) {
-            setError("No products found in your 'Pre Rolls' collection. Please check that the collection is not empty and that your Firestore security rules allow reading from it.");
+            setError(`No products found in your '${collectionName}' collection. Please double-check that the collection name is exact (case-sensitive) and that it contains documents. Also, verify your Firebase security rules allow reads.`);
             setIsLoading(false);
             return;
         }
 
         const productList: Product[] = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
           const data = doc.data();
+          // Handle potential variations in the image URL field name
           const imageUrl = data.imageUrl || data['image/Url'] || data.image || 'https://placehold.co/400x400.png';
           return {
             id: doc.id,
             name: data.name || 'No Name',
+            // Handle variations in category field name
+            category: data.category || data.catagory || "Pre Rolls",
             price: data.price ?? 0,
             image: imageUrl,
-            category: data.catagory || "Pre Rolls",
             description: data.description || '',
             hint: data.hint || 'product',
             type: data.type,
@@ -58,12 +66,14 @@ export const ProductList = () => {
         setProducts(productList);
 
       } catch (e: any) {
+        console.error("[DIAGNOSTIC] Firestore query failed with error:", e);
         if (e.code === 'permission-denied') {
-            setError("Permission Denied. Please check your Firestore security rules to allow reading from the 'Pre Rolls' collection.");
+            setError(`Permission Denied. Please check your Firestore security rules to allow reading from the '${collectionName}' collection. The current project is ${db.app.options.projectId}.`);
+        } else if (e.code === 'failed-precondition') {
+             setError(`Query requires an index. Please check the browser console for a link to create the required Firestore index. The error is: ${e.message}`);
         }
         else {
-          setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'Pre Rolls' collection exists.");
-          console.error("Firestore query failed with error:", e);
+          setError(`Failed to fetch products. Error: ${e.message}.`);
         }
       } finally {
         setIsLoading(false);
