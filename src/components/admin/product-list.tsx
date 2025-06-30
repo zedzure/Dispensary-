@@ -2,7 +2,7 @@
 'use client';
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, query, orderBy, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import type { Product } from '@/types/product';
 import Image from 'next/image';
@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Pin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// The specific document ID to highlight, as requested.
+// The specific document ID to highlight.
 const HIGHLIGHT_ID = 'NPcl8u1BqP0b4o58PpNR';
 
 export const ProductList = () => {
@@ -25,13 +25,16 @@ export const ProductList = () => {
       setIsLoading(true);
       setError(null);
       try {
-        // Correctly querying the "Rolls" collection now.
         const productsRef = collection(db, 'Rolls');
         
-        // Order by name. This might require an index.
-        const q = query(productsRef, orderBy('name'));
-        
-        const querySnapshot = await getDocs(q);
+        // Simplest query: get all documents without ordering.
+        const querySnapshot = await getDocs(productsRef);
+
+        if (querySnapshot.empty) {
+            setError("No products found in your 'Rolls' collection. Please check that the collection is not empty and that your Firestore security rules allow reading from it.");
+            setIsLoading(false);
+            return;
+        }
 
         const productList: Product[] = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
           const data = doc.data();
@@ -41,7 +44,7 @@ export const ProductList = () => {
             name: data.name || 'No Name',
             price: data.price ?? 0,
             image: imageUrl,
-            category: data.catagory || "Rolls", // Use collection name as category fallback
+            category: data.catagory || "Rolls",
             description: data.description || '',
             hint: data.hint || 'product',
             type: data.type,
@@ -51,17 +54,11 @@ export const ProductList = () => {
             active: data.active,
           } as Product;
         });
-
-        if (productList.length === 0) {
-            setError("No products found in your 'Rolls' collection. Please ensure the collection is not empty and has documents.");
-        } else {
-            setProducts(productList);
-        }
+        
+        setProducts(productList);
 
       } catch (e: any) {
-        if (e.code === 'failed-precondition') {
-          setError("Query failed. You may need to create a Firestore index. Check your browser's developer console for a link to create it for the 'name' field in the 'Rolls' collection.");
-        } else if (e.code === 'permission-denied') {
+        if (e.code === 'permission-denied') {
             setError("Permission Denied. Please check your Firestore security rules to allow reading from the 'Rolls' collection.");
         }
         else {
