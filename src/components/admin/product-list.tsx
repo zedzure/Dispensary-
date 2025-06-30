@@ -53,7 +53,11 @@ export const ProductList = () => {
           } as Product;
         });
 
-        setProducts(productList);
+        if (productList.length === 0) {
+            setError("No 'Pre-rolls' found in Firestore.");
+        } else {
+            setProducts(productList);
+        }
 
       } catch (e: any) {
         if (e.code === 'failed-precondition') {
@@ -63,6 +67,7 @@ export const ProductList = () => {
         }
         else {
           setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'products' collection exists.");
+          console.error("Firestore query failed with error:", e);
         }
       } finally {
         setIsLoading(false);
@@ -102,7 +107,7 @@ export const ProductList = () => {
         <Card className="bg-destructive/10 border-destructive">
             <CardHeader>
                 <CardTitle className="text-destructive">Error</CardTitle>
-            </Header>
+            </CardHeader>
             <CardContent>
                 <p>{error}</p>
             </CardContent>
@@ -112,9 +117,7 @@ export const ProductList = () => {
 
   return (
     <div className="space-y-12">
-        {products.length === 0 ? (
-            <p>No 'Pre-rolls' found in Firestore.</p>
-        ) : (
+        {products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {products.map((p) => (
                     <Card key={p.id} className={cn(
@@ -152,7 +155,7 @@ export const ProductList = () => {
                     </Card>
                 ))}
             </div>
-        )}
+        ) : null}
     </div>
   );
 };
