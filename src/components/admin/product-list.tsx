@@ -25,11 +25,10 @@ export const ProductList = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const productsRef = collection(db, 'products');
+        const productsRef = collection(db, 'Pre Rolls');
         
         const q = query(
           productsRef,
-          where('category', '==', 'Pre Rolls'),
           orderBy('name')
         );
         
@@ -42,7 +41,7 @@ export const ProductList = () => {
             name: data.name || 'No Name',
             price: data.price ?? 0,
             image: data.imageUrl || data.image || 'https://placehold.co/400x400.png',
-            category: data.category || 'Uncategorized',
+            category: "Pre Rolls",
             description: data.description || '',
             hint: data.hint || 'product',
             type: data.type,
@@ -54,19 +53,19 @@ export const ProductList = () => {
         });
 
         if (productList.length === 0) {
-            setError("No 'Pre Rolls' found in Firestore. Please ensure your documents in the 'products' collection have the category field set to 'Pre Rolls'.");
+            setError("No products found in your 'Pre Rolls' collection in Firestore. Please ensure the collection exists and contains product documents.");
         } else {
             setProducts(productList);
         }
 
       } catch (e: any) {
         if (e.code === 'failed-precondition') {
-          setError("Query failed. You likely need to create a composite index in Firestore. Check your browser's developer console for a direct link to create it for the query on the 'category' and 'name' fields.");
+          setError("Query failed. You may need to create an index in Firestore. Check your browser's developer console for a direct link to create it for the query on the 'name' field in the 'Pre Rolls' collection.");
         } else if (e.code === 'permission-denied') {
-            setError("Permission Denied. Please check your Firestore security rules to allow reading from the 'products' collection.");
+            setError("Permission Denied. Please check your Firestore security rules to allow reading from the 'Pre Rolls' collection.");
         }
         else {
-          setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'products' collection exists.");
+          setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'Pre Rolls' collection exists.");
           console.error("Firestore query failed with error:", e);
         }
       } finally {
