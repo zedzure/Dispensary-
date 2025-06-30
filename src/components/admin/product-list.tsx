@@ -25,13 +25,13 @@ export const ProductList = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const productsRef = collection(db, 'Rolls');
+        const productsRef = collection(db, 'Pre Rolls');
         
         // Simplest query: get all documents without ordering.
         const querySnapshot = await getDocs(productsRef);
 
         if (querySnapshot.empty) {
-            setError("No products found in your 'Rolls' collection. Please check that the collection is not empty and that your Firestore security rules allow reading from it.");
+            setError("No products found in your 'Pre Rolls' collection. Please check that the collection is not empty and that your Firestore security rules allow reading from it.");
             setIsLoading(false);
             return;
         }
@@ -44,7 +44,7 @@ export const ProductList = () => {
             name: data.name || 'No Name',
             price: data.price ?? 0,
             image: imageUrl,
-            category: data.catagory || "Rolls",
+            category: data.catagory || "Pre Rolls",
             description: data.description || '',
             hint: data.hint || 'product',
             type: data.type,
@@ -59,10 +59,10 @@ export const ProductList = () => {
 
       } catch (e: any) {
         if (e.code === 'permission-denied') {
-            setError("Permission Denied. Please check your Firestore security rules to allow reading from the 'Rolls' collection.");
+            setError("Permission Denied. Please check your Firestore security rules to allow reading from the 'Pre Rolls' collection.");
         }
         else {
-          setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'Rolls' collection exists.");
+          setError("Failed to fetch products. Make sure Firestore is set up correctly and the 'Pre Rolls' collection exists.");
           console.error("Firestore query failed with error:", e);
         }
       } finally {
