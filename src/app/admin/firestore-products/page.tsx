@@ -11,9 +11,9 @@ export default function FirestoreProductsPage() {
         <Card>
             <CardHeader>
                 <CardTitle className="font-cursive text-primary flex items-center">
-                    <Database className="mr-2 h-6 w-6" /> Live Firestore Products
+                    <Database className="mr-2 h-6 w-6" /> Live Pre-roll Products from Firestore
                 </CardTitle>
-                <CardDescription>This page directly fetches data from your 'products' collection in Firestore. Make sure your Firestore security rules are correctly configured.</CardDescription>
+                <CardDescription>This page directly fetches 'Pre-rolls' from your 'products' collection in Firestore. Make sure your Firestore security rules and indexes are correctly configured.</CardDescription>
             </CardHeader>
         </Card>
         <ProductList />
