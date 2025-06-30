@@ -44,9 +44,8 @@ export function CategoryCircles({ onProductClick }: CategoryCirclesProps) {
                       src={category.image}
                       data-ai-hint={category.hint}
                       alt={category.name}
-                      width={90}
-                      height={90}
-                      className="object-cover"
+                      fill
+                      style={{objectFit: 'cover'}}
                   />
                 </div>
               </div>

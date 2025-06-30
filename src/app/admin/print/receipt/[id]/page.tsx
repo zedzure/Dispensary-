@@ -216,14 +216,16 @@ function PrintableReceiptContent() {
             {record.items.map((item, index) => (
               <div key={item.id || index} className="flex items-center gap-2 py-1 border-b border-border/50 last:border-b-0">
                 {(item as OrderItem).image && (
-                  <Image
-                    src={(item as OrderItem).image}
-                    alt={item.name}
-                    width={30}
-                    height={30}
-                    className="rounded object-cover"
-                    data-ai-hint={(item as OrderItem).hint}
-                  />
+                  <div className="relative w-[30px] h-[30px] rounded object-cover">
+                    <Image
+                      src={(item as OrderItem).image}
+                      alt={item.name}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      className="rounded"
+                      data-ai-hint={(item as OrderItem).hint}
+                    />
+                  </div>
                 )}
                 <div className="flex-grow grid grid-cols-[1fr_auto_auto] gap-x-2 items-center">
                     <span className="truncate">{item.name} (x{((item as OrderItem).quantity || (item as TransactionItem).qty)})</span>

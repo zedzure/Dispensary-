@@ -24,16 +24,18 @@ export function CheckoutDialog({ isOpen, onOpenChange }: CheckoutDialogProps) {
       <AlertDialogContent>
         <Card className="border-0 shadow-none">
           <CardContent className="flex flex-col items-center justify-center p-6 text-center">
-            <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-2xl">
-                Thank you for your order!
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-base">
-                A budtender will be with you shortly.
-              </AlertDialogDescription>
+              <div className="flex flex-col items-center justify-center">
+                <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
+                <AlertDialogTitle className="text-2xl">
+                  Thank you for your order!
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-base mt-2">
+                  A budtender will be with you shortly.
+                </AlertDialogDescription>
+              </div>
             </AlertDialogHeader>
-            <AlertDialogFooter className="mt-6">
+            <AlertDialogFooter className="mt-6 w-full">
               <AlertDialogAction
                 className="w-full"
                 onClick={() => onOpenChange(false)}

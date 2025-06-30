@@ -62,8 +62,8 @@ export function OrderDetailDialog({ order, onOpenChange }: OrderDetailDialogProp
                             src={item.image}
                             alt={item.name}
                             data-ai-hint={item.hint}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
+                            style={{ objectFit: 'cover' }}
                           />
                         </div>
                         <span>{item.name}</span>

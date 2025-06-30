@@ -37,7 +37,11 @@ export const ProductList = () => {
         console.log(`[DIAGNOSTIC] Firestore query successful. Found ${querySnapshot.size} documents.`);
 
         if (querySnapshot.empty) {
-            setError(`No products found in your '${collectionName}' collection. Please double-check that the collection name is exact (case-sensitive) and that it contains documents. Also, verify your Firebase security rules allow reads.`);
+            setError(`No products found. Please verify the following in your Firebase Console:
+1. You are in the correct Firebase project: **${db.app.options.projectId}**
+2. A collection named exactly **'Pre Rolls'** (case-sensitive) exists.
+3. The **'Pre Rolls'** collection contains one or more documents.
+4. Your **Firestore Security Rules** allow read access to this collection.`);
             setIsLoading(false);
             return;
         }
@@ -112,10 +116,10 @@ export const ProductList = () => {
     return (
         <Card className="bg-destructive/10 border-destructive">
             <CardHeader>
-                <CardTitle className="text-destructive">Error</CardTitle>
+                <CardTitle className="text-destructive">Error Loading Products</CardTitle>
             </CardHeader>
             <CardContent>
-                <p>{error}</p>
+                <p className="whitespace-pre-wrap">{error}</p>
             </CardContent>
         </Card>
     )
@@ -137,7 +141,7 @@ export const ProductList = () => {
                                 </div>
                             )}
                             <div className="aspect-square w-full relative bg-muted">
-                                <Image src={p.image} alt={p.name} layout="fill" objectFit="cover" data-ai-hint={p.hint || 'product'} />
+                                <Image src={p.image} alt={p.name} fill style={{ objectFit: 'cover' }} data-ai-hint={p.hint || 'product'} />
                             </div>
                         </CardHeader>
                         <CardContent className="p-4 flex-grow space-y-2">

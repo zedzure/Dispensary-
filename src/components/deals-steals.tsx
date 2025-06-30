@@ -61,9 +61,8 @@ export function DealsSteals({ onProductClick }: DealsStealsProps) {
                       src={deal.image}
                       data-ai-hint={deal.hint}
                       alt={deal.name}
-                      width={90}
-                      height={90}
-                      className="object-cover"
+                      fill
+                      style={{ objectFit: 'cover' }}
                     />
                   </div>
                 </div>

@@ -1,7 +1,8 @@
+
 "use client";
 
 import Image from "next/image";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/types/product";
 import { Button } from "./ui/button";
@@ -39,8 +40,8 @@ export function ProductDetailModal({ product, isOpen, onOpenChange }: ProductDet
               src={product.image}
               alt={product.name}
               data-ai-hint={product.hint}
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{ objectFit: 'cover' }}
             />
           </div>
           <div className="flex-1">
@@ -64,14 +65,15 @@ export function ProductDetailModal({ product, isOpen, onOpenChange }: ProductDet
                     src={product.image}
                     data-ai-hint={product.hint}
                     alt={product.name}
-                    layout="fill"
-                    objectFit="cover"
+                    fill
+                    style={{ objectFit: 'cover' }}
                     className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
                 />
             </div>
             <div className="p-6 flex flex-col">
                 <DialogHeader>
                     <DialogTitle className="text-3xl font-bold mb-2">{product.name}</DialogTitle>
+                    <DialogDescription className="sr-only">Details for {product.name}</DialogDescription>
                 </DialogHeader>
                 <div className="flex items-center gap-2 flex-wrap mb-4">
                     <Badge variant="outline">{product.category}</Badge>

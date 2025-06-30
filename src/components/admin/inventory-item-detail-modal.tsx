@@ -227,8 +227,8 @@ export function InventoryItemDetailModal({ item, isOpen, onClose, onSave }: Inve
                     <Image
                       src={editableItem.image}
                       alt={editableItem.name}
-                      layout="fill"
-                      objectFit="contain"
+                      fill
+                      style={{ objectFit: 'contain' }}
                       className="rounded-sm" 
                       data-ai-hint={editableItem.hint || editableItem.category.toLowerCase()}
                       key={editableItem.image} 

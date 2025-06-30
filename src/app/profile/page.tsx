@@ -80,8 +80,8 @@ export default function ProfilePage() {
               <Image
                 src={user.avatarUrl}
                 alt={`${firstName} ${lastName}`}
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: 'cover' }}
               />
             </div>
             <div className="text-center sm:text-left">
