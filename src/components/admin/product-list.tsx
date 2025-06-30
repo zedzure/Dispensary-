@@ -10,12 +10,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Star } from 'lucide-react';
+import { Star, Pin } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export const ProductList = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const highlightedProductId = 'NPcl8u1BqP0b4o58PpNR';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,7 +102,7 @@ export const ProductList = () => {
         <Card className="bg-destructive/10 border-destructive">
             <CardHeader>
                 <CardTitle className="text-destructive">Error</CardTitle>
-            </CardHeader>
+            </Header>
             <CardContent>
                 <p>{error}</p>
             </CardContent>
@@ -114,10 +117,18 @@ export const ProductList = () => {
         ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {products.map((p) => (
-                    <Card key={p.id} className="flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-shadow">
-                        <CardHeader className="p-0">
+                    <Card key={p.id} className={cn(
+                        "flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-all",
+                        p.id === highlightedProductId && "ring-2 ring-offset-2 ring-primary"
+                      )}>
+                        <CardHeader className="p-0 relative">
                             <div className="aspect-square w-full relative bg-muted">
                                 <Image src={p.image} alt={p.name} layout="fill" objectFit="cover" data-ai-hint={p.hint || 'product'} />
+                                {p.id === highlightedProductId && (
+                                  <div className="absolute top-2 right-2 bg-primary p-1.5 rounded-full text-primary-foreground shadow-lg">
+                                    <Pin className="w-4 h-4" />
+                                  </div>
+                                )}
                             </div>
                         </CardHeader>
                         <CardContent className="p-4 flex-grow space-y-2">
