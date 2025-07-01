@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,24 @@ import { CartSheet } from "@/components/cart-sheet";
 import { BottomNavBar } from "@/components/bottom-nav-bar";
 import { allProducts } from "@/lib/products";
 import { ProductCard } from "@/components/product-card";
+import { SplashScreen } from "@/components/splash-screen";
 
 
 export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const splashShown = sessionStorage.getItem('splashShown');
+    if (splashShown) {
+      setShowSplash(false);
+    }
+  }, []);
+
+  const handleSplashFinished = () => {
+    sessionStorage.setItem('splashShown', 'true');
+    setShowSplash(false);
+  };
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -29,6 +43,10 @@ export default function Home() {
     name: 'Flower',
     products: allProducts['Flower'] || []
   };
+
+  if (showSplash) {
+    return <SplashScreen onFinished={handleSplashFinished} />;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-foreground overflow-hidden">

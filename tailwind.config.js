@@ -18,6 +18,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-sans)'],
+        cursive: ['var(--font-cursive)'],
       },
       colors: {
         background: 'hsl(var(--background))',
