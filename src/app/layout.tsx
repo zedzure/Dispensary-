@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { Inter, Dancing_Script } from 'next/font/google';
+import { PT_Sans, Belleza } from 'next/font/google';
 import { Providers } from "./providers";
 
-const inter = Inter({
+const ptSans = PT_Sans({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-pt-sans',
+  weight: ['400', '700'],
 });
 
-const dancingScript = Dancing_Script({
+const belleza = Belleza({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-dancing-script',
-  weight: '700',
+  variable: '--font-belleza',
+  weight: '400',
 });
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${dancingScript.variable}`}>
+    <html lang="en" className={`${ptSans.variable} ${belleza.variable}`}>
       <body className="font-sans antialiased">
         <Providers>
           {children}

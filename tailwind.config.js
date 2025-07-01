@@ -8,9 +8,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'sans-serif'],
+        sans: ['var(--font-pt-sans)', 'sans-serif'],
         code: ['monospace'],
-        cursive: ['var(--font-dancing-script)', 'cursive'],
+        cursive: ['var(--font-belleza)', 'cursive'],
       },
       colors: {
         background: 'hsl(var(--background))',
