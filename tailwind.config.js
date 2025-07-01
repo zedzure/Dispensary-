@@ -7,6 +7,15 @@ module.exports = {
   ],
   theme: {
     extend: {
+      boxShadow: {
+        sm: '0 1px 2px 0 hsl(var(--primary) / 0.15)',
+        DEFAULT: '0 1px 3px 0 hsl(var(--primary) / 0.15), 0 1px 2px -1px hsl(var(--primary) / 0.15)',
+        md: '0 4px 6px -1px hsl(var(--primary) / 0.15), 0 2px 4px -2px hsl(var(--primary) / 0.15)',
+        lg: '0 10px 15px -3px hsl(var(--primary) / 0.15), 0 4px 6px -4px hsl(var(--primary) / 0.15)',
+        xl: '0 20px 25px -5px hsl(var(--primary) / 0.15), 0 8px 10px -6px hsl(var(--primary) / 0.15)',
+        '2xl': '0 25px 50px -12px hsl(var(--primary) / 0.25)',
+        inner: 'inset 0 2px 4px 0 hsl(var(--primary) / 0.15)',
+      },
       fontFamily: {
         sans: ['var(--font-sans)'],
       },
