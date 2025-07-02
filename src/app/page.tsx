@@ -39,11 +39,6 @@ export default function Home() {
     setSelectedProduct(null);
   };
 
-  const flowerCategory = {
-    name: 'Flower',
-    products: allProducts['Flower'] || []
-  };
-
   if (showSplash) {
     return <SplashScreen onFinished={handleSplashFinished} />;
   }
@@ -72,17 +67,30 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Product Grid Section */}
-        <section id="menu" className="py-16 md:py-24 bg-muted/20">
-          <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8 text-primary">{flowerCategory.name}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {flowerCategory.products.map((product) => (
-                <ProductCard key={product.id} product={product} onProductClick={handleProductClick} />
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Product Rows Section */}
+        <div id="menu" className="space-y-16 py-16 md:py-24 bg-muted/20">
+          {Object.entries(allProducts).map(([categoryName, products]) => (
+            <section key={categoryName}>
+              <div className="container mx-auto px-4 md:px-6">
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8 text-primary">
+                  {categoryName}
+                </h2>
+              </div>
+              <div className="overflow-x-auto no-scrollbar">
+                <div className="flex gap-6 px-4 md:px-6 pb-4">
+                  {products.slice(0, 10).map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onProductClick={handleProductClick}
+                      className="w-72 flex-shrink-0"
+                    />
+                  ))}
+                </div>
+              </div>
+            </section>
+          ))}
+        </div>
 
       </main>
       <Footer />

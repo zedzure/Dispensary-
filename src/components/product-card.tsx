@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { Product } from '@/types/product';
+import { cn } from '@/lib/utils';
 
 interface ProductCardProps {
   product: Product;
@@ -13,15 +14,15 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onProductClick, className }: ProductCardProps) {
   return (
-    <Card className={`h-full flex flex-col overflow-hidden group bg-white border-border/60 shadow-lg ${className}`}>
+    <Card className={cn("h-full flex flex-col overflow-hidden group bg-white border-border/60 shadow-lg", className)}>
       <CardHeader className="p-0">
         <button onClick={() => onProductClick(product)} className="w-full aspect-[3/2] relative">
             <Image
               src={product.image}
               data-ai-hint={product.hint}
               alt={product.name}
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{ objectFit: 'cover' }}
               className=""
             />
         </button>
