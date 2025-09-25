@@ -1,5 +1,53 @@
 
 import type { Product } from './product';
+import type { Timestamp } from 'firebase/firestore';
+
+export interface Review {
+    id: string; // reviewId
+    userId: string; // uid
+    targetId: string; // e.g., dispensaryId
+    targetType: 'dispensary' | 'product';
+    rating: number;
+    text: string;
+    photos?: string[]; // URLs to images in Storage
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt: Timestamp | string;
+    updatedAt?: Timestamp | string;
+    // For display purposes, denormalized
+    user: {
+        name: string;
+        avatar: string;
+    };
+    followers?: number;
+}
+
+export interface ReviewComment {
+    id: string; // commentId
+    userId: string;
+    text: string;
+    createdAt: Timestamp;
+     user?: {
+        name: string;
+        avatar: string;
+    };
+}
+
+
+export interface Dispensary {
+    id: string;
+    name: string;
+    logo: string;
+    hint: string;
+    rating: string;
+    deliveryTime: number;
+    address: string;
+    state: string;
+    hours: string;
+    lat: number;
+    lng: number;
+    reviews?: Review[];
+}
 
 export interface CartItem extends Product {
   quantity: number;
@@ -16,6 +64,18 @@ export interface UserProfile {
   avatarUrl: string;
   dataAiHint?: string;
   orderHistory?: Order[];
+  points?: number;
+  nextReward?: number;
+  bio?: string;
+  followers?: string[];
+  following?: string[];
+  reviewsToday?: number;
+  receiptsThisWeek?: number;
+  followersCount?: number;
+  followingCount?: number;
+  tier?: string;
+  nextTier?: string;
+  pointsToNextTier?: number;
 }
 
 export interface CustomerMetrics extends UserProfile {
@@ -29,7 +89,7 @@ export interface CustomerMetrics extends UserProfile {
 
 export interface OrderItem extends Omit<Product, 'price' | 'stock'> {
   quantity: number;
-  price: number;
+  price?: number;
 }
 
 export type OrderStatus = 'Pending Checkout' | 'In-Store' | 'Completed' | 'Shipped' | 'Cancelled';
@@ -83,6 +143,7 @@ export interface ReelConfigItem {
   inventoryItemId: string;
   badgeType: string;
   pulsatingBorder: boolean;
+  active: boolean;
 }
 
 export interface TransactionType {
@@ -94,4 +155,54 @@ export interface TransactionType {
   amount: string; // e.g., '$75.50'
   status: TransactionStatus;
   items: TransactionItem[];
+}
+
+export interface MarketplaceLocation {
+    id: string;
+    name: string;
+    state: string;
+}
+
+export interface Receipt {
+    id: string; // receiptId
+    userId: string;
+    imageUrl: string; // Path in Firebase Storage
+    totalAmount: number;
+    createdAt: string; // ISO String
+    status: 'pending' | 'approved' | 'rejected';
+    pointsAwarded?: number;
+     // Denormalized for display
+    userName?: string;
+    userAvatar?: string;
+}
+
+export interface PointsTransaction {
+    id: string; // txId
+    userId: string;
+    delta: number; // e.g., 10 or -200
+    reason: 'review:create' | 'receipt:approve' | 'follow:new' | 'reward:redeem';
+    refType: 'review' | 'receipt' | 'user' | 'reward';
+    refId: string; // ID of the source document
+    createdAt: Timestamp;
+}
+
+export interface ChatUser {
+  id: string;
+  name: string;
+  avatar: string;
+  isOnline: boolean;
+}
+
+export interface ChatMessage {
+  id: string;
+  user: ChatUser;
+  text: string;
+  timestamp: string; // ISO string
+  likes: number;
+  isLiked: boolean; // Client-side state
+  image?: string;
+  replyingTo?: {
+    user: string;
+    text: string;
+  };
 }

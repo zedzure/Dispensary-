@@ -16,6 +16,7 @@ import { Skeleton } from "./ui/skeleton";
 import { ProductCard } from "./product-card";
 import type { Product } from "@/types/product";
 import { ProductDetailModal } from "./product-detail-modal";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   preferences: z.string().min(10, {
@@ -40,6 +41,7 @@ export function StrainRecommenderForm() {
   const [result, setResult] = useState<StrainRecommenderOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isFormVisible, setIsFormVisible] = useState(true);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,11 +51,13 @@ export function StrainRecommenderForm() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function getRecommendations(preferences: string) {
     setIsLoading(true);
     setResult(null);
+    setIsFormVisible(false);
+
     try {
-      const recommenderResult = await strainRecommender({ preferences: values.preferences });
+      const recommenderResult = await strainRecommender({ preferences });
       setResult(recommenderResult);
     } catch (error) {
       console.error(error);
@@ -62,14 +66,19 @@ export function StrainRecommenderForm() {
         description: "Failed to get recommendations. Please try again.",
         variant: "destructive",
       });
+      setIsFormVisible(true); // Show form again on error
     } finally {
       setIsLoading(false);
     }
   }
 
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    getRecommendations(values.preferences);
+  }
+  
   const handleQuickRec = (query: string) => {
     form.setValue("preferences", query);
-    form.handleSubmit(onSubmit)();
+    getRecommendations(query);
   };
   
   const handleProductClick = (product: Product) => {
@@ -87,46 +96,51 @@ export function StrainRecommenderForm() {
         <CardHeader className="text-center items-center">
           <Sparkles className="h-10 w-10 text-primary mb-4" />
           <CardTitle className="text-3xl font-semibold tracking-tight">AI Strain Finder</CardTitle>
-          <CardDescription>Tell our AI what you're looking for, or try one of our popular requests.</CardDescription>
+          <CardDescription>Tell our AI what you're looking for, or click a button below to get started.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="preferences"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="sr-only">Describe your desired experience</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="e.g., 'I'm looking for something to help me relax after work, without making me too sleepy. I prefer fruity flavors.'"
-                        className="min-h-[120px] resize-none text-base"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-               <div className="flex flex-wrap items-center justify-center gap-2">
-                {quickRecs.map(rec => (
-                    <Button key={rec.label} type="button" variant="outline" size="sm" onClick={() => handleQuickRec(rec.query)} disabled={isLoading}>
-                        <Wand2 className="mr-2 h-4 w-4" />
-                        {rec.label}
-                    </Button>
-                ))}
-               </div>
-              <Button type="submit" disabled={isLoading} className="w-full" size="lg">
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Sparkles className="mr-2 h-4 w-4" />
-                )}
-                Find My Strains
-              </Button>
-            </form>
-          </Form>
+          <div className={cn(
+            "transition-all duration-500 ease-in-out overflow-hidden",
+            isFormVisible ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+          )}>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="preferences"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="sr-only">Describe your desired experience</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="e.g., 'I'm looking for something to help me relax after work, without making me too sleepy. I prefer fruity flavors.'"
+                          className="min-h-[120px] resize-none text-base"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <div className="flex flex-wrap items-center justify-center gap-2">
+                  {quickRecs.map(rec => (
+                      <Button key={rec.label} type="button" variant="outline" size="sm" onClick={() => handleQuickRec(rec.query)} disabled={isLoading}>
+                          <Wand2 className="mr-2 h-4 w-4" />
+                          {rec.label}
+                      </Button>
+                  ))}
+                 </div>
+                <Button type="submit" disabled={isLoading} className="w-full" size="lg">
+                  {isLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="mr-2 h-4 w-4" />
+                  )}
+                  Find My Strains
+                </Button>
+              </form>
+            </Form>
+          </div>
 
           {isLoading && (
             <div className="mt-8 space-y-4">
@@ -149,6 +163,12 @@ export function StrainRecommenderForm() {
                     <ProductCard key={product.id} product={product} onProductClick={handleProductClick} />
                 ))}
               </div>
+               <div className="mt-8 text-center">
+                 <Button variant="outline" onClick={() => { setResult(null); setIsFormVisible(true); }}>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Start a New Search
+                 </Button>
+               </div>
             </div>
           )}
         </CardContent>
@@ -157,7 +177,7 @@ export function StrainRecommenderForm() {
     <ProductDetailModal
         isOpen={!!selectedProduct}
         onOpenChange={(isOpen) => !isOpen && closeModal()}
-        product={selectedProduct}
+        product={selectedProduct ?? undefined}
     />
     </>
   );

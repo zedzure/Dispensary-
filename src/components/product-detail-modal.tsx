@@ -9,9 +9,10 @@ import { Button } from "./ui/button";
 import { useCart } from "@/context/cart-context";
 import { useToast } from "@/hooks/use-toast";
 import { Check } from "lucide-react";
+import Link from "next/link";
 
 interface ProductDetailModalProps {
-  product: Product | null;
+  product: Product | undefined;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 }
@@ -46,9 +47,11 @@ export function ProductDetailModal({ product, isOpen, onOpenChange }: ProductDet
           </div>
           <div className="flex-1">
             <p className="font-semibold text-foreground">{product.name}</p>
-            <p className="text-sm font-bold text-primary">
-              ${product.price?.toFixed(2)}
-            </p>
+            {product.price && (
+              <p className="text-sm font-bold text-primary">
+                ${product.price.toFixed(2)}
+              </p>
+            )}
           </div>
         </div>
       ),
@@ -83,17 +86,13 @@ export function ProductDetailModal({ product, isOpen, onOpenChange }: ProductDet
                 <p className="text-base text-muted-foreground mb-4">{product.description}</p>
                 
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-4 border-t pt-4">
-                    {product.price ? (
-                        <p className="text-2xl font-bold text-primary">${product.price.toFixed(2)}</p>
-                    ) : (
-                        <div />
-                    )}
+                    <div />
                     <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                        <Button variant="outline" onClick={() => onOpenChange(false)}>
-                            Continue Shopping
+                        <Button variant="outline" asChild>
+                            <Link href="/">Locations</Link>
                         </Button>
-                        <Button onClick={handleAddToCart}>
-                            Add to Cart
+                        <Button asChild>
+                            <Link href="/menu/denver-colorado-10">Menu</Link>
                         </Button>
                     </div>
                 </div>

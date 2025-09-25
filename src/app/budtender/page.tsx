@@ -1,292 +1,278 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { DollarSign, Users, ShoppingBag, BarChart, LogOut, Settings, Bell, MoreVertical } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Search, X, Plus, Minus, User, ShoppingCart, DollarSign, Leaf } from 'lucide-react';
+import Image from 'next/image';
+import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useToast } from '@/hooks/use-toast';
+import { allProductsFlat } from '@/lib/products';
+import { mockCustomers } from '@/lib/mockCustomers';
+import type { Product } from '@/types/product';
+import type { UserProfile, CartItem } from '@/types/pos';
 import { Skeleton } from '@/components/ui/skeleton';
-import { OrderDetailDialog } from '@/components/order-detail-dialog';
 
-// Define types for better readability
-type OrderItem = {
-    name: string;
-    quantity: number;
-    price: number;
-    image: string;
-    hint: string;
-};
+const POS_PENDING_ORDERS_STORAGE_KEY = 'posPendingOrdersSilzey';
 
-export type BudtenderOrder = {
-    id: string;
-    customer: string;
-    total: number;
-    status: string;
-    items: OrderItem[];
-};
+// In a real app, customers would be fetched from a database.
+const customers: UserProfile[] = mockCustomers;
 
-// Mock data for the dashboard
-const recentOrders: BudtenderOrder[] = [
-  { 
-    id: '#G12346', 
-    customer: 'Alice Johnson', 
-    total: 85.00, 
-    status: 'Pending', 
-    items: [
-        { name: 'OG Kush', quantity: 1, price: 45.00, image: 'https://placehold.co/64x64.png', hint: 'cannabis flower' },
-        { name: 'Pre-roll Pack', quantity: 1, price: 32.50, image: 'https://placehold.co/64x64.png', hint: 'cannabis pre-roll' },
-    ] 
-  },
-  { 
-    id: '#G12345', 
-    customer: 'Kim L.', 
-    total: 75.50, 
-    status: 'Completed', 
-    items: [
-        { name: 'Blue Dream Vape', quantity: 1, price: 40.00, image: 'https://placehold.co/64x64.png', hint: 'vape pen' },
-        { name: 'CBD Tincture', quantity: 1, price: 30.00, image: 'https://placehold.co/64x64.png', hint: 'dropper bottle' },
-    ] 
-  },
-  { 
-    id: '#G12344', 
-    customer: 'Bob Williams', 
-    total: 50.00, 
-    status: 'Completed', 
-    items: [
-        { name: 'Gummy Edibles', quantity: 2, price: 23.00, image: 'https://placehold.co/64x64.png', hint: 'gummy candy' },
-    ]
-  },
-  { 
-    id: '#G12343', 
-    customer: 'Charlie Brown', 
-    total: 150.25, 
-    status: 'Pending', 
-    items: [
-        { name: 'Vape Pen', quantity: 2, price: 35.00, image: 'https://placehold.co/64x64.png', hint: 'vape pen' },
-        { name: 'Flower Jar (3.5g)', quantity: 1, price: 65.00, image: 'https://placehold.co/64x64.png', hint: 'cannabis flower' },
-    ]
-  },
-];
+// POS Main Component
+export default function BudtenderPOSPage() {
+    const { user, logout, isLoading } = useAuth();
+    const router = useRouter();
+    const { toast } = useToast();
+    const [isClient, setIsClient] = useState(false);
 
-const topProducts = [
-    { name: "OG Kush", category: "Flower", sales: 124 },
-    { name: "Gummy Edibles", category: "Edibles", sales: 98 },
-    { name: "Vape Pen", category: "Vapes", sales: 76 },
-]
+    // State Management
+    const [searchTerm, setSearchTerm] = useState('');
+    const [cart, setCart] = useState<CartItem[]>([]);
+    const [activeCustomer, setActiveCustomer] = useState<UserProfile | null>(null);
 
-export default function BudtenderDashboard() {
-  const { user, logout, isLoading } = useAuth();
-  const router = useRouter();
-  const [selectedOrder, setSelectedOrder] = useState<BudtenderOrder | null>(null);
+    // Set a default customer and run client-side effects
+    useEffect(() => {
+        setIsClient(true);
+        if (customers.length > 0) {
+            setActiveCustomer(customers[0]);
+        }
+    }, []);
 
-  useEffect(() => {
-    if (!isLoading && (!user || user.role !== 'budtender')) {
-      router.replace('/login');
+    // Derived State
+    const filteredProducts = useMemo(() => {
+        if (!searchTerm) return allProductsFlat.slice(0, 50); // Limit initial display
+        return allProductsFlat.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    }, [searchTerm]);
+
+    const subtotal = useMemo(() => cart.reduce((acc, item) => acc + (item.price || 0) * item.quantity, 0), [cart]);
+    const tax = subtotal * 0.15; // Mock 15% tax
+    const total = subtotal + tax;
+
+    // Handlers
+    const addToCart = (product: Product) => {
+        setCart(prevCart => {
+            const existingItem = prevCart.find(item => item.id === product.id);
+            if (existingItem) {
+                return prevCart.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+            }
+            return [...prevCart, { ...product, quantity: 1 }];
+        });
+    };
+
+    const updateQuantity = (productId: string, delta: number) => {
+        setCart(prevCart => {
+            const item = prevCart.find(i => i.id === productId);
+            if (item && item.quantity + delta <= 0) {
+                return prevCart.filter(i => i.id !== productId);
+            }
+            return prevCart.map(i => i.id === productId ? { ...i, quantity: i.quantity + delta } : i);
+        });
+    };
+
+    const clearCart = () => setCart([]);
+
+    const handleCheckout = () => {
+        if (!isClient) return;
+        if (cart.length === 0) {
+            toast({ title: 'Cart is empty', description: 'Add products to the cart before checkout.', variant: 'destructive' });
+            return;
+        }
+        if (!activeCustomer) {
+            toast({ title: 'No Customer Selected', description: 'Please select a customer before checking out.', variant: 'destructive' });
+            return;
+        }
+
+        try {
+            // Create a new order object
+            const newOrder = {
+                id: `ORD-POS-${Date.now()}`,
+                customerName: `${activeCustomer.firstName} ${activeCustomer.lastName}`,
+                customerId: activeCustomer.id,
+                orderDate: new Date().toISOString(),
+                itemCount: cart.reduce((sum, item) => sum + item.quantity, 0),
+                items: cart,
+                totalAmount: total,
+                status: 'Pending Checkout' as const,
+                submittedByPOS: true,
+            };
+            
+            // Get existing pending orders from localStorage
+            const pendingOrdersRaw = localStorage.getItem(POS_PENDING_ORDERS_STORAGE_KEY);
+            let pendingOrders = pendingOrdersRaw ? JSON.parse(pendingOrdersRaw) : [];
+            
+            // Add the new order and save back to localStorage
+            pendingOrders.push(newOrder);
+            localStorage.setItem(POS_PENDING_ORDERS_STORAGE_KEY, JSON.stringify(pendingOrders));
+
+            toast({ 
+                title: 'Order Submitted to Queue', 
+                description: `Order for ${activeCustomer.firstName} sent for processing. Total: $${total.toFixed(2)}` 
+            });
+            clearCart();
+        } catch(e) {
+            console.error("Failed to save pending order:", e);
+            toast({ title: 'Error', description: 'Could not submit order to queue. Check console for details.', variant: 'destructive' });
+        }
+    };
+    
+    useEffect(() => {
+        if (!isLoading && (!user || user.role !== 'budtender')) {
+        router.replace('/login');
+        }
+    }, [user, isLoading, router]);
+    
+    if (isLoading || !isClient) {
+        return (
+          <div className="flex flex-col min-h-screen bg-muted/40">
+            <Header />
+            <main className="flex-grow flex items-center justify-center bg-muted">
+                <div className="flex flex-col items-center gap-4">
+                    <Leaf className="h-12 w-12 text-primary animate-spin" />
+                    <p className="text-muted-foreground">Loading POS...</p>
+                </div>
+            </main>
+            <Footer />
+          </div>
+        );
     }
-  }, [user, isLoading, router]);
+    
+    if (!user || user.role !== 'budtender') {
+        return (
+             <div className="flex flex-col min-h-screen bg-muted/40">
+                <Header />
+                <main className="flex-grow container mx-auto px-4 md:px-6 py-8 flex items-center justify-center">
+                   <p>Redirecting to login...</p>
+                </main>
+                <Footer />
+            </div>
+        )
+    }
 
-  if (isLoading || !user || user.role !== 'budtender') {
+    // Main render
     return (
-      <div className="flex flex-col min-h-screen bg-muted/40">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
-            <Skeleton className="h-8 w-48 mb-8" />
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-                <Skeleton className="h-32 w-full rounded-lg" />
-                <Skeleton className="h-32 w-full rounded-lg" />
-                <Skeleton className="h-32 w-full rounded-lg" />
-                <Skeleton className="h-32 w-full rounded-lg" />
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2">
-                    <Skeleton className="h-96 w-full rounded-lg" />
-                </div>
-                <div>
-                    <Skeleton className="h-80 w-full rounded-lg" />
-                </div>
-            </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-  
-  const totalItemsInOrder = (items: OrderItem[]) => items.reduce((sum, item) => sum + item.quantity, 0);
-
-  return (
-    <>
-      <div className="flex flex-col min-h-screen bg-muted/40">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Budtender Dashboard</h1>
-              <p className="text-muted-foreground">Welcome back, {user.name}. Here's your dispensary overview.</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon">
-                  <Bell className="h-5 w-5" />
-                  <span className="sr-only">Notifications</span>
-              </Button>
-              <Button variant="ghost" size="icon">
-                  <Settings className="h-5 w-5" />
-                  <span className="sr-only">Settings</span>
-              </Button>
-              <Button variant="outline" size="sm" onClick={async () => await logout()}>
-                  <LogOut className="mr-2 h-4 w-4" /> Logout
-              </Button>
-            </div>
-          </div>
-
-          {/* Stat Cards */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-            <Card className="shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                <DollarSign className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">$45,231.89</div>
-                <p className="text-xs text-muted-foreground">+20.1% from last month</p>
-              </CardContent>
-            </Card>
-            <Card className="shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">New Customers</CardTitle>
-                <Users className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+235</div>
-                <p className="text-xs text-muted-foreground">+18.1% from last month</p>
-              </CardContent>
-            </Card>
-            <Card className="shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Orders Today</CardTitle>
-                <ShoppingBag className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+12</div>
-                <p className="text-xs text-muted-foreground">+5 vs yesterday</p>
-              </CardContent>
-            </Card>
-            <Card className="shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Avg. Order Value</CardTitle>
-                <BarChart className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">$92.50</div>
-                <p className="text-xs text-muted-foreground">-2.5% from last month</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Recent Orders */}
-            <div className="lg:col-span-2">
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle>Recent Orders</CardTitle>
-                  <CardDescription>A list of the most recent customer orders.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {/* Desktop Table View */}
-                  <div className="hidden md:block">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Order ID</TableHead>
-                          <TableHead>Customer</TableHead>
-                          <TableHead>Items</TableHead>
-                          <TableHead className="text-right">Total</TableHead>
-                          <TableHead className="text-center">Status</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {recentOrders.map((order) => (
-                          <TableRow key={order.id}>
-                            <TableCell className="font-medium">{order.id}</TableCell>
-                            <TableCell>{order.customer}</TableCell>
-                            <TableCell className="text-center">{totalItemsInOrder(order.items)}</TableCell>
-                            <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
-                            <TableCell className="text-center">
-                                <Badge 
-                                    variant={order.status === 'Pending' ? 'destructive' : (order.status === 'Completed' ? 'default' : 'secondary')}
-                                    className={order.status === 'Pending' ? 'animate-pulse' : ''}
-                                >
-                                    {order.status}
-                                </Badge>
-                            </TableCell>
-                            <TableCell className="text-right">
-                                <Button variant="outline" size="sm" onClick={() => setSelectedOrder(order)}>View</Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                  {/* Mobile Card View */}
-                  <div className="space-y-4 md:hidden">
-                    {recentOrders.map((order) => (
-                       <Card key={order.id} className="border-border/60">
-                         <CardHeader className="flex flex-row items-center justify-between p-4">
-                            <div>
-                                <h3 className="font-semibold">{order.id}</h3>
-                                <p className="text-sm text-muted-foreground">{order.customer}</p>
+        <div className="flex flex-col min-h-screen bg-muted/40 font-sans">
+            <Header />
+            <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Product Selection */}
+                    <div className="lg:col-span-2 bg-background rounded-lg shadow-md flex flex-col">
+                        <div className="p-4 border-b">
+                             <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input 
+                                    placeholder="Search products..." 
+                                    className="pl-10 h-10 text-base"
+                                    value={searchTerm}
+                                    onChange={e => setSearchTerm(e.target.value)}
+                                />
                             </div>
-                            <Badge 
-                                variant={order.status === 'Pending' ? 'destructive' : (order.status === 'Completed' ? 'default' : 'secondary')}
-                                className={`${order.status === 'Pending' ? 'animate-pulse' : ''} shrink-0`}
-                            >
-                                {order.status}
-                            </Badge>
-                         </CardHeader>
-                         <CardContent className="p-4 pt-0">
-                           <div className="flex justify-between items-center text-sm">
-                               <span className="text-muted-foreground">{totalItemsInOrder(order.items)} items</span>
-                               <span className="font-bold">${order.total.toFixed(2)}</span>
-                           </div>
-                         </CardContent>
-                         <CardFooter className="p-4 pt-0">
-                            <Button variant="outline" className="w-full" onClick={() => setSelectedOrder(order)}>View Details</Button>
-                         </CardFooter>
-                       </Card>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                        </div>
+                        <ScrollArea>
+                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 p-4">
+                                {filteredProducts.map(product => (
+                                    <Card 
+                                        key={product.id} 
+                                        className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden group"
+                                        onClick={() => addToCart(product)}
+                                    >
+                                        <div className="relative aspect-square">
+                                            <Image src={product.image} alt={product.name} fill style={{objectFit: 'cover'}} className="group-hover:scale-105 transition-transform" data-ai-hint={product.hint} />
+                                        </div>
+                                        <div className="p-3">
+                                            <p className="font-semibold text-sm truncate">{product.name}</p>
+                                            <p className="text-xs text-muted-foreground">{product.category}</p>
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                    </div>
 
-            {/* Top Products */}
-            <div>
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle>Top Selling Products</CardTitle>
-                  <CardDescription>Your most popular items this month.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {topProducts.map((product) => (
-                      <div key={product.name} className="flex items-center">
-                          <p className="text-sm font-medium flex-1">{product.name}</p>
-                          <p className="text-sm text-muted-foreground">{product.sales} units</p>
-                      </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-      <OrderDetailDialog order={selectedOrder} onOpenChange={(isOpen) => !isOpen && setSelectedOrder(null)} />
-    </>
-  );
+                    {/* Customer & Cart */}
+                    <div className="bg-background rounded-lg shadow-md flex flex-col">
+                        {/* Customer Info */}
+                        <div className="p-4 border-b">
+                            {activeCustomer ? (
+                                <div className="flex items-center gap-3">
+                                    <Avatar className="h-12 w-12 border-2 border-primary">
+                                        <AvatarImage src={activeCustomer.avatarUrl} alt={activeCustomer.firstName} data-ai-hint={activeCustomer.dataAiHint} />
+                                        <AvatarFallback>{activeCustomer.firstName[0]}{activeCustomer.lastName[0]}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="font-bold">{activeCustomer.firstName} {activeCustomer.lastName}</p>
+                                        <p className="text-xs text-muted-foreground">Member Since: {new Date(activeCustomer.memberSince).toLocaleDateString()}</p>
+                                    </div>
+                                    <Button variant="ghost" size="icon" className="ml-auto" onClick={() => setActiveCustomer(null)}><X className="h-4 w-4" /></Button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <Input placeholder="Search Customer..." className="h-10" />
+                                    <Button size="icon"><User className="h-5 w-5"/></Button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Cart Items */}
+                        <ScrollArea className="flex-1">
+                            <div className="p-4 space-y-3">
+                                {cart.length === 0 ? (
+                                    <div className="text-center py-10 text-muted-foreground">
+                                        <ShoppingCart className="mx-auto h-10 w-10 mb-2"/>
+                                        <p>Cart is empty</p>
+                                    </div>
+                                ) : (
+                                    cart.map(item => (
+                                        <div key={item.id} className="flex items-center gap-3">
+                                            <div className="relative h-12 w-12 rounded-md overflow-hidden flex-shrink-0">
+                                                <Image src={item.image} alt={item.name} fill style={{objectFit:'cover'}} data-ai-hint={item.hint} />
+                                            </div>
+                                            <div className="flex-grow">
+                                                <p className="text-sm font-medium truncate">{item.name}</p>
+                                                <p className="text-xs text-muted-foreground">${item.price?.toFixed(2)}</p>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, -1)}><Minus className="h-4 w-4"/></Button>
+                                                <span className="w-6 text-center text-sm font-bold">{item.quantity}</span>
+                                                <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, 1)}><Plus className="h-4 w-4"/></Button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </ScrollArea>
+                        
+                        {/* Cart Summary & Checkout */}
+                        {cart.length > 0 && (
+                            <div className="p-4 border-t mt-auto space-y-3">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Subtotal</span>
+                                    <span>${subtotal.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Tax (15%)</span>
+                                    <span>${tax.toFixed(2)}</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between text-lg font-bold">
+                                    <span>Total</span>
+                                    <span>${total.toFixed(2)}</span>
+                                </div>
+                                <Button className="w-full h-12 text-lg" size="lg" onClick={handleCheckout} disabled={cart.length === 0 || !activeCustomer}>
+                                    <DollarSign className="mr-2 h-5 w-5" /> Charge ${total.toFixed(2)}
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </main>
+        </div>
+    );
 }

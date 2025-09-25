@@ -39,10 +39,6 @@ export const OrderReceiptModal: FC<OrderReceiptModalProps> = ({ order, isOpen, o
 
   const statusBadgeVariant = getStatusBadgeVariant(order.status);
 
-  const handlePrint = () => {
-    window.open(`/admin/print/receipt/${order.id}?type=order`, '_blank');
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden shadow-2xl">
@@ -98,9 +94,9 @@ export const OrderReceiptModal: FC<OrderReceiptModalProps> = ({ order, isOpen, o
                       />
                     <div className="flex-grow">
                       <span className="block font-medium text-sm">{item.name} (x{item.quantity})</span>
-                      <span className="text-muted-foreground">${item.price.toFixed(2)} ea.</span>
+                      <span className="text-muted-foreground">${(item.price ?? 0).toFixed(2)} ea.</span>
                     </div>
-                    <span className="font-semibold text-sm">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="font-semibold text-sm">${((item.price ?? 0) * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
                 {order.items.length === 0 && <p className="text-muted-foreground text-center py-2">No items in this order.</p>}
@@ -123,7 +119,7 @@ export const OrderReceiptModal: FC<OrderReceiptModalProps> = ({ order, isOpen, o
           <Button variant="outline" onClick={onClose} className="w-full sm:w-auto mb-2 sm:mb-0">
              <X className="mr-2 h-4 w-4" /> Close
           </Button>
-           <Button onClick={handlePrint} className="w-full sm:w-auto">
+           <Button onClick={() => window.open(`/admin/print/receipt/${order.id}?type=order`, '_blank')} className="w-full sm:w-auto">
             <Printer className="mr-2 h-4 w-4" /> Print Receipt
           </Button> 
         </DialogFooter>

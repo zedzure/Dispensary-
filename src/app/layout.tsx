@@ -1,39 +1,83 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { Inter, Belleza } from 'next/font/google';
+import { Inter } from "next/font/google";
 import { Providers } from "./providers";
+import { ThemeProvider } from "next-themes";
+import { CartSheet } from "@/components/cart-sheet";
 
 const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-sans',
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
 });
 
-const belleza = Belleza({
-  subsets: ['latin'],
-  weight: '400',
-  display: 'swap',
-  variable: '--font-cursive',
-});
+// Static favicon stored in /public for reliability
+const faviconUrl = "/favicon.ico";
+
+const title = "GreenLeaf Guide | Local Dispensary Finder & Cannabis Deals";
+const description =
+  "Explore top-rated dispensaries in your area for delivery and pickup. GreenLeaf Guide is your ultimate cannabis marketplace to find reviews, the latest info, and unbeatable deals.";
+const url = "https://dispensary-13773344-54196.web.app";
 
 export const metadata: Metadata = {
-  title: "GreenLeaf Guide",
-  description: "Your friendly guide to cannabis.",
+  title,
+  description,
+  keywords: [
+    "dispensary finder",
+    "cannabis delivery",
+    "local dispensaries",
+    "cannabis reviews",
+    "dispensary deals",
+    "cannabis marketplace",
+    "weed pickup",
+    "marijuana deals",
+  ],
+  metadataBase: new URL(url),
+  manifest: "/manifest.json",
+  openGraph: {
+    title,
+    description,
+    url,
+    siteName: "GreenLeaf Guide",
+    images: [
+      {
+        url: faviconUrl,
+        width: 1200,
+        height: 630,
+        alt: "GreenLeaf Guide - Dispensary Marketplace",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [faviconUrl],
+  },
+  icons: {
+    icon: [faviconUrl],
+    apple: [faviconUrl],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${belleza.variable}`}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="font-sans antialiased">
-        <Providers>
-          {children}
-          <Toaster />
-        </Providers>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Providers>
+            {children}
+            <Toaster />
+            <CartSheet />
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -16,7 +17,7 @@ export function ProductCard({ product, onProductClick, className }: ProductCardP
   return (
     <Card className={cn("h-full flex flex-col overflow-hidden group bg-white border-border/60 shadow-lg", className)}>
       <CardHeader className="p-0">
-        <button onClick={() => onProductClick(product)} className="w-full aspect-[3/2] relative">
+        <button onClick={() => onProductClick(product)} className="w-full aspect-square md:aspect-square relative">
             <Image
               src={product.image}
               data-ai-hint={product.hint}
@@ -27,13 +28,12 @@ export function ProductCard({ product, onProductClick, className }: ProductCardP
             />
         </button>
       </CardHeader>
-      <CardContent className="p-6 flex-grow">
-        <CardTitle className="text-xl font-semibold">{product.name}</CardTitle>
-        <p className="text-sm text-muted-foreground mt-2">{product.type} | {product.thc}% THC</p>
+      <CardContent className="p-3 flex-grow">
+        <CardTitle className="text-sm md:text-base font-semibold line-clamp-2">{product.name}</CardTitle>
+        <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{product.type} | {product.thc}% THC</p>
       </CardContent>
-      <CardFooter className="p-6 pt-0 flex items-center justify-between">
-        <p className="text-xl font-bold text-primary">${product.price?.toFixed(2)}</p>
-        <Button variant="default" onClick={() => onProductClick(product)}>View</Button>
+      <CardFooter className="p-3 pt-0 flex items-center justify-end">
+        <Button variant="default" size="sm" onClick={() => onProductClick(product)}>View</Button>
       </CardFooter>
     </Card>
   );

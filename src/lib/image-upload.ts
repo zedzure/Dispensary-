@@ -1,23 +1,17 @@
 
-'use client';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "./firebase";
 
-import { storage } from '@/lib/firebase';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+export const uploadImage = async (file: File, path?: string): Promise<string> => {
+  const defaultPath = `images/${Date.now()}-${file.name}`;
+  const storageRef = ref(storage, path || defaultPath);
 
-/**
- * Uploads a file to Firebase Storage in the 'products' directory.
- * @param file The image file to upload.
- * @returns A promise that resolves with the public download URL of the uploaded image.
- */
-export const uploadImage = async (file: File): Promise<string> => {
-  if (!file) {
-    throw new Error("No file provided for upload.");
+  try {
+    const snapshot = await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(snapshot.ref);
+    return url;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    throw new Error("Image upload failed.");
   }
-  // Add a timestamp to the filename to prevent overwrites
-  const storageRef = ref(storage, `products/${Date.now()}-${file.name}`);
-  
-  await uploadBytes(storageRef, file);
-  
-  const url = await getDownloadURL(storageRef);
-  return url;
 };

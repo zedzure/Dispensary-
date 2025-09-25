@@ -18,25 +18,25 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-3">Shop</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="text-muted-foreground hover:text-primary">Flower</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary">Edibles</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary">Vapes</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary">Concentrates</Link></li>
+              <li><Link href="/#menu" className="text-muted-foreground hover:text-primary">Flower</Link></li>
+              <li><Link href="/#menu" className="text-muted-foreground hover:text-primary">Edibles</Link></li>
+              <li><Link href="/#menu" className="text-muted-foreground hover:text-primary">Vapes</Link></li>
+              <li><Link href="/#menu" className="text-muted-foreground hover:text-primary">Concentrates</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-3">About</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="text-muted-foreground hover:text-primary">About Us</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary">Contact</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary">FAQ</Link></li>
+              <li><Link href="/about" className="text-muted-foreground hover:text-primary">About Us</Link></li>
+              <li><Link href="/contact" className="text-muted-foreground hover:text-primary">Contact</Link></li>
+              <li><Link href="/careers" className="text-muted-foreground hover:text-primary">Careers</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-3">Legal</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="text-muted-foreground hover:text-primary">Terms of Service</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary">Privacy Policy</Link></li>
+              <li><Link href="/privacy-policy" className="text-muted-foreground hover:text-primary">Privacy Policy</Link></li>
+              <li><Link href="/privacy-policy" className="text-muted-foreground hover:text-primary">Terms of Service</Link></li>
             </ul>
           </div>
         </div>

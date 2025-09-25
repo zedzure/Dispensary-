@@ -1,3 +1,8 @@
+@import "../styles/hero-slider.css";
+@import "../styles/profile-card.css";
+@import "../styles/login-flip-card.css";
+@import "../styles/customer-card.css";
+@import "../styles/chat-input.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -37,6 +42,17 @@
     --sidebar-accent-foreground: 222.2 47.4% 11.2%;
     --sidebar-border: 214.3 31.8% 91.4%;
     --sidebar-ring: 210 100% 56%;
+
+    --gap: 8px;
+    --base: clamp(2rem, 8cqi, 80px);
+    --easing: linear(
+      0 0%, 0.1538 4.09%, 0.2926 8.29%, 0.4173 12.63%, 0.5282 17.12%,
+      0.6255 21.77%, 0.7099 26.61%, 0.782 31.67%, 0.8425 37%,
+      0.8887 42.23%, 0.9257 47.79%, 0.9543 53.78%, 0.9752 60.32%,
+      0.9883 67.11%, 0.9961 75%,
+      1 100%
+    );
+    --speed: 0.6s;
   }
 
   .dark {
@@ -73,26 +89,171 @@
     --sidebar-border: 217.2 32.6% 17.5%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  :where(.fluid) {
+    --font-size-min: 16;
+    --font-size-max: 20;
+    --font-ratio-min: 1.2;
+    --font-ratio-max: 1.33;
+    --font-width-min: 375;
+    --font-width-max: 1500;
+    --fluid-min: calc(var(--font-size-min) * pow(var(--font-ratio-min), var(--font-level, 0)));
+    --fluid-max: calc(var(--font-size-max) * pow(var(--font-ratio-max), var(--font-level, 0)));
+    --fluid-preferred: calc((var(--fluid-max) - var(--fluid-min)) / (var(--font-width-max) - var(--font-width-min)));
+    --fluid-type: clamp(
+      (var(--fluid-min) / 16) * 1rem,
+      ((var(--fluid-min) / 16) * 1rem) - (((var(--fluid-preferred) * var(--font-width-min)) / 16) * 1rem) + (var(--fluid-preferred) * 100vi),
+      (var(--fluid-max) / 16) * 1rem
+    );
+    font-size: var(--fluid-type);
+  }
 }
 
 @layer base {
+  html {
+    height: 100%;
+    height: -webkit-fill-available;
+  }
+  body {
+    height: 100%;
+    height: -webkit-fill-available;
+    @apply bg-background text-foreground;
+  }
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+  #loadingOverlay {
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .dark #loadingOverlay {
+    background: rgba(0, 0, 0, 0.7);
+  }
+  .cart-icon {
+    width: 100px;
+    height: 100px;
+    animation: rollBackForth 2s infinite ease-in-out;
   }
 }
 
 @layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
+  .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-  .no-scrollbar {
+  .scrollbar-hide {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
   .hover\:pause-animation:hover {
     animation-play-state: paused;
   }
+}
+
+/* Background Effect Styles */
+a-hole {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+a-hole::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: block;
+  width: 150%;
+  height: 140%;
+  background: radial-gradient(ellipse at 50% 55%, transparent 10%, hsl(var(--background)) 50%);
+  transform: translate3d(-50%, -50%, 0);
+  content: "";
+}
+
+a-hole::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+      ellipse at 50% 75%,
+      hsl(var(--primary)) 20%,
+      transparent 75%
+    );
+  mix-blend-mode: overlay;
+  transform: translate3d(-50%, -50%, 0);
+  content: "";
+}
+
+@keyframes aura-glow {
+  0% {
+    background-position: 0 100%;
+  }
+  100% {
+    background-position: 0 300%;
+  }
+}
+
+a-hole .aura {
+  position: absolute;
+  top: -71.5%;
+  left: 50%;
+  z-index: 3;
+  width: 30%;
+  height: 140%;
+  background: linear-gradient(
+      20deg,
+      #00f8f1,
+      rgba(255, 189, 30, 0.125),
+      #fe848f 33%,
+      rgba(254, 132, 143, 0.125) 49.5%,
+      #00f8f1 66%,
+      rgba(0, 248, 241, 0.375) 85.5%,
+      #ffbd1e 100%
+    )
+    0 100% / 100% 200%;
+  border-radius: 0 0 100% 100%;
+  filter: blur(50px);
+  mix-blend-mode: plus-lighter;
+  opacity: 0.75;
+  transform: translate3d(-50%, 0, 0);
+  animation: aura-glow 5s infinite linear;
+}
+
+a-hole .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 1px,
+    hsla(var(--foreground), 0.5) 1px,
+    hsla(var(--foreground), 0.5) 2px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+}
+
+a-hole canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }

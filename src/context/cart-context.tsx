@@ -41,15 +41,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   
   const updateQuantity = (productId: string, delta: number) => {
     setItems((prevItems) => {
-      return prevItems
-        .map(item => {
-          if (item.id === productId) {
-            const newQuantity = item.quantity + delta;
-            return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
-          }
-          return item;
-        })
-        .filter((item): item is CartItem => item !== null);
+        return prevItems.map(item => {
+            if (item.id === productId) {
+                return { ...item, quantity: item.quantity + delta };
+            }
+            return item;
+        }).filter(item => item.quantity > 0); // This correctly removes the item if quantity is 0 or less
     });
   };
 

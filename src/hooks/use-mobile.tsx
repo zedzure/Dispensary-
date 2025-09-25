@@ -1,19 +1,41 @@
-import * as React from "react"
+import * as React from "react";
 
-const MOBILE_BREAKPOINT = 768
+const MOBILE_BREAKPOINT = 768;
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+  const getIsMobile = () => typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT;
+
+  const [isMobile, setIsMobile] = React.useState<boolean>(getIsMobile);
 
   React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }
-    mql.addEventListener("change", onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener("change", onChange)
-  }, [])
+    if (typeof window === "undefined") return;
 
-  return !!isMobile
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+
+    const onChange = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches);
+    };
+
+    // ✅ Initialize immediately
+    setIsMobile(mql.matches);
+
+    // ✅ Use `addEventListener` if supported, fallback to `addListener` for older browsers
+    if (mql.addEventListener) {
+      mql.addEventListener("change", onChange);
+    } else {
+      // @ts-ignore (for Safari <14)
+      mql.addListener(onChange);
+    }
+
+    return () => {
+      if (mql.removeEventListener) {
+        mql.removeEventListener("change", onChange);
+      } else {
+        // @ts-ignore
+        mql.removeListener(onChange);
+      }
+    };
+  }, []);
+
+  return isMobile;
 }

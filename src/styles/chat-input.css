@@ -1,0 +1,25 @@
+.chat-input-container {
+    @apply flex items-start w-full gap-3 p-1;
+}
+
+.chat-input-avatar {
+    @apply h-10 w-10 border flex-shrink-0;
+}
+
+.chat-input-main {
+    @apply flex-1 flex flex-col gap-2 min-w-0; /* Prevent overflow */
+}
+
+.chat-input-textarea {
+    @apply w-full bg-muted/50 border-border/80 rounded-md p-2 text-sm;
+    resize: none;
+    min-height: 4rem; /* Adjusted height */
+    max-height: 12rem; /* Prevent excessive growth */
+}
+.chat-input-textarea:focus {
+    @apply ring-2 ring-primary/50 border-primary;
+}
+
+.chat-input-actions {
+    @apply flex justify-between items-center;
+}

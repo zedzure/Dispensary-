@@ -1,11 +1,18 @@
-import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/googleai';
 
-export const ai = genkit({
-  plugins: [googleAI()],
-  model: 'googleai/gemini-1.5-flash-latest',
-  telemetry: {
-    // Disable OpenTelemetry instrumentation which can interfere with Next.js
-    instrumentation: false,
-  },
-});
+import {genkit, type Genkit} from 'genkit';
+import {googleAI, type GoogleAIPlugin} from '@genkit-ai/googleai';
+
+let ai: Genkit<[GoogleAIPlugin]>;
+
+if (typeof process === 'undefined') {
+  ai = genkit({
+    model: process.env.GENKIT_MODEL || 'googleai/gemini-2.5-flash-preview',
+  });
+} else {
+  ai = genkit({
+    plugins: [googleAI()],
+    model: process.env.GENKIT_MODEL || 'googleai/gemini-2.5-flash-preview',
+  });
+}
+
+export {ai};
