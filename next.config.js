@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 'output: "export"' is removed to enable server-side rendering for Firebase App Hosting
+  output: 'export',
   reactStrictMode: true,
   swcMinify: true,
   images: {
