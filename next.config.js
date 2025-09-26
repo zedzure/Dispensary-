@@ -1,10 +1,23 @@
 /** @type {import('next').NextConfig} */
+
+const isGithubActions = process.env.GITHUB_ACTIONS || false;
+
+let assetPrefix = '';
+let basePath = '/Dispensary-';
+
+if (isGithubActions) {
+  const repo = process.env.GITHUB_REPOSITORY.replace(/.*?\//, '');
+  assetPrefix = `/${repo}/`;
+  basePath = `/${repo}`;
+}
+
 const nextConfig = {
   output: 'export',
+  assetPrefix: assetPrefix,
+  basePath: basePath,
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    // This can be set to false if you are using a server-based deployment
     unoptimized: true, 
     remotePatterns: [
       { protocol: 'https', hostname: 'images.pexels.com', pathname: '/**' },
@@ -15,11 +28,10 @@ const nextConfig = {
       { protocol: 'https', hostname: 'avatar.vercel.sh', pathname: '/**' },
     ],
   },
-  // We need to extend the server action timeout for longer running AI tasks
-  serverActions: {
-      bodySizeLimit: '2mb', // Allow larger image uploads
-  },
   experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
   },
 };
 
