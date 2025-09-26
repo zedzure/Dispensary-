@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: '/Dispensary-',
-  output: 'export',
   // 'output: "export"' is removed to enable server-side rendering for Firebase App Hosting
   reactStrictMode: true,
   swcMinify: true,
@@ -12,7 +10,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.pexels.com', pathname: '/**' },
       { protocol: 'https', hostname: 'placehold.co', pathname: '/**' },
       { protocol: 'https', hostname: 'firebasestorage.googleapis.com', pathname: '/**' },
-      { protocol: 'https' , hostname: 'picsum.photos', pathname: '/**' },
+      { protocol: 'https', hostname: 'picsum.photos', pathname: '/**' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com', pathname: '/**' },
       { protocol: 'https', hostname: 'avatar.vercel.sh', pathname: '/**' },
     ],
