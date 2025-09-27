@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
@@ -43,15 +44,14 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
     const now = new Date();
 
     if (userSnap.exists()) {
-        // User exists, update last login
+        // User exists, update last login and return existing data
         const existingData = userSnap.data();
         await updateDoc(userRef, { 'activity.lastLogin': serverTimestamp() });
         
-        // Convert any timestamps to strings for client-side state
         return {
             uid: firebaseUser.uid,
             name: existingData.name || firebaseUser.displayName || 'User',
-            email: existingData.email || firebaseUser.email,
+            email: existingData.email || firebaseUser.email!,
             avatarUrl: existingData.avatarUrl || firebaseUser.photoURL || `https://avatar.vercel.sh/${firebaseUser.uid}`,
             role: existingData.role || 'user',
             points: existingData.points || 0,
@@ -86,9 +86,17 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
         // Return a client-safe user object immediately
         return {
             uid: firebaseUser.uid,
-            ...newProfileData,
+            email: newProfileData.email,
+            name: newProfileData.name,
+            avatarUrl: newProfileData.avatarUrl,
+            role: newProfileData.role,
+            points: newProfileData.points,
+            followersCount: newProfileData.followersCount,
+            followingCount: newProfileData.followingCount,
             createdAt: now.toISOString(),
-            activity: { lastLogin: now.toISOString(), joined: now.toISOString() }
+            activity: { lastLogin: now.toISOString(), joined: now.toISOString() },
+            storageLimit: newProfileData.storageLimit,
+            usedStorage: newProfileData.usedStorage,
         };
     }
 };
@@ -124,10 +132,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    setIsLoading(true);
     try {
-      await signInWithPopup(auth, provider);
-      // onAuthStateChanged will handle profile creation/update and state setting
+      // Open popup first to avoid browser blocking
+      const result = await signInWithPopup(auth, provider);
+      setIsLoading(true); // Set loading state after popup is initiated
+      // onAuthStateChanged will handle the rest
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -140,9 +149,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGitHub = async () => {
     const provider = new GithubAuthProvider();
-    setIsLoading(true);
     try {
+        // Open popup first
         await signInWithPopup(auth, provider);
+        setIsLoading(true); // Then set loading state
     } catch (error: any) {
         toast({
             variant: "destructive",
@@ -208,3 +218,4 @@ export const useAuth = () => {
   }
   return context;
 };
+
