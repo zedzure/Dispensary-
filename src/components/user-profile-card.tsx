@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -66,11 +67,11 @@ export function UserProfileCard({ profile }: UserProfileCardProps) {
 
                     <div className="profile-card-inf">
                         <div className="profile-card-inf__item">
-                            <div className="profile-card-inf__title">{profile.followers?.length || 0}</div>
+                            <div className="profile-card-inf__title">{profile.followersCount || 0}</div>
                             <div className="profile-card-inf__txt">Followers</div>
                         </div>
                         <div className="profile-card-inf__item">
-                            <div className="profile-card-inf__title">{profile.following?.length || 0}</div>
+                            <div className="profile-card-inf__title">{profile.followingCount || 0}</div>
                             <div className="profile-card-inf__txt">Following</div>
                         </div>
                         <div className="profile-card-inf__item">

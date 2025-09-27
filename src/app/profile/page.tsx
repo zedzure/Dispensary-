@@ -1,14 +1,15 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
-import { LogOut, Loader2, User } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { UserProfileCard } from '@/components/user-profile-card';
 import type { UserProfile } from '@/types/pos';
@@ -36,13 +37,13 @@ function ProfilePageSkeleton() {
 
 
 export default function ProfilePage() {
-  const [user, authLoading, authError] = useAuthState(auth);
+  const [user, authLoading] = useAuthState(auth);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchOrCreateProfile = async () => {
       if (user) {
         try {
           const userDocRef = doc(db, 'users', user.uid);
@@ -51,30 +52,36 @@ export default function ProfilePage() {
           if (userDoc.exists()) {
             setProfile(userDoc.data() as UserProfile);
           } else {
-             // Create a fallback profile if one doesn't exist in Firestore
-            const fallbackProfile: UserProfile = {
+            // Create and save a new profile if one doesn't exist
+            const newProfile: UserProfile = {
                 id: user.uid,
-                firstName: user.displayName || 'New',
-                lastName: 'User',
+                firstName: user.displayName?.split(' ')[0] || 'New',
+                lastName: user.displayName?.split(' ').slice(1).join(' ') || 'User',
                 email: user.email || '',
                 memberSince: user.metadata.creationTime || new Date().toISOString(),
                 avatarUrl: user.photoURL || `https://avatar.vercel.sh/${user.uid}`,
                 points: 0,
                 followers: [],
                 following: [],
+                followersCount: 0,
+                followingCount: 0,
+                bio: 'A new member of the GreenLeaf Guide community!',
             };
-            setProfile(fallbackProfile);
+            await setDoc(userDocRef, newProfile, { merge: true });
+            setProfile(newProfile);
           }
         } catch (error) {
-          console.error("Error fetching user profile:", error);
+          console.error("Error fetching or creating user profile:", error);
+        } finally {
+          setProfileLoading(false);
         }
+      } else if (!authLoading) {
+        // If not loading and no user, stop loading and trigger redirect
+        setProfileLoading(false);
       }
-      setProfileLoading(false);
     };
 
-    if (!authLoading) {
-        fetchProfile();
-    }
+    fetchOrCreateProfile();
   }, [user, authLoading]);
 
   const handleLogout = async () => {
@@ -97,7 +104,7 @@ export default function ProfilePage() {
             <Header />
             <main className="flex-grow flex items-center justify-center bg-muted">
                 <div className="text-center">
-                    <p className="text-destructive mb-4">Could not load profile.</p>
+                    <p className="text-destructive mb-4">Could not load profile. Please try again.</p>
                     <Button onClick={handleLogout} variant="destructive">
                         <LogOut className="mr-2 h-4 w-4" />
                         Sign Out
