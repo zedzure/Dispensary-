@@ -173,13 +173,16 @@ function ProfilePage() {
     }
   };
 
-  // While authentication is resolving or there is no user, show a minimal redirecting message.
+  // While authentication is resolving or there is no user yet, show a loading screen.
   if (isLoading || !user) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow flex items-center justify-center bg-muted">
-            <p className="text-muted-foreground">Redirecting...</p>
+            <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                <span>Loading Profile...</span>
+            </div>
         </main>
         <Footer />
       </div>

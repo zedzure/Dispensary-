@@ -24,7 +24,7 @@ export default function LoginPage() {
   const [signUpPassword, setSignUpPassword] = useState('');
 
   useEffect(() => {
-    // Redirect only when authentication state is resolved and user is logged in
+    // If loading has finished and we have a user, redirect them.
     if (!isLoading && user) {
       router.replace('/profile');
     }
@@ -62,10 +62,21 @@ export default function LoginPage() {
       </svg>
   );
 
-  // If we are resolving auth or a user exists, this page will be redirected.
-  // We can return null or a minimal placeholder.
+  // If we are still resolving auth state OR if a user exists (and we're about to redirect),
+  // show a full-page loading indicator. This prevents a "flash" of the login form.
   if (isLoading || user) {
-    return null;
+    return (
+        <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-grow flex items-center justify-center bg-muted">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Loading...</span>
+                </div>
+            </main>
+            <Footer />
+        </div>
+    );
   }
   
   // Once loading is complete and there's no user, show the login form
