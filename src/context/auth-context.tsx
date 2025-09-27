@@ -33,39 +33,42 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 
 /**
- * Fetches a user's profile from Firestore or creates it if it doesn't exist.
- * This is the single source of truth for user profile data.
+ * Creates or updates a user profile in Firestore.
  * @param firebaseUser The authenticated user object from Firebase Auth.
- * @returns The user profile from Firestore.
+ * @returns The user profile from Firestore or a newly constructed one.
  */
 const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<AppUser> => {
     const userRef = doc(db, 'users', firebaseUser.uid);
     const userSnap = await getDoc(userRef);
+    const now = new Date();
 
     if (userSnap.exists()) {
-        // User exists, update last login and return profile
+        // User exists, update last login
+        const existingData = userSnap.data();
         await updateDoc(userRef, { 'activity.lastLogin': serverTimestamp() });
-        const profileData = userSnap.data();
-
-        // Convert Firestore Timestamps to ISO strings for client-side serialization
-        const createdAt = profileData.createdAt instanceof Timestamp ? profileData.createdAt.toDate().toISOString() : new Date().toISOString();
-        const lastLogin = profileData.activity?.lastLogin instanceof Timestamp ? profileData.activity.lastLogin.toDate().toISOString() : new Date().toISOString();
-        const joined = profileData.activity?.joined instanceof Timestamp ? profileData.activity.joined.toDate().toISOString() : new Date().toISOString();
-
+        
+        // Convert any timestamps to strings for client-side state
         return {
-            ...profileData,
             uid: firebaseUser.uid,
-            name: profileData.name || firebaseUser.displayName || "User",
-            avatarUrl: profileData.avatarUrl || firebaseUser.photoURL,
-            createdAt,
-            activity: { lastLogin, joined }
-        } as AppUser;
+            name: existingData.name || firebaseUser.displayName || 'User',
+            email: existingData.email || firebaseUser.email,
+            avatarUrl: existingData.avatarUrl || firebaseUser.photoURL || `https://avatar.vercel.sh/${firebaseUser.uid}`,
+            role: existingData.role || 'user',
+            points: existingData.points || 0,
+            followersCount: existingData.followersCount || 0,
+            followingCount: existingData.followingCount || 0,
+            createdAt: existingData.createdAt?.toDate?.().toISOString() || now.toISOString(),
+            activity: {
+                lastLogin: now.toISOString(),
+                joined: existingData.activity?.joined?.toDate?.().toISOString() || now.toISOString(),
+            },
+            storageLimit: existingData.storageLimit || 1024 * 1024 * 1024,
+            usedStorage: existingData.usedStorage || 0,
+        };
 
     } else {
         // New user, create the profile
-        const now = new Date();
         const newProfileData = {
-            uid: firebaseUser.uid,
             name: firebaseUser.displayName || "New User",
             email: firebaseUser.email!,
             avatarUrl: firebaseUser.photoURL || `https://avatar.vercel.sh/${firebaseUser.uid}`,
@@ -75,18 +78,18 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
             followingCount: 0,
             createdAt: serverTimestamp(),
             activity: { lastLogin: serverTimestamp(), joined: serverTimestamp() },
-            storageLimit: 1024 * 1024 * 1024,
+            storageLimit: 1024 * 1024 * 1024, // 1GB
             usedStorage: 0,
         };
         await setDoc(userRef, newProfileData);
         
-        // Return a client-side constructed user object immediately for snappy UI
+        // Return a client-safe user object immediately
         return {
-            ...newProfileData,
             uid: firebaseUser.uid,
+            ...newProfileData,
             createdAt: now.toISOString(),
             activity: { lastLogin: now.toISOString(), joined: now.toISOString() }
-        } as AppUser;
+        };
     }
 };
 
@@ -108,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error("Failed to create or fetch user profile:", err);
             toast({ title: "Profile Error", description: err.message || "Could not load your profile data.", variant: "destructive" });
             setUser(null);
+            await signOut(auth); // Log out if profile fails
         }
       } else {
         setUser(null);
