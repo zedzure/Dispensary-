@@ -51,18 +51,23 @@ export function UserProfileCard({ profile }: UserProfileCardProps) {
     }
 
     return (
-        <div className="profile-card-wrapper">
-            <div className={cn("profile-card", isMessageActive && "active")}>
+        <div className="wrapper">
+            <div className={cn("profile-card js-profile-card", isMessageActive && "active")}>
                 <div className="profile-card__img">
                     <Image src={profile.avatarUrl} alt={`${profile.firstName} ${profile.lastName}`} width={150} height={150} data-ai-hint="person face" />
                 </div>
 
-                <div className="profile-card__cnt">
+                <div className="profile-card__cnt js-profile-cnt">
                     <div className="profile-card__name">{profile.firstName} {profile.lastName}</div>
                     <div className="profile-card__txt" dangerouslySetInnerHTML={{ __html: profile.bio || `A cannabis enthusiast from <strong>Earth</strong>` }} />
                     <div className="profile-card-loc">
-                        <span className="profile-card-loc__icon"><MapPin /></span>
-                        <span className="profile-card-loc__txt">Planet Earth</span>
+                        <span className="profile-card-loc__icon">
+                            <MapPin />
+                        </span>
+
+                        <span className="profile-card-loc__txt">
+                          Planet Earth
+                        </span>
                     </div>
 
                     <div className="profile-card-inf">
@@ -70,14 +75,17 @@ export function UserProfileCard({ profile }: UserProfileCardProps) {
                             <div className="profile-card-inf__title">{profile.followersCount || 0}</div>
                             <div className="profile-card-inf__txt">Followers</div>
                         </div>
+
                         <div className="profile-card-inf__item">
                             <div className="profile-card-inf__title">{profile.followingCount || 0}</div>
                             <div className="profile-card-inf__txt">Following</div>
                         </div>
+
                         <div className="profile-card-inf__item">
                             <div className="profile-card-inf__title">{profile.reviewsToday || 0}</div>
                             <div className="profile-card-inf__txt">Reviews</div>
                         </div>
+
                         <div className="profile-card-inf__item">
                             <div className="profile-card-inf__title">{profile.points || 0}</div>
                             <div className="profile-card-inf__txt">Points</div>
@@ -93,34 +101,36 @@ export function UserProfileCard({ profile }: UserProfileCardProps) {
                     </div>
 
                     <div className="profile-card-ctr">
-                        <button className="profile-card__button button--blue" onClick={() => setMessageActive(true)}>Message</button>
+                        <button className="profile-card__button button--blue js-message-btn" onClick={() => setMessageActive(true)}>Message</button>
                         <button className="profile-card__button button--orange" onClick={handleFollow}>Follow</button>
                     </div>
                 </div>
 
-                 <div 
-                    className={cn("profile-card-message", isMessageActive && "active")}
-                    aria-hidden={!isMessageActive}
-                 >
+                <div className="profile-card-message js-message">
                     <form className="profile-card-form" onSubmit={handleSendMessage}>
                         <div className="profile-card-form__container">
                             <Textarea 
-                                placeholder="Say something..." 
+                                placeholder="Say something..."
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                             />
                         </div>
+
                         <div className="profile-card-form__bottom">
-                           <Button type="submit" className="profile-card__button button--blue">
-                                <Send className="mr-2 h-4 w-4" /> Send
-                            </Button>
-                            <Button type="button" className="profile-card__button button--gray" onClick={() => setMessageActive(false)}>Cancel</Button>
+                            <button type="submit" className="profile-card__button button--blue js-message-close">
+                                Send
+                            </button>
+
+                            <button type="button" className="profile-card__button button--gray js-message-close" onClick={() => setMessageActive(false)}>
+                                Cancel
+                            </button>
                         </div>
                     </form>
-                    <div className="profile-card__overlay" onClick={() => setMessageActive(false)}></div>
+
+                    <div className="profile-card__overlay js-message-close" onClick={() => setMessageActive(false)}></div>
                 </div>
+
             </div>
         </div>
     );
 }
-

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
@@ -17,16 +17,44 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 function ProfilePageSkeleton() {
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen bg-muted/40">
             <Header />
-            <main className="flex-grow flex items-center justify-center bg-muted/40">
-                <div className="w-full max-w-sm mx-auto p-4">
-                    <div className="bg-background p-8 rounded-lg shadow-lg text-center">
-                         <Skeleton className="h-24 w-24 rounded-full mx-auto -mt-16" />
-                         <Skeleton className="h-8 w-48 mx-auto mt-6 mb-4" />
-                         <Skeleton className="h-4 w-full mb-2" />
-                         <Skeleton className="h-4 w-3/4 mx-auto mb-6" />
-                         <Skeleton className="h-10 w-full" />
+            <main className="flex-grow flex items-center justify-center">
+                 <div className="wrapper">
+                    <div className="profile-card js-profile-card">
+                         <div className="profile-card__img">
+                             <Skeleton className="h-full w-full rounded-full" />
+                         </div>
+                         <div className="profile-card__cnt js-profile-cnt">
+                             <Skeleton className="h-8 w-48 mx-auto mb-4" />
+                             <Skeleton className="h-4 w-3/4 mx-auto mb-4" />
+                             <Skeleton className="h-4 w-1/2 mx-auto mb-6" />
+                             <div className="profile-card-inf">
+                                <div className="profile-card-inf__item">
+                                    <Skeleton className="h-6 w-12 mx-auto mb-2" />
+                                    <Skeleton className="h-4 w-20 mx-auto" />
+                                </div>
+                                <div className="profile-card-inf__item">
+                                    <Skeleton className="h-6 w-12 mx-auto mb-2" />
+                                    <Skeleton className="h-4 w-20 mx-auto" />
+                                </div>
+                                 <div className="profile-card-inf__item">
+                                    <Skeleton className="h-6 w-12 mx-auto mb-2" />
+                                    <Skeleton className="h-4 w-20 mx-auto" />
+                                </div>
+                                 <div className="profile-card-inf__item">
+                                    <Skeleton className="h-6 w-12 mx-auto mb-2" />
+                                    <Skeleton className="h-4 w-20 mx-auto" />
+                                </div>
+                             </div>
+                             <div className="profile-card-social">
+                                {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-12 rounded-full" />)}
+                             </div>
+                              <div className="profile-card-ctr">
+                                <Skeleton className="h-14 w-48 rounded-full" />
+                                <Skeleton className="h-14 w-48 rounded-full" />
+                             </div>
+                         </div>
                     </div>
                 </div>
             </main>
@@ -100,9 +128,9 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen bg-muted/40">
             <Header />
-            <main className="flex-grow flex items-center justify-center bg-muted">
+            <main className="flex-grow flex items-center justify-center">
                 <div className="text-center">
                     <p className="text-destructive mb-4">Could not load profile. Please try again.</p>
                     <Button onClick={handleLogout} variant="destructive">
