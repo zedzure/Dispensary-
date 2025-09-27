@@ -23,8 +23,51 @@ const kimProfile: UserProfile = {
     receiptsThisWeek: 3,
 };
 
+const ronProfile: UserProfile = {
+    id: `CUST-1026`,
+    firstName: 'Ron',
+    lastName: 'Stoppable',
+    email: `ron@example.com`,
+    memberSince: new Date('2023-01-15').toISOString(),
+    avatarUrl: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=400',
+    dataAiHint: 'person face',
+    orderHistory: [],
+    points: 150,
+    nextReward: 500,
+    tier: 'Bronze',
+    nextTier: 'Silver',
+    pointsToNextTier: 100,
+    followers: [],
+    following: [],
+    reviewsToday: 0,
+    receiptsThisWeek: 1,
+};
+
+const shegoProfile: UserProfile = {
+    id: `CUST-1027`,
+    firstName: 'Shego',
+    lastName: '',
+    email: `shego@example.com`,
+    memberSince: new Date('2022-11-20').toISOString(),
+    avatarUrl: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400',
+    dataAiHint: 'person face',
+    orderHistory: [],
+    points: 5000,
+    nextReward: 10000,
+    tier: 'Diamond',
+    nextTier: 'Diamond',
+    pointsToNextTier: 0,
+    followers: [],
+    following: [],
+    reviewsToday: 5,
+    receiptsThisWeek: 10,
+};
+
+
 export const mockCustomers: UserProfile[] = [
     kimProfile,
+    ronProfile,
+    shegoProfile,
     ...Array.from({ length: 25 }, (_, i) => {
     const firstNames = ["Liam", "Olivia", "Noah", "Emma", "Oliver", "Ava", "Elijah", "Charlotte", "William", "Sophia"];
     const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"];
