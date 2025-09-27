@@ -16,7 +16,7 @@ import {
   type User as FirebaseUser
 } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, serverTimestamp, Timestamp, writeBatch } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 
@@ -124,12 +124,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error("Failed to create or fetch user profile:", err);
             toast({ title: "Profile Error", description: err.message || "Could not load your profile data.", variant: "destructive" });
             setUser(null);
-            // Don't log out here, as it might cause loops if the error is intermittent.
+        } finally {
+            setIsLoading(false);
         }
       } else {
         setUser(null);
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
     return () => unsubscribe();
@@ -138,9 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const handleAuthAction = async (authPromise: Promise<any>) => {
     try {
       await authPromise;
-      // onAuthStateChanged will handle success, no need to set loading here.
     } catch (error: any) {
-      // Don't show generic error for user-cancelled popups
       if (error.code !== 'auth/popup-closed-by-user') {
           toast({
               variant: "destructive",
@@ -148,16 +147,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               description: error.message || "An unexpected error occurred. Please try again.",
           });
       }
-      setIsLoading(false); // Ensure loading is false on error
+      setIsLoading(false);
     }
   };
 
   const signInWithGoogle = async () => {
-    handleAuthAction(signInWithPopup(auth, new GoogleAuthProvider()));
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+          toast({
+              variant: "destructive",
+              title: "Sign In Failed",
+              description: error.message || "An unexpected error occurred. Please try again.",
+          });
+      }
+      setIsLoading(false);
+    }
   };
 
   const signInWithGitHub = async () => {
-    handleAuthAction(signInWithPopup(auth, new GithubAuthProvider()));
+    const provider = new GithubAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+       if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+          toast({
+              variant: "destructive",
+              title: "Sign In Failed",
+              description: error.message || "An unexpected error occurred. Please try again.",
+          });
+      }
+      setIsLoading(false);
+    }
   };
 
   const signInWithEmail = async (email: string, pass: string) => {
@@ -182,7 +205,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         displayName: name,
         photoURL: `https://avatar.vercel.sh/${cred.user.uid}`
       });
-      // onAuthStateChanged will fire and create the Firestore profile.
     } catch (error: any) {
       toast({
         variant: "destructive",
