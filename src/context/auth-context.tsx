@@ -16,7 +16,7 @@ import {
   type User as FirebaseUser
 } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, serverTimestamp, Timestamp, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, Timestamp, writeBatch } from 'firebase/firestore';
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 
@@ -34,9 +34,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 
 /**
- * Creates or updates a user profile in Firestore.
+ * Creates or retrieves a user profile in Firestore. This function is optimized to
+ * minimize round trips and improve performance.
  * @param firebaseUser The authenticated user object from Firebase Auth.
- * @returns The user profile from Firestore or a newly constructed one.
+ * @returns A promise that resolves to the application's user profile object.
  */
 const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<AppUser> => {
     const userRef = doc(db, 'users', firebaseUser.uid);
@@ -44,34 +45,32 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
     const now = new Date();
 
     if (userSnap.exists()) {
-        // User exists, update last login and return existing data
-        const existingData = userSnap.data();
-        await updateDoc(userRef, { 'activity.lastLogin': serverTimestamp() });
+        // --- EXISTING USER ---
+        // Update last login time in the background. No need to await this.
+        updateDoc(userRef, { 'activity.lastLogin': serverTimestamp() });
         
-        const createdAt = existingData.createdAt instanceof Timestamp ? existingData.createdAt.toDate().toISOString() : now.toISOString();
-        const joined = existingData.activity?.joined instanceof Timestamp ? existingData.activity.joined.toDate().toISOString() : now.toISOString();
-
-
+        const existingData = userSnap.data();
+        // Construct the user object immediately from the data we just fetched.
         return {
             uid: firebaseUser.uid,
-            name: existingData.name || firebaseUser.displayName || 'User',
             email: existingData.email || firebaseUser.email!,
+            name: existingData.name || firebaseUser.displayName || 'User',
             avatarUrl: existingData.avatarUrl || firebaseUser.photoURL || `https://avatar.vercel.sh/${firebaseUser.uid}`,
             role: existingData.role || 'user',
-            points: existingData.points || 0,
-            followersCount: existingData.followersCount || 0,
-            followingCount: existingData.followingCount || 0,
-            createdAt: createdAt,
+            points: existingData.points ?? 0,
+            followersCount: existingData.followersCount ?? 0,
+            followingCount: existingData.followingCount ?? 0,
+            createdAt: (existingData.createdAt as Timestamp)?.toDate().toISOString() || now.toISOString(),
             activity: {
-                lastLogin: now.toISOString(),
-                joined: joined,
+                lastLogin: now.toISOString(), // Use client time for immediate UI update
+                joined: (existingData.activity?.joined as Timestamp)?.toDate().toISOString() || now.toISOString(),
             },
-            storageLimit: existingData.storageLimit || 1024 * 1024 * 1024,
-            usedStorage: existingData.usedStorage || 0,
+            storageLimit: existingData.storageLimit ?? 1024 * 1024 * 1024,
+            usedStorage: existingData.usedStorage ?? 0,
         };
 
     } else {
-        // New user, create the profile
+        // --- NEW USER ---
         const newProfileData = {
             name: firebaseUser.displayName || "New User",
             email: firebaseUser.email!,
@@ -85,9 +84,11 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
             storageLimit: 1024 * 1024 * 1024, // 1GB
             usedStorage: 0,
         };
+
+        // Create the document.
         await setDoc(userRef, newProfileData);
         
-        // Return a client-safe user object immediately
+        // Return a client-safe user object immediately without another read.
         return {
             uid: firebaseUser.uid,
             email: newProfileData.email,
@@ -123,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error("Failed to create or fetch user profile:", err);
             toast({ title: "Profile Error", description: err.message || "Could not load your profile data.", variant: "destructive" });
             setUser(null);
-            await signOut(auth); // Log out if profile fails
+            // Don't log out here, as it might cause loops if the error is intermittent.
         }
       } else {
         setUser(null);
@@ -134,42 +135,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, [toast]);
 
-  const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
+  const handleAuthAction = async (authPromise: Promise<any>) => {
     try {
-      // Open popup first to avoid browser blocking
-      await signInWithPopup(auth, provider);
-      // onAuthStateChanged will handle the rest, no need to set loading here
+      await authPromise;
+      // onAuthStateChanged will handle success, no need to set loading here.
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Google Sign In Failed",
-        description: error.message || "Could not sign in with Google. Please try again.",
-      });
+      // Don't show generic error for user-cancelled popups
+      if (error.code !== 'auth/popup-closed-by-user') {
+          toast({
+              variant: "destructive",
+              title: "Sign In Failed",
+              description: error.message || "An unexpected error occurred. Please try again.",
+          });
+      }
       setIsLoading(false); // Ensure loading is false on error
     }
   };
 
+  const signInWithGoogle = async () => {
+    handleAuthAction(signInWithPopup(auth, new GoogleAuthProvider()));
+  };
+
   const signInWithGitHub = async () => {
-    const provider = new GithubAuthProvider();
-    try {
-        // Open popup first
-        await signInWithPopup(auth, provider);
-    } catch (error: any) {
-        toast({
-            variant: "destructive",
-            title: "GitHub Sign In Failed",
-            description: error.message || "Could not sign in with GitHub. Please try again.",
-        });
-        setIsLoading(false); // Ensure loading is false on error
-    }
+    handleAuthAction(signInWithPopup(auth, new GithubAuthProvider()));
   };
 
   const signInWithEmail = async (email: string, pass: string) => {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, pass);
-      // onAuthStateChanged will handle the rest
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -184,12 +178,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, pass);
-      // Update the Firebase Auth profile. This is separate from Firestore.
       await updateProfile(cred.user, {
         displayName: name,
         photoURL: `https://avatar.vercel.sh/${cred.user.uid}`
       });
-      // onAuthStateChanged will fire and handle creating the Firestore profile.
+      // onAuthStateChanged will fire and create the Firestore profile.
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -202,6 +195,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     await signOut(auth);
+    setUser(null);
     router.push('/login');
     toast({ title: "Logged Out", description: "You have been successfully signed out." });
   };
