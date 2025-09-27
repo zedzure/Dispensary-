@@ -48,6 +48,10 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
         const existingData = userSnap.data();
         await updateDoc(userRef, { 'activity.lastLogin': serverTimestamp() });
         
+        const createdAt = existingData.createdAt instanceof Timestamp ? existingData.createdAt.toDate().toISOString() : now.toISOString();
+        const joined = existingData.activity?.joined instanceof Timestamp ? existingData.activity.joined.toDate().toISOString() : now.toISOString();
+
+
         return {
             uid: firebaseUser.uid,
             name: existingData.name || firebaseUser.displayName || 'User',
@@ -57,10 +61,10 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
             points: existingData.points || 0,
             followersCount: existingData.followersCount || 0,
             followingCount: existingData.followingCount || 0,
-            createdAt: existingData.createdAt?.toDate?.().toISOString() || now.toISOString(),
+            createdAt: createdAt,
             activity: {
                 lastLogin: now.toISOString(),
-                joined: existingData.activity?.joined?.toDate?.().toISOString() || now.toISOString(),
+                joined: joined,
             },
             storageLimit: existingData.storageLimit || 1024 * 1024 * 1024,
             usedStorage: existingData.usedStorage || 0,
@@ -134,16 +138,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const provider = new GoogleAuthProvider();
     try {
       // Open popup first to avoid browser blocking
-      const result = await signInWithPopup(auth, provider);
-      setIsLoading(true); // Set loading state after popup is initiated
-      // onAuthStateChanged will handle the rest
+      await signInWithPopup(auth, provider);
+      // onAuthStateChanged will handle the rest, no need to set loading here
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Google Sign In Failed",
         description: error.message || "Could not sign in with Google. Please try again.",
       });
-      setIsLoading(false);
+      setIsLoading(false); // Ensure loading is false on error
     }
   };
 
@@ -152,14 +155,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
         // Open popup first
         await signInWithPopup(auth, provider);
-        setIsLoading(true); // Then set loading state
     } catch (error: any) {
         toast({
             variant: "destructive",
             title: "GitHub Sign In Failed",
             description: error.message || "Could not sign in with GitHub. Please try again.",
         });
-        setIsLoading(false);
+        setIsLoading(false); // Ensure loading is false on error
     }
   };
 
@@ -218,4 +220,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
