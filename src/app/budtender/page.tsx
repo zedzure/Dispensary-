@@ -1,9 +1,9 @@
-
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/auth-context';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebase';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,9 @@ import { mockCustomers } from '@/lib/mockCustomers';
 import type { Product } from '@/types/product';
 import type { UserProfile, CartItem } from '@/types/pos';
 import { Skeleton } from '@/components/ui/skeleton';
+import { signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 const POS_PENDING_ORDERS_STORAGE_KEY = 'posPendingOrdersSilzey';
 
@@ -28,7 +31,8 @@ const customers: UserProfile[] = mockCustomers;
 
 // POS Main Component
 export default function BudtenderPOSPage() {
-    const { user, logout, isLoading } = useAuth();
+    const [user, loading] = useAuthState(auth);
+    const [userRole, setUserRole] = useState<string | null>(null);
     const router = useRouter();
     const { toast } = useToast();
     const [isClient, setIsClient] = useState(false);
@@ -38,13 +42,24 @@ export default function BudtenderPOSPage() {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [activeCustomer, setActiveCustomer] = useState<UserProfile | null>(null);
 
-    // Set a default customer and run client-side effects
     useEffect(() => {
         setIsClient(true);
         if (customers.length > 0) {
             setActiveCustomer(customers[0]);
         }
     }, []);
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            if (user) {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    setUserRole(userDoc.data().role);
+                }
+            }
+        };
+        fetchUserRole();
+    }, [user]);
 
     // Derived State
     const filteredProducts = useMemo(() => {
@@ -91,7 +106,6 @@ export default function BudtenderPOSPage() {
         }
 
         try {
-            // Create a new order object
             const newOrder = {
                 id: `ORD-POS-${Date.now()}`,
                 customerName: `${activeCustomer.firstName} ${activeCustomer.lastName}`,
@@ -104,11 +118,9 @@ export default function BudtenderPOSPage() {
                 submittedByPOS: true,
             };
             
-            // Get existing pending orders from localStorage
             const pendingOrdersRaw = localStorage.getItem(POS_PENDING_ORDERS_STORAGE_KEY);
             let pendingOrders = pendingOrdersRaw ? JSON.parse(pendingOrdersRaw) : [];
             
-            // Add the new order and save back to localStorage
             pendingOrders.push(newOrder);
             localStorage.setItem(POS_PENDING_ORDERS_STORAGE_KEY, JSON.stringify(pendingOrders));
 
@@ -124,12 +136,12 @@ export default function BudtenderPOSPage() {
     };
     
     useEffect(() => {
-        if (!isLoading && (!user || user.role !== 'budtender')) {
-        router.replace('/login');
+        if (!loading && (!user || userRole && userRole !== 'budtender')) {
+            router.replace('/login');
         }
-    }, [user, isLoading, router]);
+    }, [user, userRole, loading, router]);
     
-    if (isLoading || !isClient) {
+    if (loading || !isClient || !userRole) {
         return (
           <div className="flex flex-col min-h-screen bg-muted/40">
             <Header />
@@ -144,7 +156,7 @@ export default function BudtenderPOSPage() {
         );
     }
     
-    if (!user || user.role !== 'budtender') {
+    if (!user || userRole !== 'budtender') {
         return (
              <div className="flex flex-col min-h-screen bg-muted/40">
                 <Header />
@@ -156,13 +168,11 @@ export default function BudtenderPOSPage() {
         )
     }
 
-    // Main render
     return (
         <div className="flex flex-col min-h-screen bg-muted/40 font-sans">
             <Header />
             <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Product Selection */}
                     <div className="lg:col-span-2 bg-background rounded-lg shadow-md flex flex-col">
                         <div className="p-4 border-b">
                              <div className="relative">
@@ -196,9 +206,7 @@ export default function BudtenderPOSPage() {
                         </ScrollArea>
                     </div>
 
-                    {/* Customer & Cart */}
                     <div className="bg-background rounded-lg shadow-md flex flex-col">
-                        {/* Customer Info */}
                         <div className="p-4 border-b">
                             {activeCustomer ? (
                                 <div className="flex items-center gap-3">
@@ -220,7 +228,6 @@ export default function BudtenderPOSPage() {
                             )}
                         </div>
 
-                        {/* Cart Items */}
                         <ScrollArea className="flex-1">
                             <div className="p-4 space-y-3">
                                 {cart.length === 0 ? (
@@ -249,7 +256,6 @@ export default function BudtenderPOSPage() {
                             </div>
                         </ScrollArea>
                         
-                        {/* Cart Summary & Checkout */}
                         {cart.length > 0 && (
                             <div className="p-4 border-t mt-auto space-y-3">
                                 <div className="flex justify-between text-sm">

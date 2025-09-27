@@ -1,12 +1,12 @@
-
 'use client';
 
-import { Leaf, ShoppingCart, User, ClipboardList, Shield, PanelLeft, Sun, Moon, ChevronDown, Zap, Store } from "lucide-react";
+import { Leaf, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/cart-context";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/context/auth-context";
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "next-themes";
 import {
@@ -15,11 +15,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sun, Moon, ChevronDown } from 'lucide-react';
 
 
 export function Header() {
   const { totalItems, setCartOpen } = useCart();
-  const { user } = useAuth();
+  const [user] = useAuthState(auth);
   const { setTheme, theme } = useTheme();
 
   const navItems = [
@@ -79,8 +80,8 @@ export function Header() {
               <Button asChild variant="ghost" size="icon">
                 <Link href="/profile">
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="person face" />
-                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={user.photoURL || `https://avatar.vercel.sh/${user.uid}`} alt={user.displayName || 'User'} data-ai-hint="person face" />
+                      <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
                     </Avatar>
                 </Link>
               </Button>

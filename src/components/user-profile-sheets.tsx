@@ -1,10 +1,9 @@
-
 "use client";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { X, FileText, Camera, Receipt, Send } from "lucide-react";
-import type { User } from "@/types/user";
+import type { User as FirebaseUser } from "firebase/auth";
 import type { ActiveSheet } from "@/app/profile/page";
 import type { UploadItem, Receipt as ReceiptType } from "@/types/pos";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -26,7 +25,6 @@ interface Notification {
   read: boolean;
 }
 
-// --- Mock Data (would be fetched in a real app) ---
 const mockReceiptsData: ReceiptType[] = [];
 const mockNotifications: Notification[] = [];
 
@@ -44,9 +42,7 @@ const getRelativeTime = (date: Date): string => {
     return `${diffInDays}d ago`;
 }
 
-// --- Individual Sheet Components ---
-
-const ReceiptsSheet = ({ user, open, onOpenChange }: { user: User, open: boolean, onOpenChange: (open: boolean) => void }) => {
+const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[90%] flex flex-col p-0">
@@ -100,7 +96,6 @@ const UploadsSheet = ({ uploads, open, onOpenChange }: { uploads: UploadItem[], 
                         <div key={upload.id} className="relative aspect-square rounded-md overflow-hidden group">
                            <Image src={upload.url} alt={upload.name} fill className="object-cover" />
                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                {/* Future actions can go here */}
                            </div>
                         </div>
                     ))}
@@ -116,7 +111,7 @@ const UploadsSheet = ({ uploads, open, onOpenChange }: { uploads: UploadItem[], 
   );
 };
 
-const NotesSheet = ({ user, open, onOpenChange }: { user: User, open: boolean, onOpenChange: (open: boolean) => void }) => {
+const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: boolean, onOpenChange: (open: boolean) => void }) => {
     const [messages, setMessages] = useState<Notification[]>([]);
     const [replyingTo, setReplyingTo] = useState<Notification | null>(null);
     const [newMessage, setNewMessage] = useState('');
@@ -205,13 +200,10 @@ const NotesSheet = ({ user, open, onOpenChange }: { user: User, open: boolean, o
     );
 };
 
-
-// --- Main Controller Component ---
-
 interface UserProfileSheetsProps {
   activeSheet: ActiveSheet;
   setActiveSheet: (sheet: ActiveSheet) => void;
-  user: User;
+  user: FirebaseUser;
   uploads: UploadItem[];
 }
 
@@ -219,7 +211,6 @@ export function UserProfileSheets({ activeSheet, setActiveSheet, user, uploads }
   return (
     <>
       <ReceiptsSheet 
-        user={user} 
         open={activeSheet === 'receipts'} 
         onOpenChange={(open) => !open && setActiveSheet(null)} 
       />

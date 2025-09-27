@@ -1,12 +1,12 @@
-
 'use client';
 
 import Link from 'next/link';
 import { Home, User, ClipboardList, Info, Zap, Store } from 'lucide-react';
-import { useAuth } from '@/context/auth-context';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebase';
 
 export function BottomNavBar() {
-  const { user } = useAuth();
+  const [user] = useAuthState(auth);
 
   const navItems = [
     { href: '/', icon: Store, label: 'Marketplace' },

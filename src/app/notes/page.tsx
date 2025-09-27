@@ -1,8 +1,8 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/auth-context';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebase';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
@@ -17,7 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const NOTIFICATIONS_PER_PAGE = 15;
 
 export default function NotesPage() {
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const [user, loading] = useAuthState(auth);
   const [allUserNotifications, setAllUserNotifications] = useState<Notification[]>([]);
   const [visibleNotifications, setVisibleNotifications] = useState<Notification[]>([]);
   const [page, setPage] = useState(1);
@@ -27,14 +27,12 @@ export default function NotesPage() {
 
   useEffect(() => {
     if (user) {
-      // In a real app, this would be a fetch request to get user notifications.
       const userNotifications = generateMockNotifications(user.uid);
       setAllUserNotifications(userNotifications);
       setVisibleNotifications(userNotifications.slice(0, NOTIFICATIONS_PER_PAGE));
       setHasMore(userNotifications.length > NOTIFICATIONS_PER_PAGE);
       setPage(1);
     } else {
-        // Clear notifications if user logs out
         setAllUserNotifications([]);
         setVisibleNotifications([]);
     }
@@ -56,7 +54,6 @@ export default function NotesPage() {
 
   const handleNotificationClick = (notification: Notification) => {
     setSelectedNotification(notification);
-    // Mark the notification as read on the client side
     setVisibleNotifications(prevNotifications =>
       prevNotifications.map(n =>
         n.id === notification.id ? { ...n, read: true } : n
@@ -73,7 +70,7 @@ export default function NotesPage() {
     setSelectedNotification(null);
   };
   
-  if (isAuthLoading) {
+  if (loading) {
     return (
        <div className="flex flex-col min-h-screen bg-muted/40">
         <Header />

@@ -1,8 +1,16 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/auth-context';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import {
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -11,7 +19,7 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 
 export default function LoginPage() {
-  const { user, isLoading, signInWithGoogle, signInWithGitHub, signInWithEmail, signUpWithEmail } = useAuth();
+  const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const { toast } = useToast();
   const [isFlipped, setIsFlipped] = useState(false);
@@ -24,11 +32,10 @@ export default function LoginPage() {
   const [signUpPassword, setSignUpPassword] = useState('');
 
   useEffect(() => {
-    // If loading has finished and we have a user, redirect them.
-    if (!isLoading && user) {
+    if (!loading && user) {
       router.replace('/profile');
     }
-  }, [user, isLoading, router]);
+  }, [user, loading, router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +43,11 @@ export default function LoginPage() {
       toast({ title: "Missing Fields", description: "Please enter both email and password.", variant: "destructive" });
       return;
     }
-    await signInWithEmail(signInEmail, signInPassword);
+    try {
+        await signInWithEmailAndPassword(auth, signInEmail, signInPassword);
+    } catch(e: any) {
+        toast({ title: "Sign In Failed", description: e.message, variant: "destructive" });
+    }
   }
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -45,15 +56,34 @@ export default function LoginPage() {
       toast({ title: "Missing Fields", description: "Please fill out all sign up fields.", variant: "destructive" });
       return;
     }
-    await signUpWithEmail(signUpName, signUpEmail, signUpPassword);
+    try {
+        const cred = await createUserWithEmailAndPassword(auth, signUpEmail, signUpPassword);
+        await updateProfile(cred.user, { displayName: signUpName });
+    } catch (e: any) {
+        toast({ title: "Sign Up Failed", description: e.message, variant: "destructive" });
+    }
   }
 
   const handleGoogleSignIn = async () => {
-    await signInWithGoogle();
+    try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+    } catch (e: any) {
+        if (e.code !== 'auth/popup-closed-by-user') {
+            toast({ title: "Google Sign In Failed", description: e.message, variant: "destructive" });
+        }
+    }
   }
 
   const handleGitHubSignIn = async () => {
-    await signInWithGitHub();
+    try {
+        const provider = new GithubAuthProvider();
+        await signInWithPopup(auth, provider);
+    } catch (e: any) {
+         if (e.code !== 'auth/popup-closed-by-user') {
+            toast({ title: "GitHub Sign In Failed", description: e.message, variant: "destructive" });
+        }
+    }
   }
   
   const GoogleIcon = () => (
@@ -62,9 +92,7 @@ export default function LoginPage() {
       </svg>
   );
 
-  // If we are still resolving auth state OR if a user exists (and we're about to redirect),
-  // show a full-page loading indicator. This prevents a "flash" of the login form.
-  if (isLoading || user) {
+  if (loading || user) {
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
@@ -79,14 +107,12 @@ export default function LoginPage() {
     );
   }
   
-  // Once loading is complete and there's no user, show the login form
   return (
     <div className="login-page-wrapper">
        <Header />
        <main className="login-page-main">
         <div className="flip-card">
           <div className={`flip-card-inner ${isFlipped ? 'is-flipped' : ''}`}>
-            {/* Front Side: Login */}
             <div className="flip-card-front">
               <div className="login-card">
                 <form className="login-form" onSubmit={handleSignIn}>
@@ -99,7 +125,7 @@ export default function LoginPage() {
                     <label htmlFor="login-password">Password</label>
                     <input id="login-password" type="password" value={signInPassword} onChange={e => setSignInPassword(e.target.value)} placeholder="••••••••" />
                   </div>
-                  <Button type="submit" className="form-button" disabled={isLoading}>
+                  <Button type="submit" className="form-button">
                     Sign In
                   </Button>
                   <div className="form-divider"></div>
@@ -116,7 +142,6 @@ export default function LoginPage() {
                 </form>
               </div>
             </div>
-            {/* Back Side: Sign Up */}
             <div className="flip-card-back">
               <div className="login-card">
                 <form className="login-form" onSubmit={handleSignUp}>
@@ -133,7 +158,7 @@ export default function LoginPage() {
                     <label htmlFor="signup-password">Password</label>
                     <input id="signup-password" type="password" value={signUpPassword} onChange={e => setSignUpPassword(e.target.value)} placeholder="••••••••" />
                   </div>
-                  <Button type="submit" className="form-button" disabled={isLoading}>
+                  <Button type="submit" className="form-button">
                     Create Account
                   </Button>
                   <div className="form-divider"></div>

@@ -1,11 +1,11 @@
-
 "use client";
 
 import { useState } from 'react';
 import Image from 'next/image';
 import type { UserProfile } from '@/types/pos';
 import { Github, Twitter, Facebook, Instagram, Codepen, Link as LinkIcon, MapPin, Send } from 'lucide-react';
-import { useAuth } from '@/context/auth-context';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
@@ -25,7 +25,7 @@ const socialLinks = [
 ];
 
 export function UserProfileCard({ profile }: UserProfileCardProps) {
-    const { user } = useAuth();
+    const [user] = useAuthState(auth);
     const { toast } = useToast();
     const [isMessageActive, setMessageActive] = useState(false);
     const [message, setMessage] = useState('');

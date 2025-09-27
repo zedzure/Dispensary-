@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef, ChangeEvent, useCallback } from 'react';
@@ -10,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Star, Clock, MapPin, MessageSquare, Navigation, Ticket, Package, Gift, Sparkles, UserPlus, Users, Upload, Camera, Loader2, ImagePlus, Zap } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useAuth } from '@/context/auth-context';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebase';
 import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
@@ -31,7 +31,7 @@ import { mockCustomers } from '@/lib/mockCustomers';
 
 
 function ReviewForm({ dispensaryId, onAddReview }: { dispensaryId: string, onAddReview: (review: Omit<Review, 'id' | 'createdAt'>) => void }) {
-  const { user } = useAuth();
+  const [user] = useAuthState(auth);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -89,7 +89,7 @@ function ReviewForm({ dispensaryId, onAddReview }: { dispensaryId: string, onAdd
             rating: rating,
             text: comment,
             photos: photoUrl ? [photoUrl] : [],
-            user: { name: user.name, avatar: user.avatarUrl || '' },
+            user: { name: user.displayName || 'Anonymous', avatar: user.photoURL || '' },
             likesCount: 0,
             commentsCount: 0,
             updatedAt: new Date().toISOString()
@@ -173,7 +173,7 @@ interface DispensaryDetailSheetProps {
 
 export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: DispensaryDetailSheetProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const { user } = useAuth();
+  const [user] = useAuthState(auth);
   const { toast } = useToast();
   
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -187,7 +187,6 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
   const [isProfileModalOpen, setProfileModalOpen] = useState(false);
 
   useEffect(() => {
-    // Directly use the reviews from the prop, no need for local state for it
     if (dispensary) {
         setReviews(dispensary.reviews || []);
     }
@@ -235,7 +234,7 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
         ...reviewData,
         id: Date.now().toString(),
         createdAt: new Date().toISOString() as string | Timestamp,
-        user: { name: user.name, avatar: user.avatarUrl || '' },
+        user: { name: user.displayName || 'Anonymous', avatar: user.photoURL || '' },
     }
     setReviews(prev => [newReview, ...prev]);
   }
@@ -398,7 +397,6 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
         onClose={() => setProfileModalOpen(false)}
     />
 
-    {/* Nested Sheets for each action */}
     <DispensaryPromotionsSheet isOpen={activeSheet === 'promotions'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
     <DispensaryProductsSheet isOpen={activeSheet === 'products'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
     <DispensaryChatSheet isOpen={activeSheet === 'chat'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />

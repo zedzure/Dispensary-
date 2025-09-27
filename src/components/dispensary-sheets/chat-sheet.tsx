@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef, useCallback, UIEvent } from "react";
@@ -35,16 +34,15 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { realImageUrls } from "@/lib/products";
 import { Textarea } from "../ui/textarea";
-import { useAuth } from "@/context/auth-context";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { UserProfileModal } from "../user-profile-modal";
 
-/* ---------------- Constants ---------------- */
 const MAX_MESSAGE_LENGTH = 280;
 const MESSAGES_PER_PAGE = 25;
 
-/* ---------------- Mock Data ---------------- */
 const mockUsers: ChatUser[] = Array.from({ length: 15 }, (_, i) => ({
   id: `user-${i}`,
   name: [
@@ -82,7 +80,6 @@ const initialMockMessages = Array.from({ length: 100 }, (_, i) => {
   };
 });
 
-/* ---------------- Helpers ---------------- */
 const formatTimestamp = (isoString: string) => {
   const now = new Date();
   const then = new Date(isoString);
@@ -115,7 +112,6 @@ const parseMessage = (text: string) => {
   });
 };
 
-/* ---------------- Message Components ---------------- */
 function MessageItem({ msg, onLike, onReply, onAvatarClick }: { msg: ChatMessage; onLike: () => void; onReply: () => void; onAvatarClick: (user: ChatUser) => void; }) {
   return (
     <div className="flex items-start gap-3">
@@ -179,7 +175,6 @@ function MessageList({ messages, hasMore, loadMore, onLike, onReply, onAvatarCli
   );
 }
 
-/* ---------------- Main Chat Sheet ---------------- */
 interface DispensarySheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -187,7 +182,7 @@ interface DispensarySheetProps {
 }
 
 export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: DispensarySheetProps) {
-  const { user } = useAuth();
+  const [user] = useAuthState(auth);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -300,7 +295,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     if (!newMessage.trim() || !user) return;
     const messageToSend: ChatMessage = {
       id: `msg-${Date.now()}`,
-      user: { id: user.uid, name: user.name, avatar: user.avatarUrl || "", isOnline: true },
+      user: { id: user.uid, name: user.displayName || 'Anonymous', avatar: user.photoURL || "", isOnline: true },
       text: newMessage,
       timestamp: new Date().toISOString(),
       likes: 0,
@@ -339,7 +334,6 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
         className="w-full md:max-w-md p-0 flex flex-col h-full"
         style={{ height: vh > 0 ? `${vh}px` : '100dvh' }}
        >
-        {/* Header */}
         <SheetHeader className="p-4 border-b flex flex-row items-center gap-4 flex-shrink-0">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
           <div>
@@ -348,21 +342,18 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
           </div>
         </SheetHeader>
         
-        {/* Messages */}
         <ScrollArea className="flex-1 min-h-0" onScroll={handleScroll}>
             <MessageList messages={messages} hasMore={hasMore} loadMore={loadMoreMessages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} />
         </ScrollArea>
     
-        {/* Typing indicator */}
         {isTyping && <p className="text-xs text-muted-foreground px-4 py-1 italic flex-shrink-0">A user is typing...</p>}
 
-        {/* Footer / Input */}
         <div className="p-2 border-t bg-background flex-shrink-0">
         {user ? (
             <div className="chat-input-container">
             <Avatar className="chat-input-avatar">
-                <AvatarImage src={user.avatarUrl} />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={user.photoURL || ''} />
+                <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="chat-input-main">
                 {replyingTo && (
