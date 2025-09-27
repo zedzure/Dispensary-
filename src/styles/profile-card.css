@@ -35,6 +35,11 @@ a, a:hover {
   padding: 50px 20px;
   padding-top: 100px;
   display: flex;
+  background-color: hsl(var(--primary) / 0.1);
+  background-image: url('https://firebasestorage.googleapis.com/v0/b/silzeycom-pos-2a13p.appspot.com/o/assets%2Fleaf.png?alt=media&token=c1e19d7d-532b-426c-845f-7d15a97de8a9');
+  background-repeat: no-repeat;
+  background-position: 150% -30%;
+  background-size: 60%;
 }
 
 
@@ -47,6 +52,12 @@ a, a:hover {
   border-radius: 12px;
   max-width: 700px;
   position: relative;
+  background-image: 
+    url('https://firebasestorage.googleapis.com/v0/b/silzeycom-pos-2a13p.appspot.com/o/assets%2Fleaf2.png?alt=media&token=985d852a-99f6-4f40-810a-3c73322d7d5a'), 
+    url('https://firebasestorage.googleapis.com/v0/b/silzeycom-pos-2a13p.appspot.com/o/assets%2Fleaf.png?alt=media&token=c1e19d7d-532b-426c-845f-7d15a97de8a9');
+  background-repeat: no-repeat, no-repeat;
+  background-position: 120% -5%, 200% -40%;
+  background-size: 40%, 80%;
 }
 
 .profile-card.active .profile-card__cnt {
