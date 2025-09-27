@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, db } from '@/lib/firebase';
+import { auth } from '@/lib/firebase';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
@@ -34,7 +34,15 @@ export default function ProfilePage() {
   }
 
   if (error) {
-    return <p>Error: {error.message}</p>;
+    return (
+        <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-grow flex items-center justify-center bg-muted">
+                <p className="text-destructive">Error: {error.message}</p>
+            </main>
+            <Footer />
+        </div>
+    );
   }
 
   if (!user) {
