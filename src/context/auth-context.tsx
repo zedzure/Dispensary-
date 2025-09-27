@@ -15,7 +15,7 @@ import {
   type User as FirebaseUser
 } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, Timestamp, updateDoc } from 'firebase/firestore';
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 
@@ -47,8 +47,8 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
         await updateDoc(userRef, { 'activity.lastLogin': serverTimestamp() });
         const profileData = userSnap.data();
 
+        // Convert Firestore Timestamps to ISO strings for client-side serialization
         const createdAt = profileData.createdAt instanceof Timestamp ? profileData.createdAt.toDate().toISOString() : new Date().toISOString();
-        // For existing users, lastLogin will be updated, but we can return the previously fetched data for immediate UI update.
         const lastLogin = profileData.activity?.lastLogin instanceof Timestamp ? profileData.activity.lastLogin.toDate().toISOString() : new Date().toISOString();
         const joined = profileData.activity?.joined instanceof Timestamp ? profileData.activity.joined.toDate().toISOString() : new Date().toISOString();
 
@@ -63,13 +63,13 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
 
     } else {
         // New user, create the profile
-        const now = new Date().toISOString();
-        const newProfileData: Omit<AppUser, 'createdAt' | 'activity'> & { createdAt: any, activity: any } = {
+        const now = new Date();
+        const newProfileData = {
             uid: firebaseUser.uid,
             name: firebaseUser.displayName || "New User",
             email: firebaseUser.email!,
             avatarUrl: firebaseUser.photoURL || `https://avatar.vercel.sh/${firebaseUser.uid}`,
-            role: 'user',
+            role: 'user' as const,
             points: 0,
             followersCount: 0,
             followingCount: 0,
@@ -80,11 +80,12 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
         };
         await setDoc(userRef, newProfileData);
         
-        // Return a client-side constructed user object immediately
+        // Return a client-side constructed user object immediately for snappy UI
         return {
             ...newProfileData,
-            createdAt: now,
-            activity: { lastLogin: now, joined: now }
+            uid: firebaseUser.uid,
+            createdAt: now.toISOString(),
+            activity: { lastLogin: now.toISOString(), joined: now.toISOString() }
         } as AppUser;
     }
 };
@@ -172,8 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         displayName: name,
         photoURL: `https://avatar.vercel.sh/${cred.user.uid}`
       });
-      // onAuthStateChanged will handle creating the Firestore profile.
-      // We don't need to call createOrUpdateUserProfile here because onAuthStateChanged will fire.
+      // onAuthStateChanged will fire and handle creating the Firestore profile.
     } catch (error: any) {
       toast({
         variant: "destructive",
