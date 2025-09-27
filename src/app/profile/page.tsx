@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, ChangeEvent, useRef } from 'react';
@@ -124,6 +125,7 @@ function ProfilePage() {
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
 
   useEffect(() => {
+    // If loading is finished and there's no user, redirect to login.
     if (!isLoading && !user) {
       router.replace('/login');
     }
@@ -171,7 +173,8 @@ function ProfilePage() {
     }
   };
 
-  if (isLoading || !user) {
+  // While authentication is resolving, show a loading screen.
+  if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
@@ -185,6 +188,21 @@ function ProfilePage() {
       </div>
     );
   }
+
+  // After loading, if there's still no user, the useEffect will redirect.
+  // Render nothing or a minimal message while redirecting.
+  if (!user) {
+    return (
+        <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-grow flex items-center justify-center bg-muted">
+                <p className="text-muted-foreground">Redirecting to login...</p>
+            </main>
+            <Footer />
+        </div>
+    );
+  }
+
 
   const profileUser = {
     name: user.name || 'Anonymous',

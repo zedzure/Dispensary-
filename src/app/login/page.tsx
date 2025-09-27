@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -61,13 +62,26 @@ export default function LoginPage() {
       </svg>
   );
 
-  // Show a loader only while auth state is resolving OR if a user is already logged in (and redirect is imminent)
-  if (isLoading || user) {
+  // Show a loader only while auth state is resolving.
+  if (isLoading) {
     return (
         <div className="flex h-screen w-full items-center justify-center bg-muted">
             <div className="flex flex-col items-center gap-4">
                <Leaf className="h-12 w-12 text-primary animate-spin" />
                <p className="text-muted-foreground">Loading...</p>
+            </div>
+        </div>
+    );
+  }
+  
+  // If not loading and a user exists, this page will be redirected by the useEffect.
+  // We can return null or a minimal loader while that happens.
+  if (user) {
+    return (
+       <div className="flex h-screen w-full items-center justify-center bg-muted">
+            <div className="flex flex-col items-center gap-4">
+               <Leaf className="h-12 w-12 text-primary animate-spin" />
+               <p className="text-muted-foreground">Redirecting...</p>
             </div>
         </div>
     );
@@ -94,16 +108,13 @@ export default function LoginPage() {
                     <input id="login-password" type="password" value={signInPassword} onChange={e => setSignInPassword(e.target.value)} placeholder="••••••••" />
                   </div>
                   <Button type="submit" className="form-button" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
                     Sign In
                   </Button>
                   <div className="form-divider"></div>
-                  <Button type="button" onClick={handleGoogleSignIn} className="form-button-google" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+                  <Button type="button" onClick={handleGoogleSignIn} className="form-button-google">
                     <GoogleIcon/> Sign in with Google
                   </Button>
-                  <Button type="button" onClick={handleGitHubSignIn} className="form-button-google" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+                  <Button type="button" onClick={handleGitHubSignIn} className="form-button-google">
                     <Github className="mr-2 h-4 w-4"/> Sign in with GitHub
                   </Button>
                   <p className="form-switch-text">
@@ -131,7 +142,6 @@ export default function LoginPage() {
                     <input id="signup-password" type="password" value={signUpPassword} onChange={e => setSignUpPassword(e.target.value)} placeholder="••••••••" />
                   </div>
                   <Button type="submit" className="form-button" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
                     Create Account
                   </Button>
                   <div className="form-divider"></div>

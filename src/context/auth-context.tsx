@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
@@ -115,20 +114,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-            const profileData = await createOrUpdateUserProfile(firebaseUser);
-            setUser(profileData);
-        } catch (err: any) {
-            console.error("Failed to create or fetch user profile:", err);
-            toast({ title: "Profile Error", description: err.message || "Could not load your profile data.", variant: "destructive" });
-            setUser(null);
+      try {
+        if (firebaseUser) {
+          const profileData = await createOrUpdateUserProfile(firebaseUser);
+          setUser(profileData);
+        } else {
+          setUser(null);
         }
-      } else {
+      } catch (err: any) {
+        console.error("Failed to process auth state change:", err);
+        toast({ title: "Authentication Error", description: "Could not load your session.", variant: "destructive" });
         setUser(null);
+      } finally {
+        // This is the critical fix: ensure loading is always set to false after the check.
+        setIsLoading(false);
       }
-      // This is the critical fix: ensure loading is always set to false after the check.
-      setIsLoading(false);
     });
 
     // Cleanup subscription on unmount
@@ -138,9 +138,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
+    setIsLoading(true);
     try {
-      // Don't set loading before the popup, to avoid popup blockers.
       await signInWithPopup(auth, provider);
+      // The onAuthStateChanged listener will handle the rest.
     } catch (error: any) {
       if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
           toast({
@@ -149,15 +150,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               description: error.message || "An unexpected error occurred. Please try again.",
           });
       }
-      // Ensure loading is false on failure.
       setIsLoading(false);
     }
   };
 
   const signInWithGitHub = async () => {
     const provider = new GithubAuthProvider();
+    setIsLoading(true);
     try {
       await signInWithPopup(auth, provider);
+      // The onAuthStateChanged listener will handle the rest.
     } catch (error: any) {
        if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
           toast({
@@ -189,6 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, pass);
       // The onAuthStateChanged listener will handle profile creation.
+      // We just need to ensure the display name is set for new profiles.
       await updateProfile(cred.user, {
         displayName: name,
         photoURL: `https://avatar.vercel.sh/${cred.user.uid}`
@@ -205,7 +208,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     await signOut(auth);
-    // User state will be cleared by the onAuthStateChanged listener.
+    setUser(null); // Clear user state immediately
     router.push('/login');
     toast({ title: "Logged Out", description: "You have been successfully signed out." });
   };
