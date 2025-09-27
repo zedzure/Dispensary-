@@ -24,7 +24,6 @@ import { DispensaryProductsSheet } from './dispensary-sheets/products-sheet';
 import { DispensaryChatSheet } from './dispensary-sheets/chat-sheet';
 import { DispensaryDealsSheet } from './dispensary-sheets/deals-sheet';
 import { DispensaryMapSheet } from './dispensary-sheets/map-sheet';
-import { DispensaryAiRecsSheet } from './dispensary-sheets/ai-recs-sheet';
 import { uploadImage } from '@/lib/image-upload';
 import type { Timestamp } from 'firebase/firestore';
 import { UserProfileModal } from './user-profile-modal';
@@ -164,7 +163,7 @@ function ReviewForm({ dispensaryId, onAddReview }: { dispensaryId: string, onAdd
   )
 }
 
-type SheetName = 'promotions' | 'products' | 'chat' | 'deals' | 'map' | 'ai-recs';
+type SheetName = 'promotions' | 'products' | 'chat' | 'deals' | 'map';
 
 interface DispensaryDetailSheetProps {
   dispensary: Dispensary | null;
@@ -315,7 +314,6 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
               <ActionButton sheetName="chat" icon={MessageSquare} label="Chat" />
               <ActionButton sheetName="deals" icon={Zap} label="New" />
               <ActionButton sheetName="map" icon={MapPin} label="Map" />
-              <ActionButton sheetName="ai-recs" icon={Sparkles} label="AI Recs" />
             </div>
 
             <Separator />
@@ -406,7 +404,6 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
     <DispensaryChatSheet isOpen={activeSheet === 'chat'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
     <DispensaryDealsSheet isOpen={activeSheet === 'deals'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
     <DispensaryMapSheet isOpen={activeSheet === 'map'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
-    <DispensaryAiRecsSheet isOpen={activeSheet === 'ai-recs'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
     </>
   );
 }

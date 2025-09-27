@@ -87,9 +87,8 @@ export interface CustomerMetrics extends UserProfile {
 }
 
 
-export interface OrderItem extends Omit<Product, 'price' | 'stock'> {
+export interface OrderItem extends Omit<Product, 'stock'> {
   quantity: number;
-  price?: number;
 }
 
 export type OrderStatus = 'Pending Checkout' | 'In-Store' | 'Completed' | 'Shipped' | 'Cancelled';
@@ -205,4 +204,13 @@ export interface ChatMessage {
     user: string;
     text: string;
   };
+}
+
+export interface UploadItem {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  url: string;
+  uploadedAt: Timestamp | string;
 }

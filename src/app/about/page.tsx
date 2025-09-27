@@ -29,11 +29,6 @@ const features = [
         description: "Make informed decisions with authentic reviews from a community of fellow enthusiasts."
     },
     {
-        icon: Sparkles,
-        title: "AI-Powered Recommendations",
-        description: "Let our smart recommender help you find the perfect strain for any mood or occasion."
-    },
-    {
         icon: Leaf,
         title: "Learn About Cannabis",
         description: "Deepen your knowledge with guides on strains, consumption methods, and benefits."

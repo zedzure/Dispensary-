@@ -349,7 +349,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
         </SheetHeader>
         
         {/* Messages */}
-        <ScrollArea className="flex-1 min-h-0" viewportRef={scrollViewportRef} onScroll={handleScroll}>
+        <ScrollArea className="flex-1 min-h-0" onScroll={handleScroll}>
             <MessageList messages={messages} hasMore={hasMore} loadMore={loadMoreMessages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} />
         </ScrollArea>
     

@@ -63,7 +63,7 @@ const upsellSuggestionsFlow = ai.defineFlow(
     inputSchema: UpsellSuggestionsInputSchema,
     outputSchema: UpsellSuggestionsOutputSchema,
   },
-  async ({ productNames }) => {
+  async ({ productNames }: UpsellSuggestionsInput) => {
     
     // Do not run if cart is empty
     if (productNames.length === 0) {

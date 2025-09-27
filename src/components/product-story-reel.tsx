@@ -15,10 +15,8 @@ interface ProductStoryReelProps {
   onProductClick: (product: Product) => void;
 }
 
-interface ReelItem extends InventoryItem {
-    badgeType: string;
-    pulsatingBorder: boolean;
-}
+interface ReelItem extends InventoryItem, Omit<ReelConfigItem, 'inventoryItemId'> {}
+
 
 const ReelRow = ({ items, onProductClick, borderColorClass }: { items: ReelItem[], onProductClick: (product: Product) => void, borderColorClass: string }) => {
     if (items.length === 0) return null;
@@ -78,15 +76,18 @@ export function ProductStoryReel({ onProductClick }: ProductStoryReelProps) {
                 const reelConfig: ReelConfigItem[] = JSON.parse(storedConfigRaw);
                 const inventoryMap = new Map(allInventory.map(item => [item.id, item]));
 
-                finalReelItems = reelConfig
+                const mappedItems = reelConfig
                     .map(config => {
                         const product = inventoryMap.get(config.inventoryItemId);
                         if (product) {
-                            return { ...product, ...config };
+                            const { inventoryItemId, ...restConfig } = config;
+                            return { ...product, ...restConfig, pulsatingBorder: config.pulsatingBorder ?? false };
                         }
                         return null;
                     })
                     .filter((item): item is ReelItem => item !== null && item.active);
+                
+                finalReelItems = mappedItems;
 
             } catch (e) {
                 console.error("Failed to parse reel config, using default:", e);
@@ -97,7 +98,7 @@ export function ProductStoryReel({ onProductClick }: ProductStoryReelProps) {
             const defaultItems = allInventory
                 .filter(item => item.category === "Flower" && item.active)
                 .slice(0, 20)
-                .map(item => ({ ...item, badgeType: 'New', pulsatingBorder: false }));
+                .map(item => ({ ...item, badgeType: 'New', pulsatingBorder: false, active: true }));
             finalReelItems = defaultItems;
         }
 

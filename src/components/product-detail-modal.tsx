@@ -28,12 +28,7 @@ export function ProductDetailModal({ product, isOpen, onOpenChange }: ProductDet
   const handleAddToCart = () => {
     addToCart(product);
     toast({
-      title: (
-        <div className="flex items-center">
-          <Check className="h-5 w-5 text-green-500 mr-2" />
-          <span>Added to cart!</span>
-        </div>
-      ),
+      title: "Added to cart!",
       description: (
         <div className="flex items-start gap-4 mt-2">
           <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md">
@@ -86,13 +81,17 @@ export function ProductDetailModal({ product, isOpen, onOpenChange }: ProductDet
                 <p className="text-base text-muted-foreground mb-4">{product.description}</p>
                 
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-4 border-t pt-4">
-                    <div />
+                    {product.price && (
+                        <p className="text-2xl font-bold text-primary">
+                            ${product.price.toFixed(2)}
+                        </p>
+                    )}
                     <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                        <Button variant="outline" asChild>
-                            <Link href="/">Locations</Link>
+                        <Button variant="outline" onClick={() => onOpenChange(false)}>
+                            Keep Browsing
                         </Button>
-                        <Button asChild>
-                            <Link href="/menu/denver-colorado-10">Menu</Link>
+                        <Button onClick={handleAddToCart}>
+                            Add to Cart
                         </Button>
                     </div>
                 </div>

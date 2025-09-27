@@ -84,8 +84,8 @@ export function HeroSliderScript() {
             const easeProgress = progress * progress * progress;
 
             const moveDistance = maxMoveDistance * easeProgress;
-            firstWord!.style.transform = `translateX(${moveDistance}px)`;
-            secondWord!.style.transform = `translateX(-${moveDistance}px)`;
+            firstWord!.style.transform = `translateX(${'${moveDistance}'}px)`;
+            secondWord!.style.transform = `translateX(-${'${moveDistance}'}px)`;
 
             const firstCharsToShow = Math.max(0,Math.ceil(fromFirst.length * (1 - easeProgress)));
             const secondCharsToShow = Math.max(0, Math.ceil(fromSecond.length * (1 - easeProgress)));
@@ -105,8 +105,8 @@ export function HeroSliderScript() {
                         const expandProgress = expandStep / (expandSteps - 1);
                         const easeExpandProgress = expandProgress * expandProgress * (3 - 2 * expandProgress);
                         const returnDistance = maxMoveDistance * (1 - easeExpandProgress);
-                        firstWord!.style.transform = `translateX(${returnDistance}px)`;
-                        secondWord!.style.transform = `translateX(-${returnDistance}px)`;
+                        firstWord!.style.transform = `translateX(${'${returnDistance}'}px)`;
+                        secondWord!.style.transform = `translateX(-${'${returnDistance}'}px)`;
                         
                         const firstCharsToShow = Math.ceil(toFirst.length * easeExpandProgress);
                         const secondCharsToShow = Math.ceil(toSecond.length * easeExpandProgress);

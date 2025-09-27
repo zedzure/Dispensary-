@@ -12,9 +12,6 @@ const inter = Inter({
   variable: "--font-sans",
 });
 
-// Static favicon stored in /public for reliability
-const faviconUrl = "/favicon.ico";
-
 const title = "GreenLeaf Guide | Local Dispensary Finder & Cannabis Deals";
 const description =
   "Explore top-rated dispensaries in your area for delivery and pickup. GreenLeaf Guide is your ultimate cannabis marketplace to find reviews, the latest info, and unbeatable deals.";
@@ -42,9 +39,9 @@ export const metadata: Metadata = {
     siteName: "GreenLeaf Guide",
     images: [
       {
-        url: faviconUrl,
-        width: 1200,
-        height: 630,
+        url: '/favicon.png', // Relative URL to public folder
+        width: 512,
+        height: 512,
         alt: "GreenLeaf Guide - Dispensary Marketplace",
       },
     ],
@@ -55,11 +52,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: [faviconUrl],
+    images: ['/favicon.png'], // Relative URL to public folder
   },
   icons: {
-    icon: [faviconUrl],
-    apple: [faviconUrl],
+    icon: '/favicon.ico',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
   },
   robots: {
     index: true,

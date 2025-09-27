@@ -3,11 +3,11 @@
 
 import { Leaf, ShoppingCart, User, ClipboardList, Shield, PanelLeft, Sun, Moon, ChevronDown, Zap, Store } from "lucide-react";
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/cart-context";
-import { Badge } from "./ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/auth-context";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
@@ -27,7 +27,6 @@ export function Header() {
     { href: "/#menu", label: "Menu" },
     { href: "/#new", label: "New" },
     { href: "/about", label: "About" },
-    { href: "/#recommender", label: "Recommender" },
     { href: "/notes", label: "Notes" },
   ];
 

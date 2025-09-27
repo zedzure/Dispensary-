@@ -1,23 +1,15 @@
 
-'use client';
+"use client";
 
-import type { FC } from 'react';
-import type { Notification } from '@/lib/mockNotifications';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Heart, UserPlus, MessageSquare, Award, Receipt, Shield, UserMinus } from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
-import { cn } from '@/lib/utils';
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import type { Notification } from "@/lib/mockNotifications";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
-const iconMap = {
-  like: Heart,
-  follow: UserPlus,
-  unfollow: UserMinus,
-  reply: MessageSquare,
-  milestone: Award,
-  receipt: Receipt,
-  admin: Shield,
-};
+interface NotificationCardProps {
+    notification: Notification;
+    onClick: () => void;
+}
 
 const getRelativeTime = (date: Date): string => {
     const now = new Date();
@@ -32,41 +24,33 @@ const getRelativeTime = (date: Date): string => {
     return `${diffInDays}d ago`;
 }
 
-interface NotificationCardProps {
-  notification: Notification;
-  onClick: () => void;
-}
-
-export const NotificationCard: FC<NotificationCardProps> = ({ notification, onClick }) => {
-  const Icon = iconMap[notification.type];
-  const relativeTime = getRelativeTime(notification.date);
-
+export function NotificationCard({ notification, onClick }: NotificationCardProps) {
   return (
-    <Card 
-        as="button"
+    <button
         onClick={onClick}
         className={cn(
-            "transition-all w-full text-left",
-            notification.read ? "bg-card opacity-70 hover:opacity-100" : "bg-card shadow-md hover:bg-muted/50"
-    )}>
-      <CardContent className="p-4 flex items-start gap-4">
-        <div className="relative">
-          <Icon className="h-6 w-6 text-destructive mt-1" />
-          {notification.userAvatar && (
-            <Avatar className="absolute top-4 left-4 h-6 w-6 border-2 border-background">
-              <AvatarImage src={notification.userAvatar} />
-              <AvatarFallback>{notification.userName?.[0]}</AvatarFallback>
-            </Avatar>
-          )}
-        </div>
-        <div className="flex-grow">
-          <div className="flex justify-between items-start">
-            <p className="text-sm text-foreground pr-4" dangerouslySetInnerHTML={{ __html: notification.text }} />
-            {!notification.read && <div className="h-2.5 w-2.5 rounded-full bg-primary flex-shrink-0 mt-1.5" aria-label="Unread"></div>}
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">{relativeTime}</p>
-        </div>
-      </CardContent>
-    </Card>
+            "transition-all w-full text-left rounded-lg",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            !notification.read && "bg-primary/5"
+        )}
+    >
+        <Card className="border-transparent shadow-none bg-transparent">
+            <CardContent className="p-3 flex items-start gap-3">
+                 {notification.userAvatar && (
+                    <Avatar className="h-10 w-10 border">
+                        <AvatarImage src={notification.userAvatar} />
+                        <AvatarFallback>{notification.userName?.[0]}</AvatarFallback>
+                    </Avatar>
+                )}
+                <div className="flex-1 space-y-1">
+                    <p className="text-sm" dangerouslySetInnerHTML={{ __html: notification.text }}></p>
+                    <p className="text-xs text-muted-foreground">{getRelativeTime(notification.date)}</p>
+                </div>
+                {!notification.read && (
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary mt-1.5" />
+                )}
+            </CardContent>
+        </Card>
+    </button>
   );
-};
+}
