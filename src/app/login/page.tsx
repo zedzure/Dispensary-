@@ -62,31 +62,12 @@ export default function LoginPage() {
       </svg>
   );
 
-  // Show a loader only while auth state is resolving.
-  if (isLoading) {
-    return (
-        <div className="flex h-screen w-full items-center justify-center bg-muted">
-            <div className="flex flex-col items-center gap-4">
-               <Leaf className="h-12 w-12 text-primary animate-spin" />
-               <p className="text-muted-foreground">Loading...</p>
-            </div>
-        </div>
-    );
+  // If we are resolving auth or a user exists, this page will be redirected.
+  // We can return null or a minimal placeholder.
+  if (isLoading || user) {
+    return null;
   }
   
-  // If not loading and a user exists, this page will be redirected by the useEffect.
-  // We can return null or a minimal loader while that happens.
-  if (user) {
-    return (
-       <div className="flex h-screen w-full items-center justify-center bg-muted">
-            <div className="flex flex-col items-center gap-4">
-               <Leaf className="h-12 w-12 text-primary animate-spin" />
-               <p className="text-muted-foreground">Redirecting...</p>
-            </div>
-        </div>
-    );
-  }
-
   // Once loading is complete and there's no user, show the login form
   return (
     <div className="login-page-wrapper">

@@ -173,33 +173,16 @@ function ProfilePage() {
     }
   };
 
-  // While authentication is resolving, show a loading screen.
-  if (isLoading) {
+  // While authentication is resolving or there is no user, show a minimal redirecting message.
+  if (isLoading || !user) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow flex items-center justify-center bg-muted">
-          <div className="flex flex-col items-center gap-4">
-            <Leaf className="h-12 w-12 text-primary animate-spin" />
-            <p className="text-muted-foreground">Loading Profile...</p>
-          </div>
+            <p className="text-muted-foreground">Redirecting...</p>
         </main>
         <Footer />
       </div>
-    );
-  }
-
-  // After loading, if there's still no user, the useEffect will redirect.
-  // Render nothing or a minimal message while redirecting.
-  if (!user) {
-    return (
-        <div className="flex flex-col min-h-screen">
-            <Header />
-            <main className="flex-grow flex items-center justify-center bg-muted">
-                <p className="text-muted-foreground">Redirecting to login...</p>
-            </main>
-            <Footer />
-        </div>
     );
   }
 
