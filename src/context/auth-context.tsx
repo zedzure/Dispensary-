@@ -43,34 +43,33 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
-        await setDoc(userRef, { activity: { lastLogin: serverTimestamp() } }, { merge: true });
-        
-        const updatedUserSnap = await getDoc(userRef);
-        const profileData = updatedUserSnap.data();
+        // User exists, update last login and return profile
+        await updateDoc(userRef, { 'activity.lastLogin': serverTimestamp() });
+        const profileData = userSnap.data();
 
-        if (!profileData) {
-            throw new Error("Failed to fetch updated user profile after login.");
-        }
-
-        // Convert Firestore Timestamps to ISO strings
         const createdAt = profileData.createdAt instanceof Timestamp ? profileData.createdAt.toDate().toISOString() : new Date().toISOString();
+        // For existing users, lastLogin will be updated, but we can return the previously fetched data for immediate UI update.
         const lastLogin = profileData.activity?.lastLogin instanceof Timestamp ? profileData.activity.lastLogin.toDate().toISOString() : new Date().toISOString();
         const joined = profileData.activity?.joined instanceof Timestamp ? profileData.activity.joined.toDate().toISOString() : new Date().toISOString();
 
         return {
             ...profileData,
             uid: firebaseUser.uid,
+            name: profileData.name || firebaseUser.displayName || "User",
+            avatarUrl: profileData.avatarUrl || firebaseUser.photoURL,
             createdAt,
             activity: { lastLogin, joined }
         } as AppUser;
 
     } else {
-        const newProfileData = {
+        // New user, create the profile
+        const now = new Date().toISOString();
+        const newProfileData: Omit<AppUser, 'createdAt' | 'activity'> & { createdAt: any, activity: any } = {
             uid: firebaseUser.uid,
             name: firebaseUser.displayName || "New User",
-            email: firebaseUser.email,
+            email: firebaseUser.email!,
             avatarUrl: firebaseUser.photoURL || `https://avatar.vercel.sh/${firebaseUser.uid}`,
-            role: 'user' as const,
+            role: 'user',
             points: 0,
             followersCount: 0,
             followingCount: 0,
@@ -81,23 +80,11 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
         };
         await setDoc(userRef, newProfileData);
         
-        const newUserSnap = await getDoc(userRef);
-        const fetchedProfileData = newUserSnap.data();
-        
-        if (!fetchedProfileData) {
-            throw new Error("Failed to fetch newly created user profile.");
-        }
-        
-        // Convert Firestore Timestamps to ISO strings
-        const createdAt = fetchedProfileData.createdAt instanceof Timestamp ? fetchedProfileData.createdAt.toDate().toISOString() : new Date().toISOString();
-        const lastLogin = fetchedProfileData.activity?.lastLogin instanceof Timestamp ? fetchedProfileData.activity.lastLogin.toDate().toISOString() : new Date().toISOString();
-        const joined = fetchedProfileData.activity?.joined instanceof Timestamp ? fetchedProfileData.activity.joined.toDate().toISOString() : new Date().toISOString();
-
+        // Return a client-side constructed user object immediately
         return {
-            ...fetchedProfileData,
-            uid: firebaseUser.uid,
-            createdAt,
-            activity: { lastLogin, joined }
+            ...newProfileData,
+            createdAt: now,
+            activity: { lastLogin: now, joined: now }
         } as AppUser;
     }
 };
@@ -111,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setIsLoading(true);
       if (firebaseUser) {
         try {
             const profileData = await createOrUpdateUserProfile(firebaseUser);
@@ -185,6 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         photoURL: `https://avatar.vercel.sh/${cred.user.uid}`
       });
       // onAuthStateChanged will handle creating the Firestore profile.
+      // We don't need to call createOrUpdateUserProfile here because onAuthStateChanged will fire.
     } catch (error: any) {
       toast({
         variant: "destructive",
