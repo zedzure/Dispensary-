@@ -1,4 +1,3 @@
-https://github.com/silzey/locations.git
 'use client';
 
 import { Header } from "@/components/header";
@@ -42,7 +41,7 @@ export default function AboutPage() {
         <Header />
         <main className="flex-grow container mx-auto px-4 py-8">
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold font-cursive text-primary mb-4">Your Guide to the World of Cannabis</h1>
+            <h1 className="text-4xl md:text-5xl font-bold font-cursive text-primary mb-4">About GreenLeaf Guide</h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
               GreenLeaf Guide is your trusted partner for discovering, exploring, and enjoying cannabis safely and confidently. We connect you with local dispensaries, the best products, and a community of enthusiasts.
             </p>
