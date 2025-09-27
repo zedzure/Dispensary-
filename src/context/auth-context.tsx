@@ -1,3 +1,4 @@
+
 'use client';
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
@@ -42,7 +43,7 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
-        await setDoc(userRef, { activity: { lastLogin: new Date() } }, { merge: true });
+        await setDoc(userRef, { activity: { lastLogin: serverTimestamp() } }, { merge: true });
         
         const updatedUserSnap = await getDoc(userRef);
         const profileData = updatedUserSnap.data();
@@ -73,8 +74,8 @@ const createOrUpdateUserProfile = async (firebaseUser: FirebaseUser): Promise<Ap
             points: 0,
             followersCount: 0,
             followingCount: 0,
-            createdAt: new Date(),
-            activity: { lastLogin: new Date(), joined: new Date() },
+            createdAt: serverTimestamp(),
+            activity: { lastLogin: serverTimestamp(), joined: serverTimestamp() },
             storageLimit: 1024 * 1024 * 1024,
             usedStorage: 0,
         };
