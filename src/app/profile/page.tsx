@@ -80,23 +80,46 @@ export default function ProfilePage() {
           if (userDoc.exists()) {
             setProfile(userDoc.data() as UserProfile);
           } else {
-            // Create and save a new profile if one doesn't exist
-            const newProfile: UserProfile = {
-                id: user.uid,
-                firstName: user.displayName?.split(' ')[0] || 'New',
-                lastName: user.displayName?.split(' ').slice(1).join(' ') || 'User',
-                email: user.email || '',
-                memberSince: user.metadata.creationTime || new Date().toISOString(),
-                avatarUrl: user.photoURL || `https://avatar.vercel.sh/${user.uid}`,
-                points: 123,
-                followers: [],
-                following: [],
-                followersCount: 1598,
-                followingCount: 65,
-                bio: `Front-end Developer from <strong>Mesopotamia</strong>`,
-                reviewsToday: 123,
-                receiptsThisWeek: 85,
-            };
+            let newProfile: UserProfile;
+
+            // Create a special detailed profile for kim@gmail.com
+            if (user.email === 'kim@gmail.com') {
+                newProfile = {
+                    id: user.uid,
+                    firstName: 'Kim',
+                    lastName: 'Possible',
+                    email: user.email,
+                    memberSince: user.metadata.creationTime || new Date().toISOString(),
+                    avatarUrl: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=400',
+                    dataAiHint: 'person face',
+                    points: 123,
+                    followers: [],
+                    following: [],
+                    followersCount: 1598,
+                    followingCount: 65,
+                    bio: `Front-end Developer from <strong>Mesopotamia</strong>`,
+                    reviewsToday: 123,
+                    receiptsThisWeek: 85,
+                };
+            } else {
+                // Create and save a new default profile for other users
+                newProfile = {
+                    id: user.uid,
+                    firstName: user.displayName?.split(' ')[0] || 'New',
+                    lastName: user.displayName?.split(' ').slice(1).join(' ') || 'User',
+                    email: user.email || '',
+                    memberSince: user.metadata.creationTime || new Date().toISOString(),
+                    avatarUrl: user.photoURL || `https://avatar.vercel.sh/${user.uid}`,
+                    points: 123,
+                    followers: [],
+                    following: [],
+                    followersCount: 1598,
+                    followingCount: 65,
+                    bio: `Front-end Developer from <strong>Mesopotamia</strong>`,
+                    reviewsToday: 123,
+                    receiptsThisWeek: 85,
+                };
+            }
             await setDoc(userDocRef, newProfile, { merge: true });
             setProfile(newProfile);
           }
