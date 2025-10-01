@@ -7,7 +7,7 @@ const kimProfile: UserProfile = {
     id: `CUST-1000`,
     firstName: 'Kim',
     lastName: 'Possible',
-    email: `kim@example.com`,
+    email: `kim@gmail.com`,
     memberSince: new Date().toISOString(),
     avatarUrl: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=400',
     dataAiHint: 'person face',
@@ -19,8 +19,11 @@ const kimProfile: UserProfile = {
     pointsToNextTier: 500,
     followers: [],
     following: [],
-    reviewsToday: 2,
-    receiptsThisWeek: 3,
+    followersCount: 1598,
+    followingCount: 65,
+    bio: `Front-end Developer from <strong>Mesopotamia</strong>`,
+    reviewsToday: 123,
+    receiptsThisWeek: 85,
 };
 
 const ronProfile: UserProfile = {
