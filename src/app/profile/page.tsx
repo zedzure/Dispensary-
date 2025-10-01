@@ -88,12 +88,14 @@ export default function ProfilePage() {
                 email: user.email || '',
                 memberSince: user.metadata.creationTime || new Date().toISOString(),
                 avatarUrl: user.photoURL || `https://avatar.vercel.sh/${user.uid}`,
-                points: 0,
+                points: 123,
                 followers: [],
                 following: [],
-                followersCount: 0,
-                followingCount: 0,
-                bio: 'A new member of the GreenLeaf Guide community!',
+                followersCount: 1598,
+                followingCount: 65,
+                bio: `Front-end Developer from <strong>Mesopotamia</strong>`,
+                reviewsToday: 123,
+                receiptsThisWeek: 85,
             };
             await setDoc(userDocRef, newProfile, { merge: true });
             setProfile(newProfile);
