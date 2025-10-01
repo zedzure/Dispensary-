@@ -82,13 +82,13 @@ export default function ProfilePage() {
           } else {
             let newProfile: UserProfile;
 
-            // Create a special detailed profile for kim@gmail.com
-            if (user.email === 'kim@gmail.com') {
+            // Create a special detailed profile for the specified UID
+            if (user.uid === 'p9ZjS1zAbTWrxryVd1HA1ftUcl32') {
                 newProfile = {
                     id: user.uid,
                     firstName: 'Kim',
                     lastName: 'Possible',
-                    email: user.email,
+                    email: user.email || 'kim@gmail.com',
                     memberSince: user.metadata.creationTime || new Date().toISOString(),
                     avatarUrl: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=400',
                     dataAiHint: 'person face',
