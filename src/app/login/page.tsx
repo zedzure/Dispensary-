@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -162,6 +163,12 @@ export default function LoginPage() {
                     Create Account
                   </Button>
                   <div className="form-divider"></div>
+                   <Button type="button" onClick={handleGoogleSignIn} className="form-button-google">
+                    <GoogleIcon/> Sign up with Google
+                  </Button>
+                  <Button type="button" onClick={handleGitHubSignIn} className="form-button-google">
+                    <Github className="mr-2 h-4 w-4"/> Sign up with GitHub
+                  </Button>
                    <p className="form-switch-text">
                     Already have an account?{' '}
                     <button type="button" onClick={() => setIsFlipped(false)} className="form-switch-button">Sign In</button>
