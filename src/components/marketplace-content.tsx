@@ -6,7 +6,6 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import type { Dispensary } from '@/types/pos';
 import { DispensaryDetailSheet } from '@/components/dispensary-detail-sheet';
 import { dispensariesByState } from '@/lib/dispensaries';
-import { ProductStoryReel } from '@/components/product-story-reel';
 import { ProductDetailModal } from '@/components/product-detail-modal';
 import type { Product } from '@/types/product';
 import { HeroSlider } from '@/components/hero-slider';
@@ -15,6 +14,7 @@ import { Footer } from '@/components/footer';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
 import { allProductsFlat } from '@/lib/products';
 import { StateSearch } from '@/components/state-search';
+import { StateStoryReel } from './state-story-reel';
 
 export function MarketplaceContent() {
   const router = useRouter();
@@ -113,7 +113,7 @@ export function MarketplaceContent() {
         </div>
 
         <div className="mb-12">
-          <ProductStoryReel onProductClick={handleProductClick} />
+          <StateStoryReel />
         </div>
         
 

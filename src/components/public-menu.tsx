@@ -8,7 +8,7 @@ import { allProducts } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
 import { ProductDetailModal } from '@/components/product-detail-modal';
 import { Store } from 'lucide-react';
-import { ProductStoryReel } from './product-story-reel';
+import { StateStoryReel } from './state-story-reel';
 
 interface PublicMenuProps {
   locationId: string;
@@ -40,8 +40,6 @@ export function PublicMenu({ locationId, locationName }: PublicMenuProps) {
                 Explore the curated selection of products available at our {locationName} location.
             </p>
         </section>
-
-        <ProductStoryReel onProductClick={handleProductClick} />
 
         <div id="menu" className="space-y-16 py-8">
           {Object.entries(productsForLocation).map(([categoryName, products]) => (
