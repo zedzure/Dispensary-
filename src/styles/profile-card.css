@@ -190,9 +190,9 @@ a, a:hover {
   border-radius: 50%;
   align-items: center;
   justify-content: center;
-  background: hsla(var(--destructive), 0.1);
+  background: hsl(var(--destructive));
   border: 2px solid hsl(var(--destructive));
-  color: hsl(var(--destructive));
+  color: #fff;
   box-shadow: 0 0 20px 5px hsla(var(--destructive), 0.6);
   position: relative;
   font-size: 21px;
