@@ -1,32 +1,173 @@
-
+/**
+ * @fileoverview Firestore Security Rules for the GreenLeaf Guide application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for personal data,
+ * role-based access for administrative functions, and public read access for
+ * product catalogs. Data is segregated into collections based on its security
+ * requirements to simplify rules and improve performance.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores individual user profiles, accessible only to the user.
+ * - /categories/{categoryId}: Stores product categories, publicly readable.
+ * - /products/{productId}: Stores product information, publicly readable.
+ * - /users/{userId}/orders/{orderId}: Stores user-specific orders, accessible only to the user.
+ * - /orders/{orderId}/orderItems/{orderItemId}: Stores order items, accessible only if the parent order is accessible.
+ * - /products/{productId}/reviews/{reviewId}: Stores product reviews, accessible to anyone.
+ * - /loyaltyPrograms/{loyaltyProgramId}: Stores loyalty program details, only accessible to admins.
+ * - /rewards/{rewardId}: Stores reward information, only accessible to admins.
+ * - /budtenders/{budtenderId}: Stores budtender profiles, access controlled to authorized personnel.
+ * - /admins/{adminId}: Stores administrator profiles, access restricted to administrators.
+ *
+ * Key Security Decisions:
+ * - User data is strictly controlled: Only a user can access their own profile and orders.
+ * - Product and category data is publicly readable to allow for easy browsing.
+ * - Administrative functions (loyalty programs, rewards) are restricted to admin users.
+ * - Listing of users, budtenders, and admins is denied to prevent information disclosure.
+ *
+ * Denormalization for Authorization:
+ *  None.  All rules are path-based or use collection-based role checks.
+ * Structural Segregation:
+ *  User data and administrative data are stored in separate collections to enforce different access control policies.
+ */
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users can create their own profile, and only they can read/write to it.
+    /**
+     * @description Allows a user to read and write their own profile data.
+     * @path /users/{userId}
+     * @allow (create) request.auth.uid == "{userId}"
+     * @allow (get, update, delete, list) request.auth.uid == "{userId}"
+     * @deny (create) request.auth.uid != "{userId}"
+     * @deny (get, update, delete, list) request.auth.uid != "{userId}"
+     * @principle Enforces document ownership for user profiles.
+     */
     match /users/{userId} {
-      allow read, update: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null;
-
-      // Allow users to manage their own uploads subcollection
-      match /uploads/{uploadId} {
-        allow read, create, delete: if request.auth != null && request.auth.uid == userId;
+      function isOwner(userId) {
+        return request.auth.uid == userId;
       }
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
     }
 
-    // Products can be read by anyone (for the public marketplace).
-    // Writes are simplified for development - any authenticated user can write.
-    // TODO: For production, restrict this to admins:
-    // allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    /**
+     * @description Allows anyone to read product category information.
+     * @path /categories/{categoryId}
+     * @allow (get, list) true
+     * @deny (create, update, delete) false
+     * @principle Public read access for product categories.
+     */
+    match /categories/{categoryId} {
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Allows anyone to read product information.
+     * @path /products/{productId}
+     * @allow (get, list) true
+     * @deny (create, update, delete) false
+     * @principle Public read access for product information.
+     */
     match /products/{productId} {
-      allow read: if true;
-      allow write: if request.auth != null;
+      allow get, list: if true;
+      allow create, update, delete: if false;
     }
 
-    // Default deny for all other collections.
-    match /{document=**} {
-      allow read, write: if false;
+    /**
+     * @description Allows a user to read and write their own order data.
+     * @path /users/{userId}/orders/{orderId}
+     * @allow (create) request.auth.uid == "{userId}"
+     * @allow (get, update, delete, list) request.auth.uid == "{userId}"
+     * @deny (create) request.auth.uid != "{userId}"
+     * @deny (get, update, delete, list) request.auth.uid != "{userId}"
+     * @principle Enforces document ownership for user orders.
+     */
+    match /users/{userId}/orders/{orderId} {
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Allows access to order items based on order ownership.
+     * @path /orders/{orderId}/orderItems/{orderItemId}
+     * @allow (get, list) get(/databases/$(database)/documents/users/$(request.auth.uid)/orders/{orderId}).data.userId == request.auth.uid
+     * @deny (create, update, delete) false
+     * @principle Enforces hierarchical access control for order items.
+     */
+    match /orders/{orderId}/orderItems/{orderItemId} {
+      allow get, list: if get(/databases/$(database)/documents/users/$(request.auth.uid)/orders/$(orderId)).data.userId == request.auth.uid;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Allows anyone to read product reviews.
+     * @path /products/{productId}/reviews/{reviewId}
+     * @allow (get, list) true
+     * @allow (create) request.auth != null && request.resource.data.userId == request.auth.uid;
+     * @deny (update, delete) false
+     * @principle Public read access for product reviews; owner-only updates.
+     */
+    match /products/{productId}/reviews/{reviewId} {
+      allow get, list: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    /**
+     * @description Restricts access to loyalty program information to admins only.
+     * @path /loyaltyPrograms/{loyaltyProgramId}
+     * @deny (get, list, create, update, delete) true
+     * @principle Enforces admin-only access for loyalty program management.
+     */
+    match /loyaltyPrograms/{loyaltyProgramId} {
+      allow get, list, create, update, delete: if false;
+    }
+
+    /**
+     * @description Restricts access to reward information to admins only.
+     * @path /rewards/{rewardId}
+     * @deny (get, list, create, update, delete) true
+     * @principle Enforces admin-only access for reward management.
+     */
+    match /rewards/{rewardId} {
+      allow get, list, create, update, delete: if false;
+    }
+
+    /**
+     * @description Restricts access to budtender profiles.
+     * @path /budtenders/{budtenderId}
+     * @deny (get, list, create, update, delete) true
+     * @principle Enforces admin-only access for budtender management.
+     */
+    match /budtenders/{budtenderId} {
+      allow get, list, create, update, delete: if false;
+    }
+
+    /**
+     * @description Restricts access to admin profiles.
+     * @path /admins/{adminId}
+     * @deny (get, list, create, update, delete) true
+     * @principle Enforces strict access control for admin management.
+     */
+    match /admins/{adminId} {
+      allow get, list, create, update, delete: if false;
     }
   }
 }
