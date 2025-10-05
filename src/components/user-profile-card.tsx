@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useRef } from 'react';
@@ -145,19 +146,19 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate }: UserProfi
                     <div className="profile-card-inf">
                         <div className="profile-card-inf__item">
                             <div className="profile-card-inf__title text-primary">{profile.followersCount || 0}</div>
-                            <div className="profile-card-inf__txt text-primary">Followers</div>
+                            <div className="profile-card-inf__txt">Followers</div>
                         </div>
                         <div className="profile-card-inf__item">
                             <div className="profile-card-inf__title text-primary">{profile.followingCount || 0}</div>
-                            <div className="profile-card-inf__txt text-primary">Following</div>
+                            <div className="profile-card-inf__txt">Following</div>
                         </div>
                          <div className="profile-card-inf__item">
                             <div className="profile-card-inf__title text-primary">{profile.reviewsToday || 0}</div>
-                            <div className="profile-card-inf__txt text-primary">Reviews</div>
+                            <div className="profile-card-inf__txt">Reviews</div>
                         </div>
                          <div className="profile-card-inf__item">
                             <div className="profile-card-inf__title text-primary">{profile.receiptsThisWeek || 0}</div>
-                            <div className="profile-card-inf__txt text-primary">Receipts</div>
+                            <div className="profile-card-inf__txt">Receipts</div>
                         </div>
                     </div>
 
