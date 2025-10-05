@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/cart-context";
 import { Badge } from "@/components/ui/badge";
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useUser } from '@/firebase';
 import { auth } from '@/lib/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "next-themes";
@@ -20,7 +20,7 @@ import { Sun, Moon, ChevronDown } from 'lucide-react';
 
 export function Header() {
   const { totalItems, setCartOpen } = useCart();
-  const [user] = useAuthState(auth);
+  const { user } = useUser();
   const { setTheme, theme } = useTheme();
 
   const navItems = [
@@ -80,7 +80,7 @@ export function Header() {
               <Button asChild variant="ghost" size="icon">
                 <Link href="/profile">
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={user.photoURL || `https://avatar.vercel.sh/${user.uid}`} alt={user.displayName || 'User'} data-ai-hint="person face" />
+                      <AvatarImage src={user.photoURL || `https://avatar.vercel.sh/${'user.uid'}`} alt={user.displayName || 'User'} data-ai-hint="person face" />
                       <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
                     </Avatar>
                 </Link>

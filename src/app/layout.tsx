@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import { Providers } from "./providers";
 import { ThemeProvider } from "next-themes";
 import { CartSheet } from "@/components/cart-sheet";
+import { FirebaseClientProvider } from "@/firebase";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -70,11 +71,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Providers>
-            {children}
-            <Toaster />
-            <CartSheet />
-          </Providers>
+          <FirebaseClientProvider>
+            <Providers>
+              {children}
+              <Toaster />
+              <CartSheet />
+            </Providers>
+          </FirebaseClientProvider>
         </ThemeProvider>
       </body>
     </html>
