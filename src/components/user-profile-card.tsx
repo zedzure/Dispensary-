@@ -12,6 +12,7 @@ import { Textarea } from './ui/textarea';
 import type { ActiveSheet } from '@/app/profile/page';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { doc } from 'firebase/firestore';
+import { Button } from './ui/button';
 
 interface UserProfileCardProps {
   profile: UserProfile;
@@ -85,7 +86,7 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate }: UserProfi
     };
     
     const handleSaveBio = () => {
-        if (user) {
+        if (user && db) {
             const userRef = doc(db, 'users', user.uid);
             setDocumentNonBlocking(userRef, { bio }, { merge: true });
             onUpdate({ bio });
