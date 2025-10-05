@@ -13,6 +13,11 @@ import { signOut } from 'firebase/auth';
 import { UserProfileCard } from '@/components/user-profile-card';
 import type { UserProfile } from '@/types/pos';
 import { Skeleton } from '@/components/ui/skeleton';
+import { UserProfileSheets } from '@/components/user-profile-sheets';
+import type { UploadItem } from '@/types/pos';
+
+export type ActiveSheet = 'receipts' | 'uploads' | 'notes' | 'search' | null;
+
 
 function ProfilePageSkeleton() {
     return (
@@ -47,7 +52,7 @@ function ProfilePageSkeleton() {
                                 </div>
                              </div>
                              <div className="profile-card-social">
-                                {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-12 rounded-full" />)}
+                                {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-12 w-12 rounded-full" />)}
                              </div>
                               <div className="profile-card-ctr">
                                 <Skeleton className="h-14 w-48 rounded-full" />
@@ -69,6 +74,8 @@ export default function ProfilePage() {
   const db = useFirestore();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
+  const [uploads, setUploads] = useState<UploadItem[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -171,11 +178,12 @@ export default function ProfilePage() {
   }
 
   return (
+    <>
     <div className="flex flex-col min-h-screen bg-muted/40">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
         <div className="w-full max-w-md">
-            <UserProfileCard profile={profile} />
+            <UserProfileCard profile={profile} setActiveSheet={setActiveSheet} />
              <div className="text-center mt-4">
                  <Button onClick={handleLogout} variant="destructive">
                     <LogOut className="mr-2 h-4 w-4" />
@@ -186,5 +194,12 @@ export default function ProfilePage() {
       </main>
       <Footer />
     </div>
+     <UserProfileSheets 
+        user={user}
+        activeSheet={activeSheet}
+        setActiveSheet={setActiveSheet}
+        uploads={uploads}
+      />
+    </>
   );
 }

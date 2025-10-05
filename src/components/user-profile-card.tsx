@@ -4,30 +4,34 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import type { UserProfile } from '@/types/pos';
-import { Github, Twitter, Facebook, Instagram, Codepen, Link as LinkIcon, MapPin } from 'lucide-react';
+import { Camera, Music, Video, Receipt, Wallet, MessageSquare, FileText, Bookmark } from 'lucide-react';
 import { useUser } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Textarea } from './ui/textarea';
+import type { ActiveSheet } from '@/app/profile/page';
 
 interface UserProfileCardProps {
   profile: UserProfile;
+  setActiveSheet: (sheet: ActiveSheet) => void;
 }
 
-const socialLinks = [
-    { name: 'Facebook', icon: Facebook, href: '#' },
-    { name: 'Twitter', icon: Twitter, href: '#' },
-    { name: 'Instagram', icon: Instagram, href: '#' },
-    { name: 'GitHub', icon: Github, href: 'https://github.com/firebase/genkit' },
-    { name: 'Codepen', icon: Codepen, href: '#' },
-    { name: 'Website', icon: LinkIcon, href: '#' },
-];
-
-export function UserProfileCard({ profile }: UserProfileCardProps) {
+export function UserProfileCard({ profile, setActiveSheet }: UserProfileCardProps) {
     const { user } = useUser();
     const { toast } = useToast();
     const [isMessageActive, setMessageActive] = useState(false);
     const [message, setMessage] = useState('');
+
+    const actionLinks = [
+        { name: 'Photos', icon: Camera, sheet: 'uploads' },
+        { name: 'Music', icon: Music, sheet: null },
+        { name: 'Video', icon: Video, sheet: null },
+        { name: 'Receipts', icon: Receipt, sheet: 'receipts' },
+        { name: 'Wallet', icon: Wallet, sheet: null },
+        { name: 'Messages', icon: MessageSquare, sheet: 'notes' },
+        { name: 'Notes', icon: FileText, sheet: 'notes' },
+        { name: 'Saved', icon: Bookmark, sheet: null },
+    ];
 
     const handleFollow = () => {
         if (!user) {
@@ -47,6 +51,14 @@ export function UserProfileCard({ profile }: UserProfileCardProps) {
         setMessage('');
         setMessageActive(false);
     }
+
+    const handleActionClick = (sheet: ActiveSheet) => {
+        if(sheet) {
+            setActiveSheet(sheet);
+        } else {
+            toast({ title: 'Coming Soon!', description: 'This feature is not yet implemented.' });
+        }
+    }
     
     return (
         <div className="wrapper">
@@ -58,15 +70,7 @@ export function UserProfileCard({ profile }: UserProfileCardProps) {
                 <div className="profile-card__cnt js-profile-cnt">
                     <div className="profile-card__name">{profile.firstName} {profile.lastName}</div>
                     <div className="profile-card__txt" dangerouslySetInnerHTML={{ __html: profile.bio || `A cannabis enthusiast from <strong>Earth</strong>` }} />
-                    <div className="profile-card-loc">
-                        <span className="profile-card-loc__icon">
-                            <MapPin />
-                        </span>
-                        <span className="profile-card-loc__txt">
-                           Planet Earth
-                        </span>
-                    </div>
-
+                    
                     <div className="profile-card-inf">
                         <div className="profile-card-inf__item">
                             <div className="profile-card-inf__title text-primary">{profile.followersCount || 0}</div>
@@ -87,12 +91,12 @@ export function UserProfileCard({ profile }: UserProfileCardProps) {
                     </div>
 
                     <div className="profile-card-social">
-                         {socialLinks.map(link => (
-                            <a key={link.name} href={link.href} className={`profile-card-social__item ${link.name.toLowerCase()}`} target="_blank" rel="noreferrer">
+                         {actionLinks.map(link => (
+                            <button key={link.name} onClick={() => handleActionClick(link.sheet as ActiveSheet)} className={`profile-card-social__item ${link.name.toLowerCase()}`}>
                                 <span className="icon-font">
                                     <link.icon />
                                 </span>
-                            </a>
+                            </button>
                         ))}
                     </div>
 
