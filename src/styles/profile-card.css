@@ -192,10 +192,10 @@ a, a:hover {
   border-radius: 50%;
   align-items: center;
   justify-content: center;
-  background: hsla(var(--primary), 0.1);
-  border: 1px solid hsla(var(--primary), 0.2);
-  color: hsl(var(--primary));
-  box-shadow: 0px 7px 20px rgba(43,98,169,0.1);
+  background: hsla(var(--destructive), 0.1);
+  border: 1px solid hsla(var(--destructive), 0.2);
+  color: hsl(var(--destructive));
+  box-shadow: 0px 7px 20px hsla(var(--destructive), 0.3);
   position: relative;
   font-size: 21px;
   flex-shrink: 0;
@@ -213,8 +213,9 @@ a, a:hover {
 @media screen and (min-width: 768px){
   .profile-card-social__item:hover {
     transform: scale(1.2);
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
+    background: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+    box-shadow: 0px 10px 25px hsla(var(--destructive), 0.5);
   }
 }
 
