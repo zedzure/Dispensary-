@@ -158,6 +158,9 @@
 }
 
 /* Background Effect Styles */
+.wrapper {
+  background-image: none; /* Remove previous gradient */
+}
 a-hole {
   position: fixed;
   top: 0;
@@ -167,6 +170,7 @@ a-hole {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  z-index: -1; /* Put it behind content */
 }
 
 a-hole::before {

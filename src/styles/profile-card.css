@@ -1,4 +1,5 @@
 
+
 @import url('https://fonts.googleapis.com/css?family=Quicksand:400,500,700&subset=latin-ext');
 
 html {
@@ -35,7 +36,6 @@ a, a:hover {
   padding: 50px 20px;
   padding-top: 100px;
   display: flex;
-  background-image: linear-gradient(-20deg, #ff2846 0%, #6944ff 100%);
 }
 
 @media screen and (max-width: 768px) {
@@ -50,9 +50,11 @@ a, a:hover {
   width: 100%;
   min-height: 460px;
   margin: auto;
-  box-shadow: 0px 8px 60px -10px rgba(13,28,39,0.6);
-  background: #fff;
-  border-radius: 12px;
+  background: hsla(var(--card), 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid hsla(var(--border), 0.2);
+  box-shadow: 0px 8px 30px -5px hsla(var(--primary) / 0.1);
+  border-radius: 20px;
   max-width: 700px;
   position: relative;
 }
@@ -83,7 +85,7 @@ a, a:hover {
   overflow: hidden;
   position: relative;
   z-index: 4;
-  box-shadow: 0px 5px 50px 0px rgb(108, 68, 252), 0px 0px 0px 7px rgba(107, 74, 255, 0.5);
+  box-shadow: 0px 5px 50px 0px hsla(var(--primary), 0.7), 0px 0px 0px 7px hsla(var(--primary), 0.2);
 }
 
 @media screen and (max-width: 576px) {
@@ -112,19 +114,20 @@ a, a:hover {
 .profile-card__name {
   font-weight: 700;
   font-size: 24px;
-  color: #6944ff;
+  color: hsl(var(--foreground));
   margin-bottom: 15px;
 }
 
 .profile-card__txt {
   font-size: 18px;
   font-weight: 500;
-  color: #324e63;
+  color: hsl(var(--muted-foreground));
   margin-bottom: 15px;
 }
 
 .profile-card__txt strong {
   font-weight: 700;
+  color: hsl(var(--foreground));
 }
 
 .profile-card-loc {
@@ -164,12 +167,13 @@ a, a:hover {
 .profile-card-inf__title {
   font-weight: 700;
   font-size: 27px;
-  color: #324e63;
+  color: hsl(var(--primary));
 }
 
 .profile-card-inf__txt {
   font-weight: 500;
   margin-top: 7px;
+  color: hsl(var(--muted-foreground));
 }
 
 .profile-card-social {
@@ -189,8 +193,10 @@ a, a:hover {
   align-items: center;
   justify-content: center;
   color: #fff;
-  background: #405de6;
-  box-shadow: 0px 7px 30px rgba(43,98,169,0.5);
+  background: hsla(var(--primary), 0.1);
+  border: 1px solid hsla(var(--primary), 0.2);
+  color: hsl(var(--primary));
+  box-shadow: 0px 7px 20px rgba(43,98,169,0.1);
   position: relative;
   font-size: 21px;
   flex-shrink: 0;
@@ -208,42 +214,9 @@ a, a:hover {
 @media screen and (min-width: 768px){
   .profile-card-social__item:hover {
     transform: scale(1.2);
+    background: hsla(var(--primary), 1);
+    color: hsl(var(--primary-foreground));
   }
-}
-
-.profile-card-social__item.facebook {
-  background: linear-gradient(45deg, #3b5998, #0078d7);
-  box-shadow: 0px 4px 30px rgba(43, 98, 169, 0.5);
-}
-
-.profile-card-social__item.twitter {
-  background: linear-gradient(45deg, #1da1f2,#0e71c8);
-  box-shadow: 0px 4px 30px rgba(19, 127, 212, 0.7);
-}
-
-.profile-card-social__item.instagram {
-  background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
-  box-shadow: 0px 4px 30px rgba(120, 64, 190, 0.6);
-}
-
-.profile-card-social__item.behance {
-  background: linear-gradient(45deg, #1769ff, #213fca);
-  box-shadow: 0px 4px 30px rgba(27, 86, 231, 0.7);
-}
-
-.profile-card-social__item.github {
-  background: linear-gradient(45deg, #333333, #626b73);
-  box-shadow: 0px 4px 30px rgba(63, 65, 67, 0.6);
-}
-
-.profile-card-social__item.codepen {
-  background: linear-gradient(45deg, #324e63, #414447);
-  box-shadow: 0px 4px 30px rgba(55, 75, 90, 0.6);
-}
-
-.profile-card-social__item.link {
-  background: linear-gradient(45deg, #d5135a, #f05924);
-  box-shadow: 0px 4px 30px rgba(223, 45, 70, 0.6);
 }
 
 .profile-card-social .icon-font {
@@ -319,27 +292,27 @@ a, a:hover {
 }
 
 .profile-card__button.button--blue {
-  background: linear-gradient(45deg, #1da1f2, #0e71c8);
-  box-shadow: 0px 4px 30px rgba(19, 127, 212, 0.4);
+  background: linear-gradient(45deg, hsl(var(--primary)), hsl(var(--primary)/ .8));
+  box-shadow: 0px 4px 30px hsla(var(--primary) / 0.4);
 }
 
 .profile-card__button.button--blue:hover {
-  box-shadow: 0px 7px 30px rgba(19, 127, 212, 0.75);
+  box-shadow: 0px 7px 30px hsla(var(--primary) / 0.75);
 }
 
 .profile-card__button.button--orange {
-  background: linear-gradient(45deg, #d5135a, #f05924);
-  box-shadow: 0px 4px 30px rgba(223, 45, 70, 0.35);
+  background: linear-gradient(45deg, hsl(var(--destructive)), hsl(var(--destructive)/ .8));
+  box-shadow: 0px 4px 30px hsla(var(--destructive) / 0.35);
 }
 
 .profile-card__button.button--orange:hover {
-  box-shadow: 0px 7px 30px rgba(223, 45, 70, 0.75);
+  box-shadow: 0px 7px 30px hsla(var(--destructive) / 0.75);
 }
 
 .profile-card__button.button--gray {
   box-shadow: none;
-  background: #dcdcdc;
-  color: #142029;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
 }
 
 .profile-card-message {
@@ -422,9 +395,8 @@ a, a:hover {
   left: 0;
   pointer-events: none;
   opacity: 0;
-  background: rgba(22, 33, 72, 0.35);
+  background: hsla(var(--background), 0.6);
+  backdrop-filter: blur(3px);
   border-radius: 12px;
   transition: all .3s;
 }
-
-    
