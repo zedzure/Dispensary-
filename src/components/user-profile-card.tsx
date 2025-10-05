@@ -76,13 +76,13 @@ export function UserProfileCard({ profile }: UserProfileCardProps) {
                             <div className="profile-card-inf__title">{profile.followingCount || 0}</div>
                             <div className="profile-card-inf__txt">Following</div>
                         </div>
-                        <div className="profile-card-inf__item">
+                         <div className="profile-card-inf__item">
                             <div className="profile-card-inf__title">{profile.reviewsToday || 0}</div>
-                            <div className="profile-card-inf__txt">Articles</div>
+                            <div className="profile-card-inf__txt">Reviews</div>
                         </div>
-                        <div className="profile-card-inf__item">
+                         <div className="profile-card-inf__item">
                             <div className="profile-card-inf__title">{profile.receiptsThisWeek || 0}</div>
-                            <div className="profile-card-inf__txt">Works</div>
+                            <div className="profile-card-inf__txt">Receipts</div>
                         </div>
                     </div>
 
@@ -126,5 +126,3 @@ export function UserProfileCard({ profile }: UserProfileCardProps) {
         </div>
     );
 }
-
-    
