@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useUser, useAuth } from '@/firebase';
 import {
   GoogleAuthProvider,
   GithubAuthProvider,
@@ -11,7 +11,6 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -20,7 +19,8 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 
 export default function LoginPage() {
-  const [user, loading] = useAuthState(auth);
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isFlipped, setIsFlipped] = useState(false);
@@ -33,10 +33,10 @@ export default function LoginPage() {
   const [signUpPassword, setSignUpPassword] = useState('');
 
   useEffect(() => {
-    if (!loading && user) {
+    if (!isUserLoading && user) {
       router.replace('/profile');
     }
-  }, [user, loading, router]);
+  }, [user, isUserLoading, router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +93,7 @@ export default function LoginPage() {
       </svg>
   );
 
-  if (loading || user) {
+  if (isUserLoading || user) {
     return (
         <div className="flex flex-col min-h-screen">
             <Header />

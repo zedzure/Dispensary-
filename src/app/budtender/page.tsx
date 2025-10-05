@@ -1,9 +1,9 @@
+
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { useUser, useAuth, useFirestore } from '@/firebase';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,6 @@ import type { UserProfile, CartItem } from '@/types/pos';
 import { Skeleton } from '@/components/ui/skeleton';
 import { signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 
 const POS_PENDING_ORDERS_STORAGE_KEY = 'posPendingOrdersSilzey';
 
@@ -31,7 +30,9 @@ const customers: UserProfile[] = mockCustomers;
 
 // POS Main Component
 export default function BudtenderPOSPage() {
-    const [user, loading] = useAuthState(auth);
+    const { user, isUserLoading: loading } = useUser();
+    const auth = useAuth();
+    const db = useFirestore();
     const [userRole, setUserRole] = useState<string | null>(null);
     const router = useRouter();
     const { toast } = useToast();
@@ -59,7 +60,7 @@ export default function BudtenderPOSPage() {
             }
         };
         fetchUserRole();
-    }, [user]);
+    }, [user, db]);
 
     // Derived State
     const filteredProducts = useMemo(() => {

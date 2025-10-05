@@ -3,8 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, db } from '@/lib/firebase';
+import { useUser, useAuth, useFirestore } from '@/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -65,7 +64,9 @@ function ProfilePageSkeleton() {
 
 
 export default function ProfilePage() {
-  const [user, authLoading] = useAuthState(auth);
+  const { user, isUserLoading: authLoading } = useUser();
+  const auth = useAuth();
+  const db = useFirestore();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const router = useRouter();
@@ -135,7 +136,7 @@ export default function ProfilePage() {
     };
 
     fetchOrCreateProfile();
-  }, [user, authLoading]);
+  }, [user, authLoading, db]);
 
   const handleLogout = async () => {
     await signOut(auth);

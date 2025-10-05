@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Leaf, ShoppingCart, User } from "lucide-react";
@@ -5,8 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/cart-context";
 import { Badge } from "@/components/ui/badge";
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { useUser } from '@/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "next-themes";
 import {
@@ -20,7 +20,7 @@ import { Sun, Moon, ChevronDown } from 'lucide-react';
 
 export function Header() {
   const { totalItems, setCartOpen } = useCart();
-  const [user] = useAuthState(auth);
+  const { user } = useUser();
   const { setTheme, theme } = useTheme();
 
   const navItems = [

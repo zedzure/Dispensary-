@@ -5,8 +5,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import type { UserProfile } from '@/types/pos';
 import { Github, Twitter, Facebook, Instagram, Codepen, Link as LinkIcon, MapPin } from 'lucide-react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { useUser } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Textarea } from './ui/textarea';
@@ -25,7 +24,7 @@ const socialLinks = [
 ];
 
 export function UserProfileCard({ profile }: UserProfileCardProps) {
-    const [user] = useAuthState(auth);
+    const { user } = useUser();
     const { toast } = useToast();
     const [isMessageActive, setMessageActive] = useState(false);
     const [message, setMessage] = useState('');

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, useCallback, UIEvent } from "react";
@@ -34,8 +35,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { realImageUrls } from "@/lib/products";
 import { Textarea } from "../ui/textarea";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/lib/firebase";
+import { useUser } from "@/firebase";
 import { cn } from "@/lib/utils";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { UserProfileModal } from "../user-profile-modal";
@@ -182,7 +182,7 @@ interface DispensarySheetProps {
 }
 
 export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: DispensarySheetProps) {
-  const [user] = useAuthState(auth);
+  const { user } = useUser();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);

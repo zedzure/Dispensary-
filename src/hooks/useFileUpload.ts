@@ -2,14 +2,8 @@
 "use client";
 
 import { useState } from "react";
-import { auth, db, storage } from "@/lib/firebase"; 
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  getMetadata,
-  deleteObject,
-} from "firebase/storage";
+import { useAuth, useFirestore } from "@/firebase";
+import { getStorage, ref, uploadBytes, getDownloadURL, getMetadata, deleteObject } from "firebase/storage";
 import {
   doc,
   collection,
@@ -22,6 +16,9 @@ import {
 } from "firebase/firestore";
 
 export function useFileUpload() {
+  const auth = useAuth();
+  const db = useFirestore();
+  const storage = getStorage();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

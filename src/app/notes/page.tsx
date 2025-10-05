@@ -1,8 +1,8 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { useUser } from '@/firebase';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
@@ -17,7 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const NOTIFICATIONS_PER_PAGE = 15;
 
 export default function NotesPage() {
-  const [user, loading] = useAuthState(auth);
+  const { user, isUserLoading: loading } = useUser();
   const [allUserNotifications, setAllUserNotifications] = useState<Notification[]>([]);
   const [visibleNotifications, setVisibleNotifications] = useState<Notification[]>([]);
   const [page, setPage] = useState(1);

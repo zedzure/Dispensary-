@@ -1,8 +1,8 @@
 
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "./firebase";
+import { ref, uploadBytes, getDownloadURL, getStorage } from "firebase/storage";
 
 export const uploadImage = async (file: File, path?: string): Promise<string> => {
+  const storage = getStorage();
   const defaultPath = `images/${Date.now()}-${file.name}`;
   const storageRef = ref(storage, path || defaultPath);
 

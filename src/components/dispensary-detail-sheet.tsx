@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, ChangeEvent, useCallback } from 'react';
@@ -9,8 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Star, Clock, MapPin, MessageSquare, Navigation, Ticket, Package, Gift, Sparkles, UserPlus, Users, Upload, Camera, Loader2, ImagePlus, Zap } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { useUser, useAuth } from '@/firebase';
 import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
@@ -31,7 +31,7 @@ import { mockCustomers } from '@/lib/mockCustomers';
 
 
 function ReviewForm({ dispensaryId, onAddReview }: { dispensaryId: string, onAddReview: (review: Omit<Review, 'id' | 'createdAt'>) => void }) {
-  const [user] = useAuthState(auth);
+  const { user } = useUser();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -173,7 +173,7 @@ interface DispensaryDetailSheetProps {
 
 export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: DispensaryDetailSheetProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [user] = useAuthState(auth);
+  const { user } = useUser();
   const { toast } = useToast();
   
   const [reviews, setReviews] = useState<Review[]>([]);
