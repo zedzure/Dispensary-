@@ -193,7 +193,7 @@ a, a:hover {
   background: hsla(var(--destructive), 0.1);
   border: 1px solid hsla(var(--destructive), 0.2);
   color: hsl(var(--destructive));
-  box-shadow: 0 0 15px 2px hsla(var(--destructive), 0.4);
+  box-shadow: 0 0 20px 4px hsla(var(--destructive), 0.5);
   position: relative;
   font-size: 21px;
   flex-shrink: 0;
@@ -213,7 +213,7 @@ a, a:hover {
     transform: scale(1.2);
     background: hsl(var(--destructive));
     color: hsl(var(--destructive-foreground));
-    box-shadow: 0 0 25px 5px hsla(var(--destructive), 0.6);
+    box-shadow: 0 0 35px 8px hsla(var(--destructive), 0.7);
   }
 }
 
