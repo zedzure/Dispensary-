@@ -3,8 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser, useAuth, useFirestore } from '@/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useUser, useAuth, useFirestore, setDocumentNonBlocking } from '@/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import type { UserProfile } from '@/types/pos';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UserProfileSheets } from '@/components/user-profile-sheets';
 import type { UploadItem } from '@/types/pos';
+import { useFileUpload } from '@/hooks/useFileUpload';
 
 export type ActiveSheet = 'receipts' | 'uploads' | 'notes' | 'search' | null;
 
@@ -77,6 +78,10 @@ export default function ProfilePage() {
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
   const [uploads, setUploads] = useState<UploadItem[]>([]);
   const router = useRouter();
+  
+  const handleProfileUpdate = (updatedProfile: Partial<UserProfile>) => {
+    setProfile(prev => prev ? { ...prev, ...updatedProfile } : null);
+  };
 
   useEffect(() => {
     const fetchOrCreateProfile = async () => {
@@ -128,7 +133,7 @@ export default function ProfilePage() {
                     receiptsThisWeek: 85,
                 };
             }
-            await setDoc(userDocRef, newProfile, { merge: true });
+            setDocumentNonBlocking(userDocRef, newProfile, { merge: true });
             setProfile(newProfile);
           }
         } catch (error) {
@@ -188,7 +193,7 @@ export default function ProfilePage() {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
         <div className="w-full max-w-md">
-            <UserProfileCard profile={profile} setActiveSheet={setActiveSheet} />
+            <UserProfileCard profile={profile} setActiveSheet={setActiveSheet} onUpdate={handleProfileUpdate} />
              <div className="text-center mt-4">
                  <Button onClick={handleLogout} variant="destructive">
                     <LogOut className="mr-2 h-4 w-4" />

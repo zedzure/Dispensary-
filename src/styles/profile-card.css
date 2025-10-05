@@ -53,7 +53,7 @@ a, a:hover {
   background: hsla(var(--card), 0.5);
   backdrop-filter: blur(10px);
   border: 1px solid hsla(var(--border), 0.2);
-  box-shadow: 0px 8px 30px -5px hsla(var(--primary) / 0.1);
+  box-shadow: 0px 8pxrgba(43, 98, 169, 0.1);
   border-radius: 20px;
   max-width: 700px;
   position: relative;
@@ -121,13 +121,13 @@ a, a:hover {
 .profile-card__txt {
   font-size: 18px;
   font-weight: 500;
-  color: hsl(var(--muted-foreground));
+  color: hsl(var(--foreground));
   margin-bottom: 15px;
 }
 
 .profile-card__txt strong {
   font-weight: 700;
-  color: hsl(var(--foreground));
+  color: hsl(var(--primary));
 }
 
 .profile-card-loc {
@@ -173,7 +173,7 @@ a, a:hover {
 .profile-card-inf__txt {
   font-weight: 500;
   margin-top: 7px;
-  color: hsl(var(--muted-foreground));
+  color: hsl(var(--primary));
 }
 
 .profile-card-social {
@@ -192,7 +192,6 @@ a, a:hover {
   border-radius: 50%;
   align-items: center;
   justify-content: center;
-  color: #fff;
   background: hsla(var(--primary), 0.1);
   border: 1px solid hsla(var(--primary), 0.2);
   color: hsl(var(--primary));
@@ -214,7 +213,7 @@ a, a:hover {
 @media screen and (min-width: 768px){
   .profile-card-social__item:hover {
     transform: scale(1.2);
-    background: hsla(var(--primary), 1);
+    background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
   }
 }
