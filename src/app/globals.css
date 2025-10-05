@@ -161,7 +161,7 @@
 .wrapper {
   background-image: none; /* Remove previous gradient */
 }
-a-hole {
+.hole {
   position: fixed;
   top: 0;
   left: 0;
@@ -173,7 +173,7 @@ a-hole {
   z-index: -1; /* Put it behind content */
 }
 
-a-hole::before {
+.hole::before {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -186,7 +186,7 @@ a-hole::before {
   content: "";
 }
 
-a-hole::after {
+.hole::after {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -213,7 +213,7 @@ a-hole::after {
   }
 }
 
-a-hole .aura {
+.hole .aura {
   position: absolute;
   top: -71.5%;
   left: 50%;
@@ -239,7 +239,7 @@ a-hole .aura {
   animation: aura-glow 5s infinite linear;
 }
 
-a-hole .overlay {
+.hole .overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -256,7 +256,7 @@ a-hole .overlay {
   opacity: 0.5;
 }
 
-a-hole canvas {
+.hole canvas {
   display: block;
   width: 100%;
   height: 100%;

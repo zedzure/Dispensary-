@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -185,11 +184,11 @@ export default function ProfilePage() {
   return (
     <>
     <div className="flex flex-col min-h-screen">
-      <a-hole>
+      <div className="hole">
         <div className="aura"></div>
         <div className="overlay"></div>
         <canvas id="canvas"></canvas>
-      </a-hole>
+      </div>
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
         <div className="w-full max-w-md">
