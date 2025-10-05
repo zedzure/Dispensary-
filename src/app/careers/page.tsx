@@ -4,9 +4,8 @@
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { BottomNavBar } from "@/components/bottom-nav-bar";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Briefcase } from "lucide-react";
 
 const jobOpenings = [
     { title: "Lead Budtender", location: "Denver, CO", type: "Full-time" },
@@ -30,12 +29,12 @@ export default function CareersPage() {
             <div className="space-y-4 max-w-2xl mx-auto text-left">
                 {jobOpenings.map((job, index) => (
                     <Card key={index}>
-                        <CardHeader className="flex flex-row justify-between items-start">
-                           <div>
+                        <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                           <div className="mb-4 sm:mb-0">
                             <CardTitle>{job.title}</CardTitle>
                             <CardDescription>{job.location} &middot; {job.type}</CardDescription>
                            </div>
-                             <Button variant="outline">Apply Now</Button>
+                             <Button variant="outline" className="w-full sm:w-auto">Apply Now</Button>
                         </CardHeader>
                     </Card>
                 ))}

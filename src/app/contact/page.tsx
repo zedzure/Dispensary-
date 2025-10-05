@@ -16,11 +16,11 @@ export default function ContactPage() {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
         <Card className="w-full max-w-lg shadow-lg">
-            <CardHeader className="text-center">
-                <CardTitle className="text-2xl font-cursive text-primary">Get in Touch</CardTitle>
+            <CardHeader className="text-center px-4 sm:px-6">
+                <CardTitle className="text-2xl sm:text-3xl font-cursive text-primary">Get in Touch</CardTitle>
                 <CardDescription>Have a question or feedback? Fill out the form below to contact us.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 px-4 sm:px-6 pb-6">
                 <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
                     <Input id="name" placeholder="Your Name" />
