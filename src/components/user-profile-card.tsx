@@ -69,19 +69,19 @@ export function UserProfileCard({ profile }: UserProfileCardProps) {
 
                     <div className="profile-card-inf">
                         <div className="profile-card-inf__item">
-                            <div className="profile-card-inf__title">{profile.followersCount || 0}</div>
+                            <div className="profile-card-inf__title text-primary">{profile.followersCount || 0}</div>
                             <div className="profile-card-inf__txt">Followers</div>
                         </div>
                         <div className="profile-card-inf__item">
-                            <div className="profile-card-inf__title">{profile.followingCount || 0}</div>
+                            <div className="profile-card-inf__title text-primary">{profile.followingCount || 0}</div>
                             <div className="profile-card-inf__txt">Following</div>
                         </div>
                          <div className="profile-card-inf__item">
-                            <div className="profile-card-inf__title">{profile.reviewsToday || 0}</div>
+                            <div className="profile-card-inf__title text-primary">{profile.reviewsToday || 0}</div>
                             <div className="profile-card-inf__txt">Reviews</div>
                         </div>
                          <div className="profile-card-inf__item">
-                            <div className="profile-card-inf__title">{profile.receiptsThisWeek || 0}</div>
+                            <div className="profile-card-inf__title text-primary">{profile.receiptsThisWeek || 0}</div>
                             <div className="profile-card-inf__txt">Receipts</div>
                         </div>
                     </div>
