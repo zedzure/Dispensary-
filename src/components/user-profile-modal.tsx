@@ -7,6 +7,7 @@ import type { ChatUser } from "@/types/pos";
 import { useEffect, useState } from "react";
 import { mockCustomers } from "@/lib/mockCustomers";
 import type { UserProfile } from "@/types/pos";
+import type { ActiveSheet } from "@/app/profile/page";
 
 interface UserProfileModalProps {
   user: ChatUser | null;
@@ -36,7 +37,17 @@ export function UserProfileModal({ user, isOpen, onClose }: UserProfileModalProp
         setProfile(fallbackProfile);
       }
     }
-  }, [user, isOpen, onClose]);
+  }, [user, isOpen]);
+
+  const handleSetActiveSheet = (sheet: ActiveSheet) => {
+    // This modal is read-only, so we don't need to do anything here.
+    // This function is required by UserProfileCard's props.
+  };
+
+  const handleProfileUpdate = (updatedProfile: Partial<UserProfile>) => {
+    // This modal is read-only, so we don't need to do anything here.
+    // This function is required by UserProfileCard's props.
+  };
 
   if (!profile || !isOpen) {
     return null;
@@ -45,7 +56,11 @@ export function UserProfileModal({ user, isOpen, onClose }: UserProfileModalProp
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="p-0 bg-transparent border-0 shadow-none w-full max-w-lg">
-        <UserProfileCard profile={profile} />
+        <UserProfileCard
+          profile={profile}
+          setActiveSheet={handleSetActiveSheet}
+          onUpdate={handleProfileUpdate}
+        />
       </DialogContent>
     </Dialog>
   );
