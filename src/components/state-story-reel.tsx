@@ -34,7 +34,7 @@ export function StateStoryReel() {
                             >
                                <div className={cn(
                                     "relative w-[98px] h-[98px] transition-all duration-300 rounded-full",
-                                    "backdrop-blur-2xl bg-gradient-to-br from-white/30 to-white/10 border border-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.15),inset_0_0_10px_rgba(255,255,255,0.4)]"
+                                    "backdrop-blur-2xl bg-white/20 border border-white/30 shadow-[0_12px_40px_0_rgba(31,38,135,0.2),inset_0_2px_12px_rgba(255,255,255,0.6)]"
                                 )}>
                                     <div className="absolute inset-0 rounded-full p-1 flex items-center justify-center">
                                         <Leaf className="h-12 w-12 text-primary" />
