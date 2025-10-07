@@ -35,6 +35,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "firebase": "^10.14.1",
+    "framer-motion": "^11.3.19",
     "genkit": "^1.1.1",
     "lodash": "^4.17.21",
     "lucide-react": "^0.407.0",
