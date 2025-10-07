@@ -258,10 +258,18 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
   }
   
   const ActionButton = ({ sheetName, icon: Icon, label }: { sheetName: SheetName, icon: React.ElementType, label: string }) => (
-    <button onClick={() => handleSetSheet(sheetName)} className="flex flex-col items-center gap-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">
-      <Icon className="h-6 w-6"/>
-      <span className="text-xs text-muted-foreground">{label}</span>
-    </button>
+    <div className="flex flex-col items-center">
+      <button 
+        onClick={() => handleSetSheet(sheetName)} 
+        className={cn(
+            "flex flex-col items-center justify-center h-16 w-16 rounded-full text-center group focus:outline-none",
+            "backdrop-blur-2xl bg-white/10 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.1),inset_0_4px_14px_rgba(255,255,255,0.8)]"
+        )}
+      >
+        <Icon className="w-6 h-6 text-blue-600 group-hover:text-blue-500 dark:group-hover:text-blue-400" />
+      </button>
+      <span className="text-xs text-muted-foreground mt-2">{label}</span>
+    </div>
   );
 
   if (!dispensary) {
@@ -410,3 +418,5 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
     </>
   );
 }
+
+    
