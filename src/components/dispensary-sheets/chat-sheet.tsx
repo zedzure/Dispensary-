@@ -114,56 +114,64 @@ const parseMessage = (text: string) => {
 };
 
 function MessageItem({ msg, onLike, onReply, onAvatarClick }: { msg: ChatMessage; onLike: () => void; onReply: () => void; onAvatarClick: (user: ChatUser) => void; }) {
+    const { user: currentUser } = useUser();
+    const isCurrentUser = msg.user.id === currentUser?.uid;
+
   return (
-    <div className="flex items-start gap-3">
-      <button onClick={() => onAvatarClick(msg.user)} className="relative">
-        <Avatar className="h-10 w-10 border">
-          <AvatarImage src={msg.user.avatar} />
-          <AvatarFallback>{msg.user.name.charAt(0)}</AvatarFallback>
-        </Avatar>
-        {msg.user.isOnline && (
-          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
-        )}
-      </button>
-      <div className="flex-1">
-        <div className="flex items-baseline gap-2">
-          <p className="font-semibold text-sm">{msg.user.name}</p>
-          <p className="text-xs text-muted-foreground">{formatTimestamp(msg.timestamp)}</p>
+    <div className="w-full">
+        <div className={cn(
+            "p-3 rounded-2xl",
+            "backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.1),inset_0_4px_14px_rgba(255,255,255,0.8)]"
+        )}>
+            <div className="flex items-start gap-3">
+                 <button onClick={() => onAvatarClick(msg.user)} className="relative">
+                    <Avatar className="h-10 w-10 border">
+                        <AvatarImage src={msg.user.avatar} />
+                        <AvatarFallback>{msg.user.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    {msg.user.isOnline && <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />}
+                </button>
+                <div className="flex-1">
+                    <div className="flex items-baseline gap-2">
+                        <p className="font-semibold text-sm">{msg.user.name}</p>
+                        <p className="text-xs text-muted-foreground">{formatTimestamp(msg.timestamp)}</p>
+                    </div>
+
+                    {msg.replyingTo && (
+                        <div className="text-xs text-muted-foreground pl-2 border-l-2 border-border ml-1 mt-1 mb-1">
+                            Replying to <strong className="text-primary/90">@{msg.replyingTo.user}</strong>: {msg.replyingTo.text.substring(0, 50)}...
+                        </div>
+                    )}
+                    
+                    <p className="text-sm text-foreground/90">{parseMessage(msg.text)}</p>
+                </div>
+            </div>
+
+            {msg.image && (
+                <div className="relative w-full max-w-xs h-48 mt-2 rounded-lg overflow-hidden border ml-13">
+                    <Image src={msg.image} alt="Chat image" fill className="object-cover" />
+                </div>
+            )}
+
+            <div className="flex items-center gap-4 mt-2 text-muted-foreground text-xs ml-13">
+                <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1" onClick={onLike} aria-label="Like message">
+                    <Heart className={cn("h-4 w-4", msg.isLiked && "fill-red-500 text-red-500")} /> {msg.likes}
+                </Button>
+                <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1" onClick={onReply} aria-label="Reply to message">
+                    <MessageSquareReply className="h-4 w-4" /> Reply
+                </Button>
+                <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1">
+                    <UserPlus className="h-4 w-4" /> Follow
+                </Button>
+            </div>
         </div>
-
-        {msg.replyingTo && (
-          <div className="text-xs text-muted-foreground pl-2 border-l-2 border-border ml-1 mt-1 mb-1">
-            Replying to <strong className="text-primary/90">@{msg.replyingTo.user}</strong>: {msg.replyingTo.text.substring(0, 50)}...
-          </div>
-        )}
-
-        <p className="text-sm text-foreground/90">{parseMessage(msg.text)}</p>
-
-        {msg.image && (
-          <div className="relative w-full max-w-xs h-48 mt-2 rounded-lg overflow-hidden border">
-            <Image src={msg.image} alt="Chat image" fill className="object-cover" />
-          </div>
-        )}
-
-        <div className="flex items-center gap-4 mt-2 text-muted-foreground text-xs">
-          <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1" onClick={onLike} aria-label="Like message">
-            <Heart className={cn("h-4 w-4", msg.isLiked && "fill-red-500 text-red-500")} /> {msg.likes}
-          </Button>
-          <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1" onClick={onReply} aria-label="Reply to message">
-            <MessageSquareReply className="h-4 w-4" /> Reply
-          </Button>
-          <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1">
-            <UserPlus className="h-4 w-4" /> Follow
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }
 
 function MessageList({ messages, hasMore, loadMore, onLike, onReply, onAvatarClick }: { messages: ChatMessage[]; hasMore: boolean; loadMore: () => void; onLike: (id: string) => void; onReply: (msg: ChatMessage) => void; onAvatarClick: (user: ChatUser) => void; }) {
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-4 space-y-4">
       {hasMore && (
         <div className="text-center">
           <Button variant="outline" size="sm" onClick={loadMore}>Load More</Button>

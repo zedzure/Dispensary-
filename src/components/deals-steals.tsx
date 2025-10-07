@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import type { Product } from '@/types/product';
 import { realImageUrls } from '@/lib/products';
+import { cn } from '@/lib/utils';
 
 const newItems = [
   { name: 'Blue Dream', hint: 'sativa cannabis', tag: 'New', image: realImageUrls[0] },
@@ -52,17 +53,20 @@ export function NewItemsSection({ onProductClick }: NewItemsSectionProps) {
         <div className="flex items-start space-x-4 pb-4 pl-4 pr-4 md:pl-6 md:pr-6">
             {newItems.map((deal, index) => (
               <button key={index} onClick={() => handleClick(deal)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
-                <div className="relative w-[98px] h-[98px] transition-all duration-300">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-500"></div>
-                  <div className="absolute inset-0.5 bg-card rounded-full"></div>
-                  <div className="absolute inset-1 rounded-full overflow-hidden">
-                    <Image
-                      src={deal.image}
-                      data-ai-hint={deal.hint}
-                      alt={deal.name}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                    />
+                 <div className={cn(
+                    "relative w-[98px] h-[98px] transition-all duration-300 rounded-full",
+                    "backdrop-blur-2xl bg-white/10 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.1),inset_0_4px_14px_rgba(255,255,255,0.8)]"
+                  )}>
+                  <div className="absolute inset-0.5 bg-card rounded-full p-0.5">
+                     <div className="absolute inset-0 rounded-full overflow-hidden">
+                      <Image
+                        src={deal.image}
+                        data-ai-hint={deal.hint}
+                        alt={deal.name}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </div>
                   </div>
                 </div>
                 {deal.tag && (
