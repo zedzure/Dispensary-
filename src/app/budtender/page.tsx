@@ -174,7 +174,7 @@ export default function BudtenderPOSPage() {
             <Header />
             <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="md:col-span-2 bg-background rounded-lg shadow-md flex flex-col">
+                    <div className="md:col-span-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col">
                         <div className="p-4 border-b">
                              <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -191,7 +191,7 @@ export default function BudtenderPOSPage() {
                                 {filteredProducts.map(product => (
                                     <Card 
                                         key={product.id} 
-                                        className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden group"
+                                        className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden group bg-card/60 backdrop-blur-sm"
                                         onClick={() => addToCart(product)}
                                     >
                                         <div className="relative aspect-square">
@@ -207,7 +207,7 @@ export default function BudtenderPOSPage() {
                         </ScrollArea>
                     </div>
 
-                    <div className="bg-background rounded-lg shadow-md flex flex-col">
+                    <div className="bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col">
                         <div className="p-4 border-b">
                             {activeCustomer ? (
                                 <div className="flex items-center gap-3">

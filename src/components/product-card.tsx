@@ -15,7 +15,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onProductClick, className }: ProductCardProps) {
   return (
-    <Card className={cn("h-full flex flex-col overflow-hidden group bg-white border-border/60 shadow-lg", className)}>
+    <Card className={cn("h-full flex flex-col overflow-hidden group bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg", className)}>
       <CardHeader className="p-0">
         <button onClick={() => onProductClick(product)} className="w-full aspect-square md:aspect-square relative">
             <Image

@@ -28,7 +28,7 @@ export default function CareersPage() {
             
             <div className="space-y-4 max-w-2xl mx-auto text-left">
                 {jobOpenings.map((job, index) => (
-                    <Card key={index}>
+                    <Card key={index} className="bg-card/60 backdrop-blur-sm">
                         <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                            <div className="mb-4 sm:mb-0">
                             <CardTitle>{job.title}</CardTitle>
