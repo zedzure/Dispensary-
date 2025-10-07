@@ -24,18 +24,19 @@ export function BottomNavBar() {
 
   return (
     <nav className="fixed bottom-0 left-0 z-50 w-full border-t border-white/30 bg-white/20 backdrop-blur-xl shadow-lg md:hidden">
-      <div className="grid h-16 grid-cols-5 max-w-lg mx-auto">
+      <div className="grid h-24 grid-cols-5 max-w-lg mx-auto items-center">
         {allNavItems.map((item) => (
-          <Link
-            key={item.label}
-            href={item.href}
-            className="inline-flex flex-col items-center justify-center px-1 text-center text-primary hover:text-primary/80 group"
-          >
-            <item.icon className="w-5 h-5 mb-1" />
-            <span className="text-xs">
-              {item.label}
-            </span>
-          </Link>
+          <div key={item.label} className="flex flex-col items-center justify-center">
+            <Link
+              href={item.href}
+              className="relative w-16 h-16 flex flex-col items-center justify-center rounded-full backdrop-blur-2xl bg-white/20 border border-white/30 text-primary shadow-[0_8px_32px_0_rgba(31,38,135,0.2),inset_0_2px_12px_rgba(255,255,255,0.6)]"
+            >
+              <item.icon className="w-6 h-6" />
+            </Link>
+             <span className="text-xs mt-1 text-foreground">
+                {item.label}
+              </span>
+          </div>
         ))}
       </div>
     </nav>
