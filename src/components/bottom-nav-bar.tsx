@@ -4,6 +4,8 @@
 import Link from 'next/link';
 import { Home, User, ClipboardList, Info, Zap, Store } from 'lucide-react';
 import { useUser } from '@/firebase';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 export function BottomNavBar() {
   const { user } = useUser();
@@ -25,17 +27,33 @@ export function BottomNavBar() {
   return (
     <nav className="fixed bottom-0 left-0 z-50 w-full h-24 bg-background/80 backdrop-blur-xl md:hidden border-t">
       <div className="grid h-full grid-cols-5 max-w-lg mx-auto">
-        {allNavItems.map((item) => (
-          <Link
-              key={item.label}
-              href={item.href}
-              className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+        {allNavItems.map((item, i) => (
+          <div key={item.label} className="flex items-center justify-center">
+            <motion.div
+              animate={{
+                  y: [0, -5, 0],
+                  scale: [1, 1.02, 1],
+              }}
+              transition={{
+                  duration: 4 + i * 0.3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+              }}
             >
-              <item.icon className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" />
-              <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">
-                {item.label}
-              </span>
-          </Link>
+              <Link
+                href={item.href}
+                className={cn(
+                  "flex flex-col items-center justify-center h-16 w-16 rounded-full text-center group focus:outline-none",
+                  "backdrop-blur-2xl bg-white/20 border border-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.2),inset_0_2px_12px_rgba(255,255,255,0.6)]"
+                )}
+              >
+                <item.icon className="w-6 h-6 text-primary group-hover:text-blue-600 dark:group-hover:text-blue-500" />
+                <span className="text-xs text-muted-foreground group-hover:text-blue-600 dark:group-hover:text-blue-500 sr-only">
+                  {item.label}
+                </span>
+              </Link>
+            </motion.div>
+          </div>
         ))}
       </div>
     </nav>
