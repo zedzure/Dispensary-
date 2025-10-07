@@ -42,7 +42,7 @@ export function NewItemsSection({ onProductClick }: NewItemsSectionProps) {
   };
 
   return (
-    <section id="new" className="py-8 md:py-12 bg-white">
+    <section id="new" className="py-8 md:py-12 bg-transparent">
       <div className="container mx-auto px-4 md:px-6">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12 text-primary">
           What's New

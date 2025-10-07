@@ -55,6 +55,7 @@ export function PublicMenu({ locationId, locationName }: PublicMenuProps) {
                     key={product.id}
                     product={product}
                     onProductClick={handleProductClick}
+                    className="bg-card/60 backdrop-blur-sm"
                   />
                 ))}
               </div>

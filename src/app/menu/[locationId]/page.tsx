@@ -15,7 +15,7 @@ function MenuPageContent() {
   const locationName = locationId ? locationId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : 'Our';
 
   return (
-    <div className="flex flex-col min-h-screen bg-white text-foreground overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-transparent text-foreground overflow-hidden">
       <Header />
       <main className="flex-grow">
         <PublicMenu locationId={locationId} locationName={locationName} />
@@ -36,7 +36,7 @@ export default function MenuPage() {
 
 function MenuPageSkeleton() {
     return (
-        <div className="flex flex-col min-h-screen bg-white">
+        <div className="flex flex-col min-h-screen bg-transparent">
             <Header />
             <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
                 <Skeleton className="h-10 w-1/3 mx-auto mb-12" />

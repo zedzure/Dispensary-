@@ -331,10 +331,10 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent 
         side="left" 
-        className="w-full md:max-w-md p-0 flex flex-col h-full"
+        className="w-full md:max-w-md p-0 flex flex-col h-full bg-transparent backdrop-blur-xl border-border/20"
         style={{ height: vh > 0 ? `${vh}px` : '100dvh' }}
        >
-        <SheetHeader className="p-4 border-b flex flex-row items-center gap-4 flex-shrink-0">
+        <SheetHeader className="p-4 border-b border-border/20 flex flex-row items-center gap-4 flex-shrink-0">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
           <div>
             <SheetTitle>Live Group Chat</SheetTitle>
@@ -348,7 +348,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     
         {isTyping && <p className="text-xs text-muted-foreground px-4 py-1 italic flex-shrink-0">A user is typing...</p>}
 
-        <div className="p-2 border-t bg-background flex-shrink-0">
+        <div className="p-2 border-t border-border/20 bg-transparent flex-shrink-0">
         {user ? (
             <div className="chat-input-container">
             <Avatar className="chat-input-avatar">
@@ -357,7 +357,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
             </Avatar>
             <div className="chat-input-main">
                 {replyingTo && (
-                <div className="text-xs p-2 bg-muted rounded-md flex justify-between items-center">
+                <div className="text-xs p-2 bg-muted/50 rounded-md flex justify-between items-center">
                     <p className="text-muted-foreground truncate">
                     Replying to <strong className="text-primary/90">@{replyingTo.user.name}</strong>
                     </p>
@@ -369,7 +369,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                 <Textarea 
                     ref={textAreaRef}
                     placeholder="Type your message..." 
-                    className="chat-input-textarea"
+                    className="chat-input-textarea bg-muted/30"
                     value={newMessage}
                     maxLength={MAX_MESSAGE_LENGTH}
                     onChange={(e) => { setNewMessage(e.target.value); setIsTyping(true); }}

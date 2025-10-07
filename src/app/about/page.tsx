@@ -38,7 +38,7 @@ const features = [
 export default function AboutPage() {
   return (
     <>
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen bg-transparent">
         <Header />
         <main className="flex-grow container mx-auto px-4 py-8">
           <div className="text-center mb-12">
@@ -50,7 +50,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature) => (
-                <Card key={feature.title} className="shadow-md hover:shadow-lg transition-shadow">
+                <Card key={feature.title} className="shadow-md hover:shadow-lg transition-shadow bg-card/60 backdrop-blur-sm">
                     <CardHeader className="flex flex-row items-start gap-4 p-4">
                         <feature.icon className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
                         <div>
