@@ -44,7 +44,7 @@ export function BottomNavBar() {
                 href={item.href}
                 className={cn(
                   "flex flex-col items-center justify-center h-16 w-16 rounded-full text-center group focus:outline-none",
-                  "backdrop-blur-2xl bg-white/20 border border-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.2),inset_0_2px_12px_rgba(255,255,255,0.6)]"
+                  "backdrop-blur-2xl bg-white/10 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.1),inset_0_4px_14px_rgba(255,255,255,0.8)]"
                 )}
               >
                 <item.icon className="w-6 h-6 text-blue-600 group-hover:text-blue-500 dark:group-hover:text-blue-400" />
