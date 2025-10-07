@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -28,7 +29,7 @@ export function DispensaryMapSheet({ isOpen, onOpenChange, dispensary }: Dispens
   
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <SheetContent side="left" className="w-full md:max-w-md p-0">
+      <SheetContent side="left" className="w-full md:max-w-md p-0 bg-transparent backdrop-blur-xl border-border/20">
         <SheetHeader className="p-4 border-b flex flex-row items-center gap-4">
           <Button variant="ghost" size="icon" onClick={handleClose}>
             <ArrowLeft />

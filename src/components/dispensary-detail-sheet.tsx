@@ -271,7 +271,7 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
   return (
     <>
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent className="p-0 w-full md:max-w-md flex flex-col">
+      <SheetContent className="p-0 w-full md:max-w-md flex flex-col bg-transparent backdrop-blur-xl border-border/20">
         <ScrollArea className="flex-1" ref={scrollAreaRef}>
           <SheetHeader className="p-0 relative h-48">
             <Image
@@ -376,7 +376,7 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
 
           </div>
         </ScrollArea>
-        <SheetFooter className="p-4 border-t bg-background grid grid-cols-2 gap-3">
+        <SheetFooter className="p-4 border-t bg-transparent grid grid-cols-2 gap-3">
           <Button size="lg" className="w-full" variant="outline" onClick={handleLeaveReviewClick}>
              <MessageSquare className="mr-2 h-4 w-4" />
             Leave Review
