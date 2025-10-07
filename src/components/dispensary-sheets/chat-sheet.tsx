@@ -39,6 +39,7 @@ import { useUser } from "@/firebase";
 import { cn } from "@/lib/utils";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { UserProfileModal } from "../user-profile-modal";
+import { useViewportHeight } from "@/hooks/use-viewport-height";
 
 const MAX_MESSAGE_LENGTH = 280;
 const MESSAGES_PER_PAGE = 25;
@@ -192,7 +193,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   const [selectedProfile, setSelectedProfile] = useState<ChatUser | null>(null);
   const [isProfileModalOpen, setProfileModalOpen] = useState(false);
   const [autoScroll, setAutoScroll] = useState(true);
-  const [vh, setVh] = useState(0);
+  const vh = useViewportHeight();
 
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -210,27 +211,6 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     params.delete("sheet");
     router.push(pathname + "?" + params.toString());
   };
-  
-  useEffect(() => {
-    const setViewportHeight = () => {
-      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-      setVh(window.innerHeight);
-    };
-
-    setViewportHeight();
-    window.addEventListener('resize', setViewportHeight);
-
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', setViewportHeight);
-    }
-    
-    return () => {
-        window.removeEventListener('resize', setViewportHeight);
-        if (window.visualViewport) {
-            window.visualViewport.removeEventListener('resize', setViewportHeight);
-        }
-    };
-  }, []);
   
   // Scroll lock effect
   useEffect(() => {
@@ -331,8 +311,8 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent 
         side="left" 
-        className="w-full md:max-w-md p-0 flex flex-col h-full bg-transparent backdrop-blur-xl border-border/20"
-        style={{ height: vh > 0 ? `${vh}px` : '100dvh' }}
+        className="w-full md:max-w-md p-0 flex flex-col bg-transparent backdrop-blur-xl border-border/20"
+        style={{ height: vh ? `${vh}px` : '100dvh' }}
        >
         <SheetHeader className="p-4 border-b border-border/20 flex flex-row items-center gap-4 flex-shrink-0">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
@@ -342,7 +322,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
           </div>
         </SheetHeader>
         
-        <ScrollArea className="flex-1 min-h-0" onScroll={handleScroll}>
+        <ScrollArea className="flex-1 min-h-0" onScroll={handleScroll} ref={scrollViewportRef}>
             <MessageList messages={messages} hasMore={hasMore} loadMore={loadMoreMessages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} />
         </ScrollArea>
     

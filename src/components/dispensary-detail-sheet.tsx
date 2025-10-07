@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useViewportHeight } from '@/hooks/use-viewport-height';
 
 
 import { DispensaryPromotionsSheet } from './dispensary-sheets/promotions-sheet';
@@ -175,6 +176,7 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
   const { toast } = useToast();
+  const vh = useViewportHeight();
   
   const [reviews, setReviews] = useState<Review[]>([]);
 
@@ -271,7 +273,10 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
   return (
     <>
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent className="p-0 w-full md:max-w-md flex flex-col bg-transparent backdrop-blur-xl border-border/20">
+      <SheetContent 
+        className="p-0 w-full md:max-w-md flex flex-col bg-transparent backdrop-blur-xl border-border/20"
+        style={{ height: vh ? `${vh}px` : '100dvh' }}
+        >
         <ScrollArea className="flex-1" ref={scrollAreaRef}>
           <SheetHeader className="p-0 relative h-48">
             <Image
