@@ -119,7 +119,8 @@
   body {
     height: 100%;
     height: -webkit-fill-available;
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background: linear-gradient(120deg, hsl(var(--primary)), hsl(var(--destructive)));
   }
   * {
     @apply border-border;
@@ -161,8 +162,17 @@
 
 /* Background Effect Styles */
 .wrapper {
-  background-image: none; /* Remove previous gradient */
+  background: linear-gradient(270deg, hsl(var(--primary)), hsl(var(--destructive)), #a6c0fe, #f68084);
+  background-size: 800% 800%;
+  animation: moveGradient 20s ease infinite;
 }
+
+@keyframes moveGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .hole {
   position: fixed;
   top: 0;

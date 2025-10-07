@@ -50,10 +50,15 @@ a, a:hover {
   width: 100%;
   min-height: 460px;
   margin: auto;
-  background: hsla(var(--card), 0.5);
-  backdrop-filter: blur(10px);
-  border: 1px solid hsla(var(--border), 0.2);
-  box-shadow: 0px 8px 30px 0px hsla(var(--primary), 0.1);
+  
+  /* --- LIQUID GLASS EFFECT --- */
+  background: hsla(var(--card) / 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid hsla(var(--card-foreground) / 0.18);
+  box-shadow: 0 8px 32px 0 hsla(var(--primary) / 0.15);
+  /* --- END LIQUID GLASS EFFECT --- */
+
   border-radius: 20px;
   max-width: 700px;
   position: relative;
@@ -73,7 +78,7 @@ a, a:hover {
   overflow: hidden;
   position: relative;
   z-index: 4;
-  box-shadow: 0px 5px 50px 0px hsla(var(--primary), 0.7), 0px 0px 0px 7px hsla(var(--primary), 0.2);
+  box-shadow: 0px 5px 50px 0px hsla(var(--primary), 0.7), 0px 0px 0px 7px hsla(var(--card) / 0.5);
 }
 
 @media screen and (max-width: 576px) {
@@ -160,7 +165,7 @@ a, a:hover {
 .profile-card-inf__txt {
   font-weight: 500;
   margin-top: 7px;
-  color: white;
+  color: hsl(var(--foreground));
 }
 
 .profile-card-social {
@@ -181,7 +186,7 @@ a, a:hover {
   justify-content: center;
   color: white;
   background: hsl(var(--destructive));
-  border: 4px solid hsl(var(--destructive));
+  border: 4px solid red;
   box-shadow: 0 0 20px 5px hsla(var(--destructive), 0.4);
   position: relative;
   font-size: 21px;
