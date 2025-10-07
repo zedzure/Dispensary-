@@ -10,7 +10,7 @@ export function StateStoryReel() {
     if (states.length === 0) return null;
 
     return (
-        <section className="py-8 md:py-12 bg-background space-y-4">
+        <section className="py-8 md:py-12 space-y-4">
            <div className="overflow-x-auto no-scrollbar">
                 <ul className="flex items-start gap-4 px-4 md:px-6 pb-4">
                     {states.map((state) => (
