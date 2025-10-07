@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -30,16 +31,16 @@ export function StateSearch() {
     <div className="max-w-xl mx-auto">
       <form onSubmit={handleSearch} className="flex w-full items-center space-x-2">
         <div className="relative flex-grow">
-            <Store className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Store className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/80" />
             <Input
               type="text"
               placeholder="Enter a state to find dispensaries..."
-              className="pl-10 h-12 text-lg"
+              className="pl-10 h-12 text-lg bg-white/20 backdrop-blur-xl border-white/30 text-foreground placeholder:text-foreground/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.2),inset_0_2px_12px_rgba(255,255,255,0.5)]"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
         </div>
-        <Button type="submit" size="lg">
+        <Button type="submit" size="lg" className="h-12 text-lg bg-white/20 backdrop-blur-xl border-white/30 text-foreground hover:bg-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.2),inset_0_2px_12px_rgba(255,255,255,0.5)]">
             <Search className="mr-2 h-5 w-5" />
             Search
         </Button>
