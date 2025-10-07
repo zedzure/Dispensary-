@@ -57,7 +57,7 @@ export default function StatePage() {
     setSelectedProduct(null);
   }
 
-  const dispensaryRows = stateDispensaries ? chunk(stateDispensaries.dispensaries, 10).slice(0, 5) : [];
+  const dispensaryRows = stateDispensaries ? chunk(stateDispensaries.dispensaries, 10) : [];
 
   return (
     <div className="flex flex-col min-h-screen">
