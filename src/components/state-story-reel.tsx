@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -12,7 +13,7 @@ export function StateStoryReel() {
     return (
         <section className="py-8 md:py-12 space-y-4 bg-transparent">
            <div className="overflow-x-auto no-scrollbar">
-                <ul className="flex items-start gap-4 px-4 md:px-6 pb-4">
+                <ul className="flex items-start gap-4 px-4 md:px-6 pb-4 pt-2">
                     {states.map((state, i) => (
                         <motion.li 
                             key={state.abbreviation} 
@@ -33,7 +34,7 @@ export function StateStoryReel() {
                             >
                                <div className={cn(
                                     "relative w-[98px] h-[98px] transition-all duration-300 rounded-full",
-                                    "backdrop-blur-2xl bg-white/20 border border-white/30 shadow-[0_4px_20px_rgba(255,255,255,0.1)]"
+                                    "backdrop-blur-2xl bg-gradient-to-br from-white/30 to-white/10 border border-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.15),inset_0_0_10px_rgba(255,255,255,0.4)]"
                                 )}>
                                     <div className="absolute inset-0 rounded-full p-1 flex items-center justify-center">
                                         <Leaf className="h-12 w-12 text-primary" />
