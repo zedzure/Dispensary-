@@ -23,7 +23,7 @@ export function BottomNavBar() {
 
 
   return (
-    <nav className="fixed bottom-0 left-0 z-50 w-full border-t bg-background/95 backdrop-blur-sm md:hidden">
+    <nav className="fixed bottom-0 left-0 z-50 w-full border-t border-white/30 bg-white/20 backdrop-blur-xl shadow-lg md:hidden">
       <div className="grid h-16 grid-cols-5 max-w-lg mx-auto">
         {allNavItems.map((item) => (
           <Link
