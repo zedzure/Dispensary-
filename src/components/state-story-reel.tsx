@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -33,10 +32,10 @@ export function StateStoryReel() {
                                 className="flex flex-col items-center space-y-2 w-28 group text-center focus:outline-none"
                             >
                                <div className={cn(
-                                    "relative w-[98px] h-[98px] transition-all duration-300 rounded-full p-1",
-                                    "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500"
+                                    "relative w-[98px] h-[98px] transition-all duration-300 rounded-full",
+                                    "backdrop-blur-2xl bg-white/20 border border-white/30 shadow-[0_4px_20px_rgba(255,255,255,0.1)]"
                                 )}>
-                                    <div className="absolute inset-0.5 bg-card rounded-full p-1 flex items-center justify-center">
+                                    <div className="absolute inset-0 rounded-full p-1 flex items-center justify-center">
                                         <Leaf className="h-12 w-12 text-primary" />
                                     </div>
                                 </div>
