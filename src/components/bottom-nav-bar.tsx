@@ -23,13 +23,13 @@ export function BottomNavBar() {
 
 
   return (
-    <nav className="fixed bottom-0 left-0 z-50 w-full border-t border-white/30 bg-white/20 backdrop-blur-xl shadow-lg md:hidden">
+    <nav className="fixed bottom-0 left-0 z-50 w-full backdrop-blur-xl md:hidden">
       <div className="grid h-24 grid-cols-5 max-w-lg mx-auto items-center">
         {allNavItems.map((item) => (
           <div key={item.label} className="flex flex-col items-center justify-center">
             <Link
               href={item.href}
-              className="relative w-16 h-16 flex flex-col items-center justify-center rounded-full backdrop-blur-2xl bg-white/20 border border-white/30 text-primary shadow-[0_8px_32px_0_rgba(31,38,135,0.2),inset_0_2px_12px_rgba(255,255,255,0.6)]"
+              className="relative w-16 h-16 flex flex-col items-center justify-center rounded-full backdrop-blur-2xl bg-white/30 border border-white/40 text-primary shadow-[0_8px_32px_0_rgba(31,38,135,0.2),inset_0_4px_14px_rgba(255,255,255,0.8)]"
             >
               <item.icon className="w-6 h-6" />
             </Link>
