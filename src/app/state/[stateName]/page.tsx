@@ -74,25 +74,22 @@ export default function StatePage() {
         </section>
 
         <section className="container mx-auto px-4 md:px-6 py-8">
-            <div className="overflow-x-auto no-scrollbar">
-              <div className="flex gap-4 pb-4">
-                {stateDispensaries && stateDispensaries.dispensaries.length > 0 ? (
-                  stateDispensaries.dispensaries.map((dispensary) => (
-                    <div key={dispensary.id} className="w-40 flex-shrink-0">
-                      <DispensaryCard
-                        dispensary={dispensary}
-                        onDispensaryClick={handleDispensaryClick}
-                        className="h-full"
-                      />
-                    </div>
-                  ))
-                ) : (
-                  <p className="col-span-full text-center text-muted-foreground">
-                    No dispensaries listed for this state yet.
-                  </p>
-                )}
-              </div>
-            </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {stateDispensaries && stateDispensaries.dispensaries.length > 0 ? (
+              stateDispensaries.dispensaries.map((dispensary) => (
+                <DispensaryCard
+                  key={dispensary.id}
+                  dispensary={dispensary}
+                  onDispensaryClick={handleDispensaryClick}
+                  className="h-full"
+                />
+              ))
+            ) : (
+              <p className="col-span-full text-center text-muted-foreground">
+                No dispensaries listed for this state yet.
+              </p>
+            )}
+          </div>
         </section>
       </main>
       <Footer />
