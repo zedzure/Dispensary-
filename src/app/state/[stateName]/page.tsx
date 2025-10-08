@@ -74,7 +74,7 @@ export default function StatePage() {
         </section>
 
         <section className="container mx-auto px-4 md:px-6 py-8">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-10 gap-4">
             {stateDispensaries && stateDispensaries.dispensaries.length > 0 ? (
               stateDispensaries.dispensaries.map((dispensary) => (
                 <DispensaryCard
