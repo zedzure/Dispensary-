@@ -6,18 +6,20 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, PlusCircle, Zap } from 'lucide-react';
 import type { Dispensary } from '@/types/pos';
 import { ScrollArea } from '../ui/scroll-area';
-import { Card, CardContent } from '../ui/card';
-import Image from 'next/image';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { ProductBubble } from '../product-bubble';
+
 
 const mockNewProducts = Array.from({ length: 20 }, (_, i) => ({
   id: `new-${i}`,
   name: `New Product ${i + 1}`,
-  brand: i % 2 === 0 ? 'Artisan Farms' : 'CannaCo',
-  strain: i % 3 === 0 ? 'Indica' : i % 3 === 1 ? 'Sativa' : 'Hybrid',
-  thc: (19 + (i * 1.2) % 11).toFixed(1),
-  price: (30 + (i * 2.5) % 20).toFixed(2),
-  image: `https://picsum.photos/id/${200 + i}/200/200`
+  category: i % 2 === 0 ? 'Artisan Farms' : 'CannaCo',
+  type: (['Indica', 'Sativa', 'Hybrid'] as const)[i%3],
+  thc: parseFloat((19 + (i * 1.2) % 11).toFixed(1)),
+  price: parseFloat((30 + (i * 2.5) % 20).toFixed(2)),
+  description: `Brand new product from ${i % 2 === 0 ? 'Artisan Farms' : 'CannaCo'}. Try it today!`,
+  image: `https://picsum.photos/id/${200 + i}/200/200`,
+  hint: "cannabis product",
 }));
 
 
@@ -40,8 +42,8 @@ export function DispensaryDealsSheet({ isOpen, onOpenChange, dispensary }: Dispe
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-blue-900/10 backdrop-blur-xl border-border/20">
-        <SheetHeader className="p-4 border-b flex flex-row items-center gap-4">
+      <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl">
+        <SheetHeader className="p-4 border-b flex flex-row items-center gap-4 bg-transparent">
           <Button variant="ghost" size="icon" onClick={handleClose}>
             <ArrowLeft />
           </Button>
@@ -53,22 +55,7 @@ export function DispensaryDealsSheet({ isOpen, onOpenChange, dispensary }: Dispe
         <ScrollArea className="flex-grow">
           <div className="p-4 space-y-4">
             {mockNewProducts.map((product) => (
-              <Card key={product.id} className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-3 flex items-center gap-4">
-                  <div className="relative h-20 w-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
-                    <Image src={product.image} alt={product.name} fill className="object-cover" data-ai-hint="cannabis flower" />
-                  </div>
-                  <div className="flex-grow space-y-1">
-                    <p className="text-xs text-muted-foreground font-medium">{product.brand}</p>
-                    <h4 className="font-semibold text-sm">{product.name}</h4>
-                    <p className="text-xs text-muted-foreground">{product.strain} | THC: {product.thc}%</p>
-                  </div>
-                  <Button size="icon" variant="outline" className="h-10 w-10">
-                    <PlusCircle className="h-5 w-5" />
-                    <span className="sr-only">Add to cart</span>
-                  </Button>
-                </CardContent>
-              </Card>
+              <ProductBubble key={product.id} product={product} />
             ))}
           </div>
         </ScrollArea>

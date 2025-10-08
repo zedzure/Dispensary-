@@ -3,22 +3,22 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PlusCircle, Ticket } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import type { Dispensary } from '@/types/pos';
 import { ScrollArea } from '../ui/scroll-area';
-import { Card, CardContent } from '../ui/card';
-import Image from 'next/image';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { ProductBubble } from '../product-bubble';
 
 const mockPromoProducts = Array.from({ length: 20 }, (_, i) => ({
   id: `promo-${i}`,
   name: `Promo Product ${i + 1}`,
-  brand: i % 2 === 0 ? 'Daily Deals' : 'CannaSaver',
-  strain: i % 3 === 0 ? 'Indica' : i % 3 === 1 ? 'Sativa' : 'Hybrid',
-  thc: (18 + (i * 1.1) % 10).toFixed(1),
-  price: (25 + (i * 2) % 15).toFixed(2),
-  originalPrice: (35 + (i * 2) % 15).toFixed(2),
-  image: `https://picsum.photos/id/${300 + i}/200/200`
+  category: i % 2 === 0 ? 'Daily Deals' : 'CannaSaver',
+  type: (['Indica', 'Sativa', 'Hybrid'] as const)[i % 3],
+  thc: parseFloat((18 + (i * 1.1) % 10).toFixed(1)),
+  price: parseFloat((25 + (i * 2) % 15).toFixed(2)),
+  description: `A special promotional offer for ${`Promo Product ${i + 1}`}. Limited time only!`,
+  image: `https://picsum.photos/id/${300 + i}/200/200`,
+  hint: "cannabis flower",
 }));
 
 
@@ -41,8 +41,8 @@ export function DispensaryPromotionsSheet({ isOpen, onOpenChange, dispensary }: 
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-blue-900/10 backdrop-blur-xl border-border/20">
-        <SheetHeader className="p-4 border-b flex flex-row items-center gap-4">
+      <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl">
+        <SheetHeader className="p-4 border-b flex flex-row items-center gap-4 bg-transparent">
           <Button variant="ghost" size="icon" onClick={handleClose}>
             <ArrowLeft />
           </Button>
@@ -54,22 +54,7 @@ export function DispensaryPromotionsSheet({ isOpen, onOpenChange, dispensary }: 
         <ScrollArea className="flex-grow">
           <div className="p-4 space-y-4">
             {mockPromoProducts.map((product) => (
-              <Card key={product.id} className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-3 flex items-center gap-4">
-                  <div className="relative h-20 w-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
-                    <Image src={product.image} alt={product.name} fill className="object-cover" data-ai-hint="cannabis flower" />
-                  </div>
-                  <div className="flex-grow space-y-1">
-                    <p className="text-xs text-muted-foreground font-medium">{product.brand}</p>
-                    <h4 className="font-semibold text-sm">{product.name}</h4>
-                    <p className="text-xs text-muted-foreground">{product.strain} | THC: {product.thc}%</p>
-                  </div>
-                  <Button size="icon" variant="outline" className="h-10 w-10">
-                    <PlusCircle className="h-5 w-5" />
-                    <span className="sr-only">Add to cart</span>
-                  </Button>
-                </CardContent>
-              </Card>
+                <ProductBubble key={product.id} product={product} />
             ))}
           </div>
         </ScrollArea>

@@ -307,10 +307,10 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent 
         side="left" 
-        className="w-full md:max-w-md p-0 flex flex-col bg-background"
+        className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl"
         style={{ height: vh ? `${vh}px` : '100dvh' }}
        >
-        <SheetHeader className="p-4 flex-row items-center gap-4 flex-shrink-0">
+        <SheetHeader className="p-4 flex-row items-center gap-4 flex-shrink-0 bg-transparent border-b-0">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
           <div>
             <SheetTitle>Live Group Chat</SheetTitle>
@@ -318,39 +318,39 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
           </div>
         </SheetHeader>
         
-        <ScrollArea className="flex-1 min-h-0 pb-20" onScroll={handleScroll} ref={scrollViewportRef}>
+        <ScrollArea className="flex-1 min-h-0" onScroll={handleScroll} ref={scrollViewportRef}>
             <MessageList messages={messages} hasMore={hasMore} loadMore={loadMoreMessages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} />
         </ScrollArea>
     
-        <div className="chat-input-bar">
+        <div className="relative p-2 pt-0">
              {isTyping && <p className="text-xs text-muted-foreground px-4 py-1 italic flex-shrink-0">A user is typing...</p>}
             {user ? (
-            <div className="chat-input-container">
-                <div className="chat-input-main">
-                    <AnimatePresence>
-                        {isToolsOpen && (
-                            <motion.div 
-                                className="chat-tools-sheet"
-                                initial={{ y: "100%", opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: "100%", opacity: 0 }}
-                                transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                            >
-                                <div className="chat-tools-grid">
-                                    {editingIcons.map(({ icon: Icon, name }) => (
-                                        <div key={name} className="flex flex-col items-center">
-                                            <button className="h-14 w-14 liquid-glass rounded-full flex items-center justify-center">
-                                                <Icon className="h-6 w-6 text-blue-500" />
-                                            </button>
-                                            <span className="text-xs mt-2 text-muted-foreground">{name}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                    {replyingTo && (
-                    <div className="text-xs p-2 bg-muted/50 rounded-md flex justify-between items-center">
+            <div className="relative">
+                <AnimatePresence>
+                    {isToolsOpen && (
+                        <motion.div 
+                            className="absolute bottom-full left-0 right-0 p-4 bg-muted/80 backdrop-blur-sm rounded-t-2xl mb-2"
+                            initial={{ y: "100%", opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: "100%", opacity: 0 }}
+                            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                        >
+                            <div className="grid grid-cols-5 gap-4">
+                                {editingIcons.map(({ icon: Icon, name }) => (
+                                    <div key={name} className="flex flex-col items-center">
+                                        <button className="h-14 w-14 liquid-glass rounded-full flex items-center justify-center">
+                                            <Icon className="h-6 w-6 text-blue-500" />
+                                        </button>
+                                        <span className="text-xs mt-2 text-muted-foreground">{name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                 {replyingTo && (
+                    <div className="text-xs p-2 bg-muted/50 rounded-t-md flex justify-between items-center mx-2">
                         <p className="text-muted-foreground truncate">
                         Replying to <strong className="text-primary/90">@{replyingTo.user.name}</strong>
                         </p>
@@ -358,34 +358,34 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                         <X className="h-3 w-3" />
                         </Button>
                     </div>
-                    )}
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-9 w-9 flex-shrink-0 rounded-full bg-muted/50 hover:bg-muted"
-                            onClick={() => setIsToolsOpen(!isToolsOpen)}
-                        >
-                            <Plus className={cn("h-5 w-5 transition-transform", isToolsOpen && "rotate-45")} />
+                )}
+                
+                <div className="flex items-center gap-2 bg-muted/80 backdrop-blur-sm rounded-full p-1.5 border border-border/20">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 flex-shrink-0 rounded-full bg-background/50 hover:bg-background"
+                        onClick={() => setIsToolsOpen(!isToolsOpen)}
+                    >
+                        <Plus className={cn("h-5 w-5 transition-transform", isToolsOpen && "rotate-45")} />
+                    </Button>
+                    <div 
+                        ref={inputRef}
+                        contentEditable
+                        onInput={(e) => {
+                            const target = e.currentTarget as HTMLDivElement;
+                            setNewMessage(target.innerText);
+                            setIsTyping(true);
+                        }}
+                        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                        className="w-full bg-transparent outline-none text-sm px-2 flex-grow min-h-[2.25rem] flex items-center"
+                        data-placeholder="Type your message..."
+                    />
+                    {newMessage.trim() && (
+                        <Button size="icon" className="h-9 w-9 rounded-full flex-shrink-0" onClick={handleSendMessage} >
+                            <Send className="h-4 w-4" />
                         </Button>
-                        <div 
-                            ref={inputRef}
-                            contentEditable
-                            onInput={(e) => {
-                                const target = e.currentTarget as HTMLDivElement;
-                                setNewMessage(target.innerText);
-                                setIsTyping(true);
-                            }}
-                            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-                            className="chat-input-textarea"
-                            data-placeholder="Type your message..."
-                        />
-                        {newMessage.trim() && (
-                            <Button size="icon" className="h-9 w-9 rounded-full flex-shrink-0" onClick={handleSendMessage} >
-                                <Send className="h-4 w-4" />
-                            </Button>
-                        )}
-                    </div>
+                    )}
                 </div>
             </div>
             ) : (
