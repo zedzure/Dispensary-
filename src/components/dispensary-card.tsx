@@ -16,8 +16,8 @@ interface DispensaryCardProps {
 
 export function DispensaryCard({ dispensary, className, onDispensaryClick }: DispensaryCardProps) {
   return (
-    <div 
-        className={cn("w-full overflow-hidden group transition-shadow text-left h-full cursor-pointer liquid-glass rounded-3xl", className)}
+    <Card 
+        className={cn("w-full overflow-hidden group transition-shadow hover:shadow-md text-left h-full cursor-pointer bg-card/60", className)}
         onClick={() => onDispensaryClick(dispensary)}
     >
       <div className="relative h-24 w-full">
@@ -39,6 +39,6 @@ export function DispensaryCard({ dispensary, className, onDispensaryClick }: Dis
             <span>{dispensary.deliveryTime} min</span>
         </div>
       </CardContent>
-    </div>
+    </Card>
   );
 }
