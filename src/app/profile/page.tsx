@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -15,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { UserProfileSheets } from '@/components/user-profile-sheets';
 import type { UploadItem } from '@/types/pos';
 import { useFileUpload } from '@/hooks/useFileUpload';
+import { BottomNavBar } from '@/components/bottom-nav-bar';
 
 export type ActiveSheet = 'receipts' | 'uploads' | 'notes' | 'search' | null;
 
@@ -191,7 +193,7 @@ export default function ProfilePage() {
       </div>
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
-        <div className="w-full max-w-md">
+        <div className="w-full">
             <UserProfileCard profile={profile} setActiveSheet={setActiveSheet} onUpdate={handleProfileUpdate} />
              <div className="text-center mt-4">
                  <Button onClick={handleLogout} variant="destructive">
@@ -202,6 +204,7 @@ export default function ProfilePage() {
         </div>
       </main>
       <Footer />
+      <BottomNavBar />
     </div>
      <UserProfileSheets 
         user={user}

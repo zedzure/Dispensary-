@@ -31,25 +31,17 @@ a, a:hover {
 
 .wrapper {
   width: 100%;
-  height: auto;
-  min-height: 100vh;
-  padding: 50px 20px;
-  padding-top: 100px;
+  padding: 20px;
+  padding-top: 50px;
   display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-@media screen and (max-width: 768px) {
-  .wrapper {
-    height: auto;
-    min-height: 100vh;
-    padding-top: 100px;
-  }
-}
 
 .profile-card {
   width: 100%;
   min-height: 460px;
-  margin: auto;
   
   /* --- LIQUID GLASS EFFECT --- */
   background: hsla(var(--card) / 0.25);
@@ -60,7 +52,7 @@ a, a:hover {
   /* --- END LIQUID GLASS EFFECT --- */
 
   border-radius: 20px;
-  max-width: 700px;
+  max-width: 380px;
   position: relative;
 }
 
@@ -146,25 +138,20 @@ a, a:hover {
 }
 
 .profile-card-inf__item {
-  padding: 10px 35px;
-  min-width: 150px;
+  padding: 10px 20px;
+  min-width: 120px;
 }
 
-@media screen and (max-width: 768px) {
-  .profile-card-inf__item {
-    padding: 10px 20px;
-    min-width: 120px;
-  }
-}
 
 .profile-card-inf__title {
   font-weight: 700;
-  font-size: 27px;
+  font-size: 24px;
 }
 
 .profile-card-inf__txt {
   font-weight: 500;
   margin-top: 7px;
+  font-size: 14px;
   color: hsl(var(--foreground));
 }
 
@@ -178,36 +165,29 @@ a, a:hover {
 
 .profile-card-social__item {
   display: inline-flex;
-  width: 55px;
-  height: 55px;
-  margin: 15px;
+  width: 45px;
+  height: 45px;
+  margin: 10px;
   border-radius: 50%;
   align-items: center;
   justify-content: center;
   color: white;
   background: hsl(var(--destructive));
-  border: 4px solid red;
-  box-shadow: 0 0 20px 5px hsla(var(--destructive), 0.4);
+  border: 3px solid red;
+  box-shadow: 0 0 15px 3px hsla(var(--destructive), 0.4);
   position: relative;
-  font-size: 21px;
+  font-size: 18px;
   flex-shrink: 0;
   transition: all .3s;
 }
 
-@media screen and (max-width: 768px) {
-  .profile-card-social__item {
-    width: 50px;
-    height: 50px;
-    margin: 10px;
-  }
-}
 
 @media screen and (min-width: 768px){
   .profile-card-social__item:hover {
     transform: scale(1.2);
     background: hsl(var(--destructive));
     color: hsl(var(--destructive-foreground));
-    box-shadow: 0 0 45px 12px hsla(var(--destructive), 0.7);
+    box-shadow: 0 0 35px 10px hsla(var(--destructive), 0.7);
   }
 }
 
@@ -219,13 +199,9 @@ a, a:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 40px;
-}
-
-@media screen and (max-width: 576px) {
-  .profile-card-ctr {
-    flex-wrap: wrap;
-  }
+  margin-top: 30px;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .profile-card__button {
@@ -233,40 +209,16 @@ a, a:hover {
   border: none;
   font-family: 'Quicksand', sans-serif;
   font-weight: 700;
-  font-size: 19px;
-  margin: 15px 35px;
-  padding: 15px 40px;
-  min-width: 201px;
+  font-size: 1rem;
+  padding: 12px 30px;
+  min-width: 180px;
   border-radius: 50px;
-  min-height: 55px;
   color: #fff;
   cursor: pointer;
   backface-visibility: hidden;
   transition: all .3s;
-}
-
-@media screen and (max-width: 768px) {
-  .profile-card__button {
-    min-width: 170px;
-    margin: 15px 25px;
-  }
-}
-
-@media screen and (max-width: 576px) {
-  .profile-card__button {
-    min-width: inherit;
-    margin: 0;
-    margin-bottom: 16px;
-    width: 100%;
-    max-width: 300px;
-  }
-  .profile-card__button:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.profile-card__button:focus {
-  outline: none!important;
+  width: 100%;
+  max-width: 280px;
 }
 
 @media screen and (min-width: 768px) {
@@ -275,30 +227,22 @@ a, a:hover {
   }
 }
 
-.profile-card__button:first-child {
-  margin-left: 0;
-}
-
-.profile-card__button:last-child {
-  margin-right: 0;
-}
-
 .profile-card__button.button--blue {
   background: linear-gradient(45deg, hsl(var(--primary)), hsl(var(--primary)/ .8));
-  box-shadow: 0px 4px 30px hsla(var(--primary) / 0.4);
+  box-shadow: 0px 4px 25px hsla(var(--primary) / 0.3);
 }
 
 .profile-card__button.button--blue:hover {
-  box-shadow: 0px 7px 30px hsla(var(--primary) / 0.75);
+  box-shadow: 0px 7px 25px hsla(var(--primary) / 0.6);
 }
 
 .profile-card__button.button--orange {
   background: linear-gradient(45deg, hsl(var(--destructive)), hsl(var(--destructive)/ .8));
-  box-shadow: 0px 4px 30px hsla(var(--destructive) / 0.35);
+  box-shadow: 0px 4px 25px hsla(var(--destructive) / 0.3);
 }
 
 .profile-card__button.button--orange:hover {
-  box-shadow: 0px 7px 30px hsla(var(--destructive) / 0.75);
+  box-shadow: 0px 7px 25px hsla(var(--destructive) / 0.6);
 }
 
 .profile-card__button.button-gray {

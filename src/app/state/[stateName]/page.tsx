@@ -15,7 +15,6 @@ import { Store } from 'lucide-react';
 import { ProductDetailModal } from '@/components/product-detail-modal';
 import type { Product } from '@/types/product';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { chunk } from 'lodash';
 import { HeroSlider } from '@/components/hero-slider';
 
 export default function StatePage() {
@@ -57,8 +56,6 @@ export default function StatePage() {
     setSelectedProduct(null);
   }
 
-  const dispensaryRows = stateDispensaries ? chunk(stateDispensaries.dispensaries, 10) : [];
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -76,31 +73,22 @@ export default function StatePage() {
           </p>
         </section>
 
-        <section className="container mx-auto px-4 md:px-6 py-8 space-y-8">
-          {dispensaryRows.length > 0 ? (
-            dispensaryRows.map((row, rowIndex) => (
-              <div key={rowIndex}>
-                <h2 className="text-2xl font-bold tracking-tight mb-4 text-foreground">
-                  Featured Stores - Row {rowIndex + 1}
-                </h2>
-                <div className="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide" style={{scrollSnapType: 'x mandatory'}}>
-                  {row.map((dispensary) => (
-                    <div key={dispensary.id} style={{scrollSnapAlign: 'start'}}>
-                      <DispensaryCard
-                        dispensary={dispensary}
-                        onDispensaryClick={handleDispensaryClick}
-                        className="w-48"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="col-span-full text-center text-muted-foreground">
-              No dispensaries listed for this state yet.
-            </p>
-          )}
+        <section className="container mx-auto px-4 md:px-6 py-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {stateDispensaries && stateDispensaries.dispensaries.length > 0 ? (
+                stateDispensaries.dispensaries.map((dispensary) => (
+                  <DispensaryCard
+                    key={dispensary.id}
+                    dispensary={dispensary}
+                    onDispensaryClick={handleDispensaryClick}
+                  />
+                ))
+              ) : (
+                <p className="col-span-full text-center text-muted-foreground">
+                  No dispensaries listed for this state yet.
+                </p>
+              )}
+            </div>
         </section>
       </main>
       <Footer />

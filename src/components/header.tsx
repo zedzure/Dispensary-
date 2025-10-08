@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sun, Moon, ChevronDown } from 'lucide-react';
+import { Sun, Moon, ChevronDown, Menu } from 'lucide-react';
 
 
 export function Header() {
@@ -43,21 +43,12 @@ export function Header() {
             </Link>
         </div>
         
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost">
-                Menu <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {navItems.map((item) => (
-                <DropdownMenuItem key={item.label} asChild>
-                  <Link href={item.href}>{item.label}</Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
+          {navItems.map((item) => (
+            <Button key={item.label} variant="ghost" asChild>
+                <Link href={item.href}>{item.label}</Link>
+            </Button>
+          ))}
         </nav>
 
         <div className="flex items-center gap-2 md:gap-4">
@@ -86,13 +77,31 @@ export function Header() {
                 </Link>
               </Button>
           ) : (
-            <Button variant="default" size="sm" asChild>
+            <Button variant="default" size="sm" asChild className="hidden md:flex">
               <Link href="/login">
                 <User className="mr-2 h-4 w-4" />
                 Login
               </Link>
             </Button>
           )}
+
+          <div className="md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Open Menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {navItems.map((item) => (
+                  <DropdownMenuItem key={item.label} asChild>
+                    <Link href={item.href}>{item.label}</Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </header>

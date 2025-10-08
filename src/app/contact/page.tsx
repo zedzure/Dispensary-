@@ -14,7 +14,7 @@ export default function ContactPage() {
   return (
     <div className="flex flex-col min-h-screen bg-muted/40">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
+      <main className="flex-grow container mx-auto px-4 py-8 pt-24 md:pt-8 flex items-center justify-center">
         <Card className="w-full max-w-lg shadow-lg bg-card/60 backdrop-blur-sm">
             <CardHeader className="text-center px-4 sm:px-6">
                 <CardTitle className="text-2xl sm:text-3xl font-cursive text-primary">Get in Touch</CardTitle>
