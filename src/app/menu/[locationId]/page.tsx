@@ -17,7 +17,7 @@ function MenuPageContent() {
   return (
     <div className="flex flex-col min-h-screen bg-transparent text-foreground overflow-hidden">
       <Header />
-      <main className="flex-grow">
+      <main className="flex-grow pt-16">
         <PublicMenu locationId={locationId} locationName={locationName} />
       </main>
       <Footer />
@@ -38,7 +38,7 @@ function MenuPageSkeleton() {
     return (
         <div className="flex flex-col min-h-screen bg-transparent">
             <Header />
-            <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
+            <main className="flex-grow container mx-auto px-4 md:px-6 py-8 pt-24">
                 <Skeleton className="h-10 w-1/3 mx-auto mb-12" />
                 <div className="space-y-16">
                     <div>

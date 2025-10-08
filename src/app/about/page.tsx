@@ -40,7 +40,7 @@ export default function AboutPage() {
     <>
       <div className="flex flex-col min-h-screen bg-transparent">
         <Header />
-        <main className="flex-grow container mx-auto px-4 py-8">
+        <main className="flex-grow container mx-auto px-4 py-8 pt-24">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold font-cursive text-primary mb-4">About GreenLeaf Guide</h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
