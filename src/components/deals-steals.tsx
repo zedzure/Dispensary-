@@ -55,7 +55,7 @@ export function NewItemsSection({ onProductClick }: NewItemsSectionProps) {
               <button key={index} onClick={() => handleClick(deal)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
                  <div className={cn(
                     "relative w-[98px] h-[98px] transition-all duration-300 rounded-full",
-                    "backdrop-blur-2xl bg-white/10 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.1),inset_0_4px_14px_rgba(255,255,255,0.8)]"
+                    "backdrop-blur-3xl bg-white/20 border border-white/30 rounded-3xl shadow-[inset_0_0_10px_rgba(255,255,255,0.4),0_8px_32px_rgba(31,38,135,0.25)] bg-gradient-to-br from-white/25 to-sky-200/10"
                   )}>
                   <div className="absolute inset-0.5 bg-card rounded-full p-0.5">
                      <div className="absolute inset-0 rounded-full overflow-hidden">

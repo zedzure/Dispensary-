@@ -17,7 +17,7 @@ interface DispensaryCardProps {
 export function DispensaryCard({ dispensary, className, onDispensaryClick }: DispensaryCardProps) {
   return (
     <Card 
-        className={cn("w-full flex-shrink-0 overflow-hidden group transition-shadow text-left h-full cursor-pointer backdrop-blur-2xl bg-white/20 border border-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.2),inset_0_2px_12px_rgba(255,255,255,0.6)]", className)}
+        className={cn("w-full flex-shrink-0 overflow-hidden group transition-shadow text-left h-full cursor-pointer", "backdrop-blur-3xl bg-white/20 border border-white/30 rounded-3xl shadow-[inset_0_0_10px_rgba(255,255,255,0.4),0_8px_32px_rgba(31,38,135,0.25)] bg-gradient-to-br from-white/25 to-sky-200/10", className)}
         onClick={() => onDispensaryClick(dispensary)}
     >
       <div className="relative h-24 w-full">
