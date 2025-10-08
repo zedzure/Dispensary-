@@ -281,7 +281,7 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
     <>
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent 
-        className="p-0 w-full md:max-w-md flex flex-col bg-transparent backdrop-blur-xl border-border/20"
+        className="p-0 w-full md:max-w-md flex flex-col bg-blue-900/10 backdrop-blur-xl border-border/20"
         style={{ height: vh ? `${vh}px` : '100dvh' }}
         >
         <ScrollArea className="flex-1" ref={scrollAreaRef}>

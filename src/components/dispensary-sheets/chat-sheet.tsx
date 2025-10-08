@@ -316,7 +316,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent 
         side="left" 
-        className="w-full md:max-w-md p-0 flex flex-col bg-transparent backdrop-blur-xl border-border/20"
+        className="w-full md:max-w-md p-0 flex flex-col bg-blue-900/10 backdrop-blur-xl border-border/20"
         style={{ height: vh ? `${vh}px` : '100dvh' }}
        >
         <SheetHeader className="p-4 border-b border-border/20 flex flex-row items-center gap-4 flex-shrink-0">
