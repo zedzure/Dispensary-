@@ -31,16 +31,16 @@ export function StateSearch() {
     <div className="max-w-xl mx-auto">
       <form onSubmit={handleSearch} className="flex w-full items-center space-x-2">
         <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/80 z-10" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/80 z-10" />
             <Input
               type="text"
               placeholder="Enter a state to find dispensaries..."
-              className="pl-10 h-12 text-lg text-foreground placeholder:text-foreground/60 liquid-glass"
+              className="pl-12 h-12 text-lg rounded-full text-foreground placeholder:text-foreground/60 liquid-glass"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
         </div>
-        <Button type="submit" size="lg" className="h-12 text-lg">
+        <Button type="submit" size="lg" className="h-12 text-lg rounded-full">
             <Search className="mr-2 h-5 w-5" />
             Search
         </Button>
