@@ -53,10 +53,7 @@ export function NewItemsSection({ onProductClick }: NewItemsSectionProps) {
         <div className="flex items-start space-x-4 pb-4 pl-4 pr-4 md:pl-6 md:pr-6">
             {newItems.map((deal, index) => (
               <button key={index} onClick={() => handleClick(deal)} className="flex flex-col items-center space-y-2 flex-shrink-0 w-28 group text-center focus:outline-none">
-                 <div className={cn(
-                    "relative w-[98px] h-[98px] transition-all duration-300 rounded-full",
-                    "backdrop-blur-3xl bg-white/20 border border-white/30 rounded-3xl shadow-[inset_0_0_10px_rgba(255,255,255,0.4),0_8px_32px_rgba(31,38,135,0.25)] bg-gradient-to-br from-white/25 to-sky-200/10"
-                  )}>
+                 <div className="relative w-[98px] h-[98px] rounded-full liquid-glass">
                   <div className="absolute inset-0.5 bg-card rounded-full p-0.5">
                      <div className="absolute inset-0 rounded-full overflow-hidden">
                       <Image

@@ -119,10 +119,7 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick }: { msg: ChatMessage
 
   return (
     <div className="w-full">
-        <div className={cn(
-            "p-3 rounded-2xl",
-            "backdrop-blur-3xl bg-white/20 border border-white/30 rounded-3xl shadow-[inset_0_0_10px_rgba(255,255,255,0.4),0_8px_32px_rgba(31,38,135,0.25)] bg-gradient-to-br from-white/25 to-sky-200/10"
-        )}>
+        <div className="p-3 rounded-2xl liquid-glass">
             <div className="flex items-start gap-3">
                  <button onClick={() => onAvatarClick(msg.user)} className="relative">
                     <Avatar className="h-10 w-10 border">

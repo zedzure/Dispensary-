@@ -32,10 +32,7 @@ export function StateStoryReel() {
                                 href={`/state/${encodeURIComponent(state.name)}`} 
                                 className="flex flex-col items-center space-y-2 w-28 group text-center focus:outline-none"
                             >
-                               <div className={cn(
-                                    "relative w-[98px] h-[98px] transition-all duration-300 rounded-full",
-                                    "backdrop-blur-3xl bg-white/20 border border-white/30 rounded-3xl shadow-[inset_0_0_10px_rgba(255,255,255,0.4),0_8px_32px_rgba(31,38,135,0.25)] bg-gradient-to-br from-white/25 to-sky-200/10"
-                                )}>
+                               <div className="relative w-[98px] h-[98px] rounded-full liquid-glass">
                                     <div className="absolute inset-0 rounded-full p-1 flex items-center justify-center">
                                         <Leaf className="h-12 w-12 text-primary" />
                                     </div>
