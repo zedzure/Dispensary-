@@ -119,7 +119,7 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick }: { msg: ChatMessage
 
   return (
     <div className="w-full">
-        <div className="p-3 rounded-2xl bg-blue-900/10">
+        <div className="p-3 rounded-2xl liquid-glass">
             <div className="flex items-start gap-3">
                  <button onClick={() => onAvatarClick(msg.user)} className="relative">
                     <Avatar className="h-10 w-10 border">
@@ -319,7 +319,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
         className="w-full md:max-w-md p-0 flex flex-col bg-background backdrop-blur-xl border-border/20"
         style={{ height: vh ? `${vh}px` : '100dvh' }}
        >
-        <SheetHeader className="p-4 border-b border-border/20 flex flex-row items-center gap-4 flex-shrink-0">
+        <SheetHeader className="p-4 bg-transparent flex flex-row items-center gap-4 flex-shrink-0">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
           <div>
             <SheetTitle>Live Group Chat</SheetTitle>
@@ -391,3 +391,5 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     </>
   );
 }
+
+    
