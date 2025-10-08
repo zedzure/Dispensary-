@@ -25,7 +25,7 @@ export function BottomNavBar() {
 
 
   return (
-    <nav className="fixed bottom-0 left-0 z-50 w-full h-24 bg-background/80 backdrop-blur-xl md:hidden border-t">
+    <nav className="fixed bottom-0 left-0 z-50 w-full h-24 bg-transparent md:hidden">
       <div className="grid h-full grid-cols-5 max-w-lg mx-auto">
         {allNavItems.map((item, i) => (
           <div key={item.label} className="flex items-center justify-center">

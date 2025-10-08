@@ -61,7 +61,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 shadow-2xl shadow-blue-500/20">
+            <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 shadow-2xl shadow-blue-500/20 liquid-glass">
                 <SheetHeader className="p-4 border-b flex-shrink-0">
                     <SheetTitle className="flex items-center"><Search className="mr-2 h-5 w-5" />Search Products & Stores</SheetTitle>
                 </SheetHeader>
@@ -91,12 +91,12 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
                         )}
                     </div>
                 </ScrollArea>
-                <SheetFooter className="p-4 border-t bg-background">
+                <SheetFooter className="p-4 border-t bg-background/50">
                      <div className="relative w-full">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Type to search..."
-                            className="pl-10"
+                            className="pl-10 liquid-glass"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -111,7 +111,7 @@ const SearchResultCard = ({ result, onLinkClick }: { result: SearchResult, onLin
     if (result.type === 'product') {
         const { data: product } = result;
         return (
-            <Card className="overflow-hidden shadow-sm">
+            <Card className="overflow-hidden shadow-sm liquid-glass-static">
                 <CardContent className="p-3 flex items-center gap-4">
                     <div className="relative h-16 w-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
                         <Image src={product.image} alt={product.name} fill className="object-cover" data-ai-hint={product.hint} />
@@ -134,7 +134,7 @@ const SearchResultCard = ({ result, onLinkClick }: { result: SearchResult, onLin
     if (result.type === 'dispensary') {
         const { data: dispensary } = result;
         return (
-            <Card className="overflow-hidden shadow-sm">
+            <Card className="overflow-hidden shadow-sm liquid-glass-static">
                 <CardContent className="p-3 flex items-center gap-4">
                     <div className="relative h-16 w-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
                         <Image src={dispensary.logo} alt={dispensary.name} fill className="object-cover" data-ai-hint={dispensary.hint} />

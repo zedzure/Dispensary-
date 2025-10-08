@@ -32,7 +32,7 @@ export function Header() {
   ];
 
   return (
-    <header className="py-4 px-4 md:px-6 bg-white/20 backdrop-blur-xl sticky top-0 z-50 border-b border-white/30 shadow-lg">
+    <header className="py-4 px-4 md:px-6 liquid-glass sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2 group">
