@@ -33,7 +33,13 @@ export default function StatePage() {
     notFound();
   }
 
-  const stateDispensaries = dispensariesByState.find(s => s.stateName.toLowerCase() === stateName.toLowerCase());
+  const stateDispensaries = dispensariesByState.find(s => s.stateName.toLowerCase() === stateName.toLowerCase())?.dispensaries || [];
+
+  // Split dispensaries into three rows
+  const dispensariesInRow1 = stateDispensaries.slice(0, 10);
+  const dispensariesInRow2 = stateDispensaries.slice(10, 20);
+  const dispensariesInRow3 = stateDispensaries.slice(20, 30);
+  const rows = [dispensariesInRow1, dispensariesInRow2, dispensariesInRow3].filter(row => row.length > 0);
 
   const handleDispensaryClick = (dispensary: Dispensary) => {
     setSelectedDispensary(dispensary);
@@ -48,7 +54,6 @@ export default function StatePage() {
   };
   
   const handleProductClick = (product: Product) => {
-    // This could be implemented to show product details
     setSelectedProduct(product);
   };
   
@@ -73,25 +78,27 @@ export default function StatePage() {
           </p>
         </section>
 
-        <section className="container mx-auto px-4 md:px-6 py-8">
-           <div className="overflow-x-auto no-scrollbar pb-4">
-            <div className="grid grid-flow-col grid-rows-3 gap-4">
-                {stateDispensaries && stateDispensaries.dispensaries.length > 0 ? (
-                stateDispensaries.dispensaries.map((dispensary) => (
-                    <DispensaryCard
-                    key={dispensary.id}
-                    dispensary={dispensary}
-                    onDispensaryClick={handleDispensaryClick}
-                    className="w-40"
-                    />
+        <section className="container mx-auto px-4 md:px-6 py-8 space-y-4">
+           {rows.length > 0 ? (
+                rows.map((row, rowIndex) => (
+                    <div key={rowIndex} className="overflow-x-auto no-scrollbar pb-4">
+                        <div className="flex items-stretch gap-4">
+                             {row.map((dispensary) => (
+                                <DispensaryCard
+                                key={dispensary.id}
+                                dispensary={dispensary}
+                                onDispensaryClick={handleDispensaryClick}
+                                className="w-40 flex-shrink-0"
+                                />
+                            ))}
+                        </div>
+                    </div>
                 ))
-                ) : (
-                <p className="col-span-full text-center text-muted-foreground">
-                    No dispensaries listed for this state yet.
-                </p>
-                )}
-            </div>
-          </div>
+            ) : (
+            <p className="col-span-full text-center text-muted-foreground">
+                No dispensaries listed for this state yet.
+            </p>
+            )}
         </section>
       </main>
       <Footer />

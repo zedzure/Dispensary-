@@ -17,7 +17,7 @@ interface DispensaryCardProps {
 export function DispensaryCard({ dispensary, className, onDispensaryClick }: DispensaryCardProps) {
   return (
     <Card 
-        className={cn("w-full overflow-hidden group transition-shadow hover:shadow-md text-left h-full cursor-pointer bg-card/60", className)}
+        className={cn("w-full overflow-hidden rounded-lg group transition-shadow hover:shadow-md text-left h-full cursor-pointer bg-card/60", className)}
         onClick={() => onDispensaryClick(dispensary)}
     >
       <div className="relative h-24 w-full">
