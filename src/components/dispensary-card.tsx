@@ -26,7 +26,7 @@ export function DispensaryCard({ dispensary, className, onDispensaryClick }: Dis
           alt={dispensary.name}
           fill
           style={{ objectFit: 'cover' }}
-          className="group-hover:scale-105 transition-transform"
+          className="group-hover:scale-105 transition-transform rounded-t-lg"
         />
       </div>
       <CardContent className="p-3">
