@@ -389,16 +389,22 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
           </div>
         </ScrollArea>
         <SheetFooter className="p-4 border-t bg-transparent grid grid-cols-2 gap-3">
-          <Button size="lg" className="w-full" variant="outline" onClick={handleLeaveReviewClick}>
-             <MessageSquare className="mr-2 h-4 w-4" />
-            Leave Review
-          </Button>
-          <Button size="lg" asChild className="w-full">
-            <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
+            <button
+              onClick={handleLeaveReviewClick}
+              className="h-12 w-full flex items-center justify-center text-sm font-medium liquid-glass rounded-full text-blue-600 dark:text-blue-400"
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Leave Review
+            </button>
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-12 w-full flex items-center justify-center text-sm font-medium liquid-glass rounded-full text-blue-600 dark:text-blue-400"
+            >
               <Navigation className="mr-2 h-4 w-4" />
               Directions
             </a>
-          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>
@@ -417,5 +423,3 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
     </>
   );
 }
-
-    
