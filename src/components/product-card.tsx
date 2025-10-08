@@ -33,7 +33,7 @@ export function ProductCard({ product, onProductClick, className }: ProductCardP
         <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{product.type} | {product.thc}% THC</p>
       </CardContent>
       <CardFooter className="p-3 pt-0 flex items-center justify-end">
-        <Button variant="default" size="sm" onClick={() => onProductClick(product)}>View</Button>
+        <Button size="sm" onClick={() => onProductClick(product)} className="text-foreground">View</Button>
       </CardFooter>
     </Card>
   );

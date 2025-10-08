@@ -126,7 +126,7 @@ export default function LoginPage() {
                     <label htmlFor="login-password">Password</label>
                     <input id="login-password" type="password" value={signInPassword} onChange={e => setSignInPassword(e.target.value)} placeholder="••••••••" />
                   </div>
-                  <Button type="submit" className="form-button">
+                  <Button type="submit" className="form-button text-foreground">
                     Sign In
                   </Button>
                   <div className="form-divider"></div>
@@ -159,7 +159,7 @@ export default function LoginPage() {
                     <label htmlFor="signup-password">Password</label>
                     <input id="signup-password" type="password" value={signUpPassword} onChange={e => setSignUpPassword(e.target.value)} placeholder="••••••••" />
                   </div>
-                  <Button type="submit" className="form-button">
+                  <Button type="submit" className="form-button text-foreground">
                     Create Account
                   </Button>
                   <div className="form-divider"></div>

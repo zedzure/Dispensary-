@@ -87,10 +87,10 @@ export function ProductDetailModal({ product, isOpen, onOpenChange }: ProductDet
                         </p>
                     )}
                     <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                        <Button variant="outline" onClick={() => onOpenChange(false)}>
+                        <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-full">
                             Keep Browsing
                         </Button>
-                        <Button onClick={handleAddToCart}>
+                        <Button onClick={handleAddToCart} className="text-foreground">
                             Add to Cart
                         </Button>
                     </div>

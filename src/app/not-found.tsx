@@ -20,7 +20,7 @@ export default function NotFound() {
           <p className="text-lg text-muted-foreground">
             Oops! The page you're looking for doesn't exist or has been moved.
           </p>
-          <Button asChild size="lg">
+          <Button asChild size="lg" className="text-foreground">
             <Link href="/">
               Go Back Home
             </Link>

@@ -33,7 +33,7 @@ export default function ContactPage() {
                     <Label htmlFor="message">Message</Label>
                     <Textarea id="message" placeholder="Your message..." />
                 </div>
-                <Button className="w-full">Send Message</Button>
+                <Button className="w-full text-foreground">Send Message</Button>
             </CardContent>
         </Card>
       </main>

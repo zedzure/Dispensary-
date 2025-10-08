@@ -34,7 +34,7 @@ export default function CareersPage() {
                             <CardTitle>{job.title}</CardTitle>
                             <CardDescription>{job.location} &middot; {job.type}</CardDescription>
                            </div>
-                             <Button variant="outline" className="w-full sm:w-auto">Apply Now</Button>
+                             <Button variant="outline" className="w-full sm:w-auto rounded-full">Apply Now</Button>
                         </CardHeader>
                     </Card>
                 ))}

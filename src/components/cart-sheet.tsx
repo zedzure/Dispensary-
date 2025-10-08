@@ -52,7 +52,7 @@ export function CartSheet() {
                     <span>${totalPrice.toFixed(2)}</span>
                   </div>
                   <Button
-                    className="w-full"
+                    className="w-full text-foreground"
                     size="lg"
                     onClick={handleCheckout}
                   >
@@ -67,7 +67,7 @@ export function CartSheet() {
               <p className="text-sm text-muted-foreground">
                 Add some products to get started!
               </p>
-              <Button className="mt-4" onClick={() => setCartOpen(false)}>
+              <Button className="mt-4 text-foreground" onClick={() => setCartOpen(false)}>
                 Continue Shopping
               </Button>
             </div>
