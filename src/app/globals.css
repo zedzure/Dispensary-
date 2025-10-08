@@ -11,24 +11,24 @@
 
 @layer base {
   :root {
-    --background: 40 10% 95%; /* Light Beige */
+    --background: 0 0% 98%; /* Lighter Gray */
     --foreground: 20 10% 20%;
-    --card: 40 10% 95%;
+    --card: 0 0% 98%;
     --card-foreground: 20 10% 20%;
-    --popover: 40 10% 95%;
+    --popover: 0 0% 98%;
     --popover-foreground: 20 10% 20%;
     --primary: 120 27% 65%; /* Natural Green */
     --primary-foreground: 20 10% 10%;
-    --secondary: 30 50% 90%;
+    --secondary: 0 0% 95%;
     --secondary-foreground: 20 10% 20%;
-    --muted: 30 50% 90%;
+    --muted: 0 0% 95%;
     --muted-foreground: 20 10% 40%;
     --accent: 30 76% 58%; /* Earthy Brown */
     --accent-foreground: 20 10% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 40 10% 85%;
-    --input: 40 10% 85%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
     --ring: 120 27% 65%;
     --radius: 0.75rem;
     --chart-1: 12 76% 61%;
@@ -133,5 +133,6 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
 
 
