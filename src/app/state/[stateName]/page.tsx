@@ -75,14 +75,14 @@ export default function StatePage() {
 
         <section className="container mx-auto px-4 md:px-6 py-8">
            <div className="overflow-x-auto no-scrollbar pb-4">
-            <div className="flex gap-4">
+            <div className="grid grid-flow-col grid-rows-3 gap-4">
                 {stateDispensaries && stateDispensaries.dispensaries.length > 0 ? (
                 stateDispensaries.dispensaries.map((dispensary) => (
                     <DispensaryCard
                     key={dispensary.id}
                     dispensary={dispensary}
                     onDispensaryClick={handleDispensaryClick}
-                    className="h-full w-40 flex-shrink-0"
+                    className="w-40"
                     />
                 ))
                 ) : (
