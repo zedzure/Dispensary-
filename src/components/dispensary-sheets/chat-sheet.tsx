@@ -279,7 +279,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   const handleSendMessage = useCallback(() => {
     if (!newMessage.trim() || !user) return;
     const messageToSend: ChatMessage = {
-      id: `msg-${Date.now()}`,
+      id: `msg-${'${Date.now()}'}`,
       user: { id: user.uid, name: user.displayName || 'Anonymous', avatar: user.photoURL || "", isOnline: true },
       text: newMessage,
       timestamp: new Date().toISOString(),
@@ -304,7 +304,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     if (textAreaRef.current) {
         textAreaRef.current.focus();
     }
-    setNewMessage(`@${msg.user.name} `);
+    setNewMessage(`@${'${msg.user.name}'} `);
   }, []);
 
   const charsLeft = MAX_MESSAGE_LENGTH - newMessage.length;
@@ -317,7 +317,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
       <SheetContent 
         side="left" 
         className="w-full md:max-w-md p-0 flex flex-col bg-background backdrop-blur-xl border-border/20"
-        style={{ height: vh ? `${vh}px` : '100dvh' }}
+        style={{ height: vh ? `${'${vh}'}px` : '100dvh' }}
        >
         <SheetHeader className="p-4 bg-transparent flex flex-row items-center gap-4 flex-shrink-0">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
