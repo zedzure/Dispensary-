@@ -16,7 +16,6 @@ import {
   Send,
   Heart,
   UserPlus,
-  Paperclip,
   MessageSquareReply,
   X,
   Bold,
@@ -25,10 +24,11 @@ import {
   Smile,
   Camera,
   Image as ImageIcon,
-  Link,
+  Link as LinkIcon,
   Mic,
   Hash,
   AtSign,
+  Plus,
 } from "lucide-react";
 import type { Dispensary, ChatUser, ChatMessage } from "@/types/pos";
 import { ScrollArea } from "../ui/scroll-area";
@@ -39,6 +39,7 @@ import { cn } from "@/lib/utils";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { UserProfileModal } from "../user-profile-modal";
 import { useViewportHeight } from "@/hooks/use-viewport-height";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MAX_MESSAGE_LENGTH = 280;
 const MESSAGES_PER_PAGE = 25;
@@ -197,6 +198,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   const [selectedProfile, setSelectedProfile] = useState<ChatUser | null>(null);
   const [isProfileModalOpen, setProfileModalOpen] = useState(false);
   const [autoScroll, setAutoScroll] = useState(true);
+  const [isToolsOpen, setIsToolsOpen] = useState(false);
   const vh = useViewportHeight();
 
   const scrollViewportRef = useRef<HTMLDivElement>(null);
@@ -287,7 +289,18 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
 
   const charsLeft = MAX_MESSAGE_LENGTH - newMessage.length;
   
-  const editingIcons = [Bold, Italic, Underline, Smile, Camera, ImageIcon, Link, Mic, Hash, AtSign];
+  const editingIcons = [
+    { icon: Bold, name: 'Bold' },
+    { icon: Italic, name: 'Italic' },
+    { icon: Underline, name: 'Underline' },
+    { icon: Smile, name: 'Emoji' },
+    { icon: Camera, name: 'Camera' },
+    { icon: ImageIcon, name: 'Image' },
+    { icon: LinkIcon, name: 'Link' },
+    { icon: Mic, name: 'Mic' },
+    { icon: Hash, name: 'Tag' },
+    { icon: AtSign, name: 'Mention' },
+  ];
 
   return (
     <>
@@ -297,7 +310,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
         className="w-full md:max-w-md p-0 flex flex-col bg-background"
         style={{ height: vh ? `${vh}px` : '100dvh' }}
        >
-        <SheetHeader className="p-4 bg-transparent flex-row items-center gap-4 flex-shrink-0">
+        <SheetHeader className="p-4 flex-row items-center gap-4 flex-shrink-0">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
           <div>
             <SheetTitle>Live Group Chat</SheetTitle>
@@ -313,11 +326,29 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
              {isTyping && <p className="text-xs text-muted-foreground px-4 py-1 italic flex-shrink-0">A user is typing...</p>}
             {user ? (
             <div className="chat-input-container">
-                <Avatar className="chat-input-avatar">
-                    <AvatarImage src={user.photoURL || ''} />
-                    <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
-                </Avatar>
                 <div className="chat-input-main">
+                    <AnimatePresence>
+                        {isToolsOpen && (
+                            <motion.div 
+                                className="chat-tools-sheet"
+                                initial={{ y: "100%", opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: "100%", opacity: 0 }}
+                                transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                            >
+                                <div className="chat-tools-grid">
+                                    {editingIcons.map(({ icon: Icon, name }) => (
+                                        <div key={name} className="flex flex-col items-center">
+                                            <button className="h-14 w-14 liquid-glass rounded-full flex items-center justify-center">
+                                                <Icon className="h-6 w-6 text-blue-500" />
+                                            </button>
+                                            <span className="text-xs mt-2 text-muted-foreground">{name}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                     {replyingTo && (
                     <div className="text-xs p-2 bg-muted/50 rounded-md flex justify-between items-center">
                         <p className="text-muted-foreground truncate">
@@ -328,32 +359,32 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                         </Button>
                     </div>
                     )}
-                    <div 
-                        ref={inputRef}
-                        contentEditable
-                        onInput={(e) => {
-                            const target = e.currentTarget as HTMLDivElement;
-                            setNewMessage(target.innerText);
-                            setIsTyping(true);
-                        }}
-                        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-                        className="chat-input-textarea"
-                        data-placeholder="Type your message..."
-                    />
-                    <div className="chat-input-actions">
-                        <div className="flex items-center gap-1">
-                            {editingIcons.map((Icon, i) => (
-                                <Button key={i} variant="ghost" size="icon" className="h-8 w-8">
-                                    <Icon className="text-muted-foreground w-4 h-4" />
-                                </Button>
-                            ))}
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className={cn("text-xs", charsLeft < 20 ? "text-destructive" : "text-muted-foreground")}>{charsLeft}</span>
-                            <Button size="sm" onClick={handleSendMessage} disabled={!newMessage.trim()}>
-                            <Send className="h-4 w-4 mr-2" /> Send
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 flex-shrink-0 rounded-full bg-muted/50 hover:bg-muted"
+                            onClick={() => setIsToolsOpen(!isToolsOpen)}
+                        >
+                            <Plus className={cn("h-5 w-5 transition-transform", isToolsOpen && "rotate-45")} />
+                        </Button>
+                        <div 
+                            ref={inputRef}
+                            contentEditable
+                            onInput={(e) => {
+                                const target = e.currentTarget as HTMLDivElement;
+                                setNewMessage(target.innerText);
+                                setIsTyping(true);
+                            }}
+                            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                            className="chat-input-textarea"
+                            data-placeholder="Type your message..."
+                        />
+                        {newMessage.trim() && (
+                            <Button size="icon" className="h-9 w-9 rounded-full flex-shrink-0" onClick={handleSendMessage} >
+                                <Send className="h-4 w-4" />
                             </Button>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>
