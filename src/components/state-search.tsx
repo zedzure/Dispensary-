@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Store } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { states } from '@/lib/states';
@@ -31,7 +31,7 @@ export function StateSearch() {
     <div className="max-w-xl mx-auto">
       <form onSubmit={handleSearch} className="flex w-full items-center space-x-2">
         <div className="relative flex-grow">
-            <Store className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/80 z-10" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/80 z-10" />
             <Input
               type="text"
               placeholder="Enter a state to find dispensaries..."
@@ -40,7 +40,7 @@ export function StateSearch() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
         </div>
-        <Button type="submit" size="lg" className="h-12 text-lg text-foreground liquid-glass">
+        <Button type="submit" size="lg" className="h-12 text-lg">
             <Search className="mr-2 h-5 w-5" />
             Search
         </Button>
