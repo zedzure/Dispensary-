@@ -34,7 +34,6 @@ import type { Dispensary, ChatUser, ChatMessage } from "@/types/pos";
 import { ScrollArea } from "../ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { realImageUrls } from "@/lib/products";
-import { Textarea } from "../ui/textarea";
 import { useUser } from "@/firebase";
 import { cn } from "@/lib/utils";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -201,7 +200,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   const vh = useViewportHeight();
 
   const scrollViewportRef = useRef<HTMLDivElement>(null);
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -216,28 +215,6 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     params.delete("sheet");
     router.push(pathname + "?" + params.toString());
   };
-  
-  // Scroll lock effect
-  useEffect(() => {
-    const textarea = textAreaRef.current;
-    if (!textarea) return;
-
-    const handleFocus = () => {
-      document.body.style.overflow = 'hidden';
-    };
-    const handleBlur = () => {
-       document.body.style.overflow = '';
-    };
-
-    textarea.addEventListener('focus', handleFocus);
-    textarea.addEventListener('blur', handleBlur);
-
-    return () => {
-      textarea.removeEventListener('focus', handleFocus);
-      textarea.removeEventListener('blur', handleBlur);
-      handleBlur(); // Ensure style is removed on component unmount
-    }
-  }, [isOpen]); // Re-attach listeners if the sheet re-opens
 
   useEffect(() => {
     if (isOpen) {
@@ -279,7 +256,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   const handleSendMessage = useCallback(() => {
     if (!newMessage.trim() || !user) return;
     const messageToSend: ChatMessage = {
-      id: `msg-${'${Date.now()}'}`,
+      id: `msg-${Date.now()}`,
       user: { id: user.uid, name: user.displayName || 'Anonymous', avatar: user.photoURL || "", isOnline: true },
       text: newMessage,
       timestamp: new Date().toISOString(),
@@ -289,6 +266,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     };
     setMessages((prev) => [...prev, messageToSend]);
     setNewMessage("");
+    if (inputRef.current) inputRef.current.innerHTML = '';
     setReplyingTo(null);
     setAutoScroll(true);
   }, [newMessage, replyingTo, user]);
@@ -301,10 +279,10 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
 
   const handleReply = useCallback((msg: ChatMessage) => {
     setReplyingTo(msg);
-    if (textAreaRef.current) {
-        textAreaRef.current.focus();
+    if (inputRef.current) {
+        inputRef.current.focus();
     }
-    setNewMessage(`@${'${msg.user.name}'} `);
+    setNewMessage(`@${msg.user.name} `);
   }, []);
 
   const charsLeft = MAX_MESSAGE_LENGTH - newMessage.length;
@@ -316,10 +294,10 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent 
         side="left" 
-        className="w-full md:max-w-md p-0 flex flex-col bg-background backdrop-blur-xl border-border/20"
-        style={{ height: vh ? `${'${vh}'}px` : '100dvh' }}
+        className="w-full md:max-w-md p-0 flex flex-col bg-background"
+        style={{ height: vh ? `${vh}px` : '100dvh' }}
        >
-        <SheetHeader className="p-4 bg-transparent flex flex-row items-center gap-4 flex-shrink-0">
+        <SheetHeader className="p-4 bg-transparent flex-row items-center gap-4 flex-shrink-0">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
           <div>
             <SheetTitle>Live Group Chat</SheetTitle>
@@ -327,59 +305,61 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
           </div>
         </SheetHeader>
         
-        <ScrollArea className="flex-1 min-h-0" onScroll={handleScroll} ref={scrollViewportRef}>
+        <ScrollArea className="flex-1 min-h-0 pb-20" onScroll={handleScroll} ref={scrollViewportRef}>
             <MessageList messages={messages} hasMore={hasMore} loadMore={loadMoreMessages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} />
         </ScrollArea>
     
-        {isTyping && <p className="text-xs text-muted-foreground px-4 py-1 italic flex-shrink-0">A user is typing...</p>}
-
-        <div className="p-2 border-t border-border/20 bg-transparent flex-shrink-0">
-        {user ? (
+        <div className="chat-input-bar">
+             {isTyping && <p className="text-xs text-muted-foreground px-4 py-1 italic flex-shrink-0">A user is typing...</p>}
+            {user ? (
             <div className="chat-input-container">
-            <Avatar className="chat-input-avatar">
-                <AvatarImage src={user.photoURL || ''} />
-                <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div className="chat-input-main">
-                {replyingTo && (
-                <div className="text-xs p-2 bg-muted/50 rounded-md flex justify-between items-center">
-                    <p className="text-muted-foreground truncate">
-                    Replying to <strong className="text-primary/90">@{replyingTo.user.name}</strong>
-                    </p>
-                    <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setReplyingTo(null)}>
-                    <X className="h-3 w-3" />
-                    </Button>
-                </div>
-                )}
-                <Textarea 
-                    ref={textAreaRef}
-                    placeholder="Type your message..." 
-                    className="chat-input-textarea bg-muted/30"
-                    value={newMessage}
-                    maxLength={MAX_MESSAGE_LENGTH}
-                    onChange={(e) => { setNewMessage(e.target.value); setIsTyping(true); }}
-                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-                />
-                <div className="chat-input-actions">
-                <div className="flex items-center gap-1">
-                    {editingIcons.map((Icon, i) => (
-                        <Button key={i} variant="ghost" size="icon" className="h-8 w-8">
-                            <Icon className="text-muted-foreground w-4 h-4" />
+                <Avatar className="chat-input-avatar">
+                    <AvatarImage src={user.photoURL || ''} />
+                    <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="chat-input-main">
+                    {replyingTo && (
+                    <div className="text-xs p-2 bg-muted/50 rounded-md flex justify-between items-center">
+                        <p className="text-muted-foreground truncate">
+                        Replying to <strong className="text-primary/90">@{replyingTo.user.name}</strong>
+                        </p>
+                        <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setReplyingTo(null)}>
+                        <X className="h-3 w-3" />
                         </Button>
-                    ))}
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className={cn("text-xs", charsLeft < 20 ? "text-destructive" : "text-muted-foreground")}>{charsLeft}</span>
-                    <Button size="sm" onClick={handleSendMessage} disabled={!newMessage.trim()}>
-                    <Send className="h-4 w-4 mr-2" /> Send
-                    </Button>
-                </div>
+                    </div>
+                    )}
+                    <div 
+                        ref={inputRef}
+                        contentEditable
+                        onInput={(e) => {
+                            const target = e.currentTarget as HTMLDivElement;
+                            setNewMessage(target.innerText);
+                            setIsTyping(true);
+                        }}
+                        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                        className="chat-input-textarea"
+                        data-placeholder="Type your message..."
+                    />
+                    <div className="chat-input-actions">
+                        <div className="flex items-center gap-1">
+                            {editingIcons.map((Icon, i) => (
+                                <Button key={i} variant="ghost" size="icon" className="h-8 w-8">
+                                    <Icon className="text-muted-foreground w-4 h-4" />
+                                </Button>
+                            ))}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className={cn("text-xs", charsLeft < 20 ? "text-destructive" : "text-muted-foreground")}>{charsLeft}</span>
+                            <Button size="sm" onClick={handleSendMessage} disabled={!newMessage.trim()}>
+                            <Send className="h-4 w-4 mr-2" /> Send
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            </div>
-        ) : (
-            <p className="text-sm text-center text-muted-foreground">Please log in to participate in the chat.</p>
-        )}
+            ) : (
+                <p className="text-sm text-center text-muted-foreground p-4">Please log in to participate in the chat.</p>
+            )}
         </div>
       </SheetContent>
     </Sheet>
@@ -391,9 +371,3 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     </>
   );
 }
-
-    
-
-    
-
-    

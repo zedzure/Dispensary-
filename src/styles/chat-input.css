@@ -1,5 +1,11 @@
+
+.chat-input-bar {
+    @apply fixed bottom-0 left-0 w-full bg-background/80 backdrop-blur-lg border-t border-border/20;
+    padding: 0.5rem env(safe-area-inset-left) calc(0.5rem + env(safe-area-inset-bottom)) env(safe-area-inset-right);
+}
+
 .chat-input-container {
-    @apply flex items-start w-full gap-3 p-1;
+    @apply flex items-start w-full gap-3;
 }
 
 .chat-input-avatar {
@@ -11,13 +17,19 @@
 }
 
 .chat-input-textarea {
-    @apply w-full bg-muted/50 border-border/80 rounded-md p-2 text-sm;
+    @apply w-full bg-muted/50 border border-border/80 rounded-2xl p-3 text-sm;
     resize: none;
-    min-height: 4rem; /* Adjusted height */
+    min-height: 2.75rem; /* ~44px */
     max-height: 12rem; /* Prevent excessive growth */
+    overflow-y: auto;
 }
 .chat-input-textarea:focus {
-    @apply ring-2 ring-primary/50 border-primary;
+    @apply ring-2 ring-primary/50 border-primary outline-none;
+}
+
+.chat-input-textarea[data-placeholder]:empty:before {
+    content: attr(data-placeholder);
+    @apply text-muted-foreground pointer-events-none;
 }
 
 .chat-input-actions {
