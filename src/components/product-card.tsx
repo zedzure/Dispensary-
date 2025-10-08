@@ -15,16 +15,23 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onProductClick, className }: ProductCardProps) {
   return (
-    <Card className={cn("h-full flex flex-col overflow-hidden group bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg", className)}>
+    <Card 
+      className={cn(
+        "h-full flex flex-col overflow-hidden group transition-all duration-300 ease-in-out",
+        "bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg rounded-[24px]", // liquid glass with large radius
+        "hover:transform hover:-translate-y-1 hover:shadow-2xl",
+        className
+      )}
+    >
       <CardHeader className="p-0">
-        <button onClick={() => onProductClick(product)} className="w-full aspect-square md:aspect-square relative">
+        <button onClick={() => onProductClick(product)} className="w-full aspect-square md:aspect-square relative overflow-hidden rounded-t-[24px]">
             <Image
               src={product.image}
               data-ai-hint={product.hint}
               alt={product.name}
               fill
               style={{ objectFit: 'cover' }}
-              className=""
+              className="group-hover:scale-105 transition-transform"
             />
         </button>
       </CardHeader>
@@ -33,7 +40,7 @@ export function ProductCard({ product, onProductClick, className }: ProductCardP
         <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{product.type} | {product.thc}% THC</p>
       </CardContent>
       <CardFooter className="p-3 pt-0 flex items-center justify-end">
-        <Button size="sm" onClick={() => onProductClick(product)} className="text-foreground">View</Button>
+        <Button size="sm" onClick={() => onProductClick(product)}>View</Button>
       </CardFooter>
     </Card>
   );
