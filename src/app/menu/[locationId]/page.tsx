@@ -17,7 +17,7 @@ function MenuPageContent() {
   return (
     <div className="flex flex-col min-h-screen bg-transparent text-foreground overflow-hidden">
       <Header />
-      <main className="flex-grow pt-16">
+      <main className="flex-grow pt-24 pb-32">
         <PublicMenu locationId={locationId} locationName={locationName} />
       </main>
       <Footer />

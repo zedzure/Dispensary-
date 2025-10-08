@@ -136,7 +136,7 @@ function MarketplaceContent() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-grow">
+      <main className="flex-grow pb-32">
         <header className="text-center mb-12 flex items-center justify-center p-4">
           <HeroSlider />
         </header>
