@@ -119,7 +119,7 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick }: { msg: ChatMessage
 
   return (
     <div className="w-full">
-        <div className="p-3 rounded-2xl liquid-glass">
+        <div className="p-3 rounded-2xl liquid-glass-static">
             <div className="flex items-start gap-3">
                  <button onClick={() => onAvatarClick(msg.user)} className="relative">
                     <Avatar className="h-10 w-10 border">
