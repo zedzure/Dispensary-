@@ -51,7 +51,9 @@ export function DispensaryDealsSheet({ isOpen, onOpenChange, dispensary }: Dispe
                 </Button>
             </div>
             <div className="transform scale-90 -mt-8">
-                <HeroSlider />
+                <div className="mt-8">
+                    <HeroSlider />
+                </div>
             </div>
             <div className="flex justify-between items-center -mt-8">
                 <SheetTitle>What's New</SheetTitle>
