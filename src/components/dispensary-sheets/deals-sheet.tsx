@@ -44,7 +44,7 @@ export function DispensaryDealsSheet({ isOpen, onOpenChange, dispensary }: Dispe
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-transparent backdrop-blur-xl">
-        <SheetHeader className="p-4 flex flex-col gap-4 bg-transparent absolute top-0 left-0 right-0 z-10">
+        <SheetHeader className="p-4 flex flex-col gap-4 absolute top-0 left-0 right-0 z-10">
           <HeroSlider />
           <div className="flex justify-between items-center w-full">
               <div className="flex-1"></div>
