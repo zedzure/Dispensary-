@@ -3,7 +3,7 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PlusCircle, Zap } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import type { Dispensary } from '@/types/pos';
 import { ScrollArea } from '../ui/scroll-area';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -45,17 +45,18 @@ export function DispensaryDealsSheet({ isOpen, onOpenChange, dispensary }: Dispe
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl">
         <SheetHeader className="p-4 border-b flex flex-col gap-4 bg-transparent">
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" onClick={handleClose}>
-                    <ArrowLeft />
-                </Button>
-            </div>
-            <div className="transform scale-90 -mt-8">
-                <HeroSlider />
-            </div>
-            <div className="flex justify-between items-center -mt-8">
-                <SheetTitle>What's New</SheetTitle>
-                <SheetDescription>{dispensary.name}</SheetDescription>
+            <HeroSlider />
+            <div className="flex justify-between items-center w-full">
+                <div className="flex-1"></div>
+                <div className="flex-1 text-center">
+                    <SheetTitle>What's New</SheetTitle>
+                    <SheetDescription>{dispensary.name}</SheetDescription>
+                </div>
+                <div className="flex-1 flex justify-end">
+                    <Button variant="ghost" size="icon" onClick={handleClose}>
+                        <ArrowLeft />
+                    </Button>
+                </div>
             </div>
         </SheetHeader>
         <ScrollArea className="flex-grow">
