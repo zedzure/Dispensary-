@@ -8,6 +8,7 @@ import type { Dispensary } from '@/types/pos';
 import { ScrollArea } from '../ui/scroll-area';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { ProductBubble } from '../product-bubble';
+import { HeroSlider } from '../hero-slider';
 
 
 const mockNewProducts = Array.from({ length: 20 }, (_, i) => ({
@@ -52,6 +53,9 @@ export function DispensaryDealsSheet({ isOpen, onOpenChange, dispensary }: Dispe
             <SheetDescription>{dispensary.name}</SheetDescription>
           </div>
         </SheetHeader>
+         <div className="p-4 transform scale-90">
+          <HeroSlider />
+        </div>
         <ScrollArea className="flex-grow">
           <div className="p-4 space-y-4">
             {mockNewProducts.map((product) => (
