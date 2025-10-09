@@ -54,7 +54,7 @@ export function DispensaryDealsSheet({ isOpen, onOpenChange, dispensary }: Dispe
                 </div>
                 <div className="flex-1 flex justify-end">
                     <Button variant="ghost" size="icon" onClick={handleClose}>
-                        <ArrowLeft />
+                        <ArrowLeft className="text-blue-500" />
                     </Button>
                 </div>
             </div>
