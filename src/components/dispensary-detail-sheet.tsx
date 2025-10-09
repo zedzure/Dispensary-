@@ -259,14 +259,14 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
   
   const ActionButton = ({ sheetName, icon: Icon, label }: { sheetName: SheetName, icon: React.ElementType, label: string }) => (
     <div className="flex flex-col items-center">
-      <button 
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={() => handleSetSheet(sheetName)} 
-        className={cn(
-            "flex flex-col items-center justify-center h-16 w-16 rounded-full text-center group focus:outline-none liquid-glass"
-        )}
+        className="h-16 w-16 rounded-2xl bg-muted/50 hover:bg-muted group"
       >
-        <Icon className="w-6 h-6 text-blue-600 group-hover:text-blue-500 dark:group-hover:text-blue-400" />
-      </button>
+        <Icon className="w-7 h-7 text-primary group-hover:text-blue-500" />
+      </Button>
       <span className="text-xs text-muted-foreground mt-2">{label}</span>
     </div>
   );
@@ -319,7 +319,7 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
             
             <Separator />
 
-            <div className="py-2 flex justify-around text-center">
+            <div className="py-2 grid grid-cols-5 gap-3 text-center">
               <ActionButton sheetName="promotions" icon={Ticket} label="Promos" />
               <ActionButton sheetName="products" icon={Package} label="Products" />
               <ActionButton sheetName="chat" icon={MessageSquare} label="Chat" />
@@ -389,22 +389,27 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
           </div>
         </ScrollArea>
         <SheetFooter className="p-4 border-t bg-transparent grid grid-cols-2 gap-3">
-            <button
+            <Button
               onClick={handleLeaveReviewClick}
-              className="h-12 w-full flex items-center justify-center text-sm font-medium liquid-glass rounded-full text-blue-600 dark:text-blue-400"
+              variant="outline"
+              className="h-12 w-full flex items-center justify-center text-sm font-medium rounded-full"
             >
               <MessageSquare className="mr-2 h-4 w-4" />
               Leave Review
-            </button>
-            <a
-              href={googleMapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="h-12 w-full flex items-center justify-center text-sm font-medium liquid-glass rounded-full text-blue-600 dark:text-blue-400"
+            </Button>
+            <Button
+              asChild
+              className="h-12 w-full flex items-center justify-center text-sm font-medium rounded-full"
             >
-              <Navigation className="mr-2 h-4 w-4" />
-              Directions
-            </a>
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Navigation className="mr-2 h-4 w-4" />
+                Directions
+              </a>
+            </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>
