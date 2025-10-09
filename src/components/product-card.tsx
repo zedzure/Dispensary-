@@ -17,8 +17,8 @@ export function ProductCard({ product, onProductClick, className }: ProductCardP
   return (
     <Card 
       className={cn(
-        "h-full flex flex-col overflow-hidden group transition-all duration-300 ease-in-out",
-        "bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg rounded-[24px]", // liquid glass with large radius
+        "h-full flex flex-col overflow-hidden group transition-all duration-300 ease-in-out liquid-glass",
+        "rounded-[24px]", // liquid glass with large radius
         "hover:transform hover:-translate-y-1 hover:shadow-2xl",
         className
       )}
