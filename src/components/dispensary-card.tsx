@@ -17,8 +17,7 @@ export function DispensaryCard({ dispensary, className, onDispensaryClick }: Dis
   return (
     <div 
         className={cn(
-            "w-full h-full text-left cursor-pointer group transition-all duration-400 ease-in-out",
-            "bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg",
+            "w-full h-full text-left cursor-pointer group transition-all duration-400 ease-in-out liquid-glass",
             "rounded-[32px]", // Big, soft corners like the example
             "hover:transform hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-2xl", // Hover effect
             "overflow-hidden", // This is crucial to clip the image
