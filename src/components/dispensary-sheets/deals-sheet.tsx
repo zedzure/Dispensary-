@@ -43,8 +43,8 @@ export function DispensaryDealsSheet({ isOpen, onOpenChange, dispensary }: Dispe
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl">
-        <SheetHeader className="p-4 border-b flex flex-col gap-4 bg-transparent">
+      <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-transparent backdrop-blur-xl">
+        <SheetHeader className="p-4 flex flex-col gap-4 bg-transparent absolute top-0 left-0 right-0 z-10">
             <HeroSlider />
             <div className="flex justify-between items-center w-full">
                 <div className="flex-1"></div>
@@ -59,7 +59,7 @@ export function DispensaryDealsSheet({ isOpen, onOpenChange, dispensary }: Dispe
                 </div>
             </div>
         </SheetHeader>
-        <ScrollArea className="flex-grow">
+        <ScrollArea className="flex-grow pt-80">
           <div className="p-4 space-y-4">
             {mockNewProducts.map((product) => (
               <ProductBubble key={product.id} product={product} />
