@@ -8,6 +8,8 @@ import type { Dispensary } from '@/types/pos';
 import { ScrollArea } from '../ui/scroll-area';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { ProductBubble } from '../product-bubble';
+import { HeroSlider } from '../hero-slider';
+
 
 const mockPromoProducts = Array.from({ length: 20 }, (_, i) => ({
   id: `promo-${i}`,
@@ -41,17 +43,23 @@ export function DispensaryPromotionsSheet({ isOpen, onOpenChange, dispensary }: 
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl">
-        <SheetHeader className="p-4 border-b flex flex-row items-center gap-4 bg-transparent">
-          <Button variant="ghost" size="icon" onClick={handleClose}>
-            <ArrowLeft />
-          </Button>
-          <div>
-            <SheetTitle>Promotions</SheetTitle>
-            <SheetDescription>{dispensary.name}</SheetDescription>
+      <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-transparent backdrop-blur-xl">
+        <SheetHeader className="p-4 flex flex-col gap-4 bg-transparent absolute top-0 left-0 right-0 z-10">
+          <HeroSlider />
+          <div className="flex justify-between items-center w-full">
+              <div className="flex-1"></div>
+              <div className="flex-1 text-center">
+                  <SheetTitle className="text-primary">Promotions</SheetTitle>
+                  <SheetDescription className="text-primary">{dispensary.name}</SheetDescription>
+              </div>
+              <div className="flex-1 flex justify-end">
+                  <Button variant="ghost" size="icon" onClick={handleClose}>
+                      <ArrowLeft className="text-blue-500" />
+                  </Button>
+              </div>
           </div>
         </SheetHeader>
-        <ScrollArea className="flex-grow">
+        <ScrollArea className="flex-grow pt-[calc(24rem+env(safe-area-inset-top))]">
           <div className="p-4 space-y-4">
             {mockPromoProducts.map((product) => (
                 <ProductBubble key={product.id} product={product} />
