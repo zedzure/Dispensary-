@@ -39,7 +39,8 @@ export function ProductCard({ product, onProductClick, className }: ProductCardP
         <CardTitle className="text-sm md:text-base font-semibold line-clamp-2">{product.name}</CardTitle>
         <p className="text-[11px] md:text-xs text-muted-foreground mt-1">{product.type} | {product.thc}% THC</p>
       </CardContent>
-      <CardFooter className="p-3 pt-0 flex items-center justify-end">
+      <CardFooter className="p-3 pt-0 flex items-center justify-between">
+         <p className="text-sm font-bold text-primary">${product.price?.toFixed(2)}</p>
         <Button size="sm" onClick={() => onProductClick(product)}>View</Button>
       </CardFooter>
     </Card>

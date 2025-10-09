@@ -59,7 +59,7 @@ export function DispensaryPromotionsSheet({ isOpen, onOpenChange, dispensary }: 
               </div>
           </div>
         </SheetHeader>
-        <ScrollArea className="flex-grow pt-[calc(20rem+env(safe-area-inset-top))]">
+        <ScrollArea className="flex-grow pt-[calc(18rem+env(safe-area-inset-top))]">
           <div className="p-4 space-y-4">
             {mockPromoProducts.map((product) => (
                 <ProductBubble key={product.id} product={product} />

@@ -45,21 +45,21 @@ export function DispensaryDealsSheet({ isOpen, onOpenChange, dispensary }: Dispe
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-transparent backdrop-blur-xl">
         <SheetHeader className="p-4 flex flex-col gap-4 bg-transparent absolute top-0 left-0 right-0 z-10">
-            <HeroSlider />
-            <div className="flex justify-between items-center w-full">
-                <div className="flex-1"></div>
-                <div className="flex-1 text-center">
-                    <SheetTitle className="text-primary">What's New</SheetTitle>
-                    <SheetDescription className="text-primary">{dispensary.name}</SheetDescription>
-                </div>
-                <div className="flex-1 flex justify-end">
-                    <Button variant="ghost" size="icon" onClick={handleClose}>
-                        <ArrowLeft className="text-blue-500" />
-                    </Button>
-                </div>
-            </div>
+          <HeroSlider />
+          <div className="flex justify-between items-center w-full">
+              <div className="flex-1"></div>
+              <div className="flex-1 text-center">
+                  <SheetTitle className="text-primary">What's New</SheetTitle>
+                  <SheetDescription className="text-primary">{dispensary.name}</SheetDescription>
+              </div>
+              <div className="flex-1 flex justify-end">
+                  <Button variant="ghost" size="icon" onClick={handleClose}>
+                      <ArrowLeft className="text-blue-500" />
+                  </Button>
+              </div>
+          </div>
         </SheetHeader>
-        <ScrollArea className="flex-grow pt-80">
+        <ScrollArea className="flex-grow pt-[calc(18rem+env(safe-area-inset-top))]">
           <div className="p-4 space-y-4">
             {mockNewProducts.map((product) => (
               <ProductBubble key={product.id} product={product} />
