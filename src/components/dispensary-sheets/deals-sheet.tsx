@@ -44,18 +44,20 @@ export function DispensaryDealsSheet({ isOpen, onOpenChange, dispensary }: Dispe
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent side="left" className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl">
-        <SheetHeader className="p-4 border-b flex flex-row items-center gap-4 bg-transparent">
-          <Button variant="ghost" size="icon" onClick={handleClose}>
-            <ArrowLeft />
-          </Button>
-          <div>
-            <SheetTitle>What's New</SheetTitle>
-            <SheetDescription>{dispensary.name}</SheetDescription>
-          </div>
+        <SheetHeader className="p-4 border-b flex flex-col gap-4 bg-transparent">
+            <div className="flex items-center gap-4">
+                <Button variant="ghost" size="icon" onClick={handleClose}>
+                    <ArrowLeft />
+                </Button>
+            </div>
+            <div className="transform scale-90 -mt-8">
+                <HeroSlider />
+            </div>
+            <div className="flex justify-between items-center -mt-8">
+                <SheetTitle>What's New</SheetTitle>
+                <SheetDescription>{dispensary.name}</SheetDescription>
+            </div>
         </SheetHeader>
-         <div className="p-4 transform scale-90">
-          <HeroSlider />
-        </div>
         <ScrollArea className="flex-grow">
           <div className="p-4 space-y-4">
             {mockNewProducts.map((product) => (
