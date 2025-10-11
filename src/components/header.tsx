@@ -32,6 +32,8 @@ export function Header() {
     { href: "/notes", label: "Notes" },
   ];
 
+  const profileLink = user ? `/profile/${user.uid}` : '/login';
+
   return (
     <header className="py-4 px-4 md:px-6 bg-transparent sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between">
@@ -70,7 +72,7 @@ export function Header() {
 
           {user ? (
               <Button asChild variant="ghost" size="icon">
-                <Link href="/profile">
+                <Link href={profileLink}>
                     <Avatar className="h-9 w-9">
                       <AvatarImage src={user.photoURL || `https://avatar.vercel.sh/${user.uid}`} alt={user.displayName || 'User'} data-ai-hint="person face" />
                       <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
