@@ -140,9 +140,9 @@ const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: bo
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-[90%] flex flex-col p-0">
+        <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
             <SheetHeader className="p-4 border-b">
-            <SheetTitle className="flex items-center"><FileText className="mr-2 h-5 w-5"/>Notes & Messages</SheetTitle>
+            <SheetTitle className="flex items-center text-red-500"><FileText className="mr-2 h-5 w-5"/>Notes & Messages</SheetTitle>
             </SheetHeader>
             <ScrollArea className="flex-1">
                 {messages.length > 0 ? (
@@ -165,16 +165,16 @@ const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: bo
                         ))}
                     </div>
                 ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
+                    <div className="h-full flex flex-col items-center justify-center text-red-500">
                         <FileText className="h-12 w-12 mb-4" />
                         <p>No messages or notes yet.</p>
                     </div>
                 )}
             </ScrollArea>
-            <SheetFooter className="p-2 border-t bg-background">
+            <SheetFooter className="p-2 border-t bg-transparent">
                 <div className="w-full space-y-2">
                     {replyingTo && (
-                        <div className="text-xs p-2 bg-muted rounded-md flex justify-between items-center">
+                        <div className="text-xs p-2 bg-muted rounded-md flex justify-between items-center text-red-500">
                             <p className="text-muted-foreground truncate">
                                 Replying to <strong className="text-primary/90">@{replyingTo.userName}</strong>
                             </p>

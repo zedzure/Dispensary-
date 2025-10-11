@@ -61,9 +61,9 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 shadow-2xl shadow-blue-500/20 liquid-glass">
+            <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
                 <SheetHeader className="p-4 border-b flex-shrink-0">
-                    <SheetTitle className="flex items-center"><Search className="mr-2 h-5 w-5" />Search Products & Stores</SheetTitle>
+                    <SheetTitle className="flex items-center text-red-500"><Search className="mr-2 h-5 w-5" />Search Products & Stores</SheetTitle>
                 </SheetHeader>
                 <ScrollArea className="flex-1">
                     <div className="p-4 space-y-3">
@@ -91,12 +91,12 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
                         )}
                     </div>
                 </ScrollArea>
-                <SheetFooter className="p-4 border-t bg-background/50">
+                <SheetFooter className="p-4 border-t bg-transparent">
                      <div className="relative w-full">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Type to search..."
-                            className="pl-10 liquid-glass"
+                            className="pl-10 bg-transparent text-red-500 placeholder:text-red-500/50"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -111,17 +111,17 @@ const SearchResultCard = ({ result, onLinkClick }: { result: SearchResult, onLin
     if (result.type === 'product') {
         const { data: product } = result;
         return (
-            <Card className="overflow-hidden shadow-sm liquid-glass-static">
+            <Card className="overflow-hidden shadow-sm bg-red-500/10 border-red-500/20">
                 <CardContent className="p-3 flex items-center gap-4">
                     <div className="relative h-16 w-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
                         <Image src={product.image} alt={product.name} fill className="object-cover" data-ai-hint={product.hint} />
                     </div>
                     <div className="flex-grow min-w-0">
-                        <p className="text-xs text-muted-foreground font-medium flex items-center gap-1"><Package className="h-3 w-3" />PRODUCT</p>
+                        <p className="text-xs text-red-500/80 font-medium flex items-center gap-1"><Package className="h-3 w-3" />PRODUCT</p>
                         <h4 className="font-semibold text-sm truncate" title={product.name}>{product.name}</h4>
-                        <p className="text-xs text-muted-foreground truncate">{product.category}</p>
+                        <p className="text-xs text-red-500/70 truncate">{product.category}</p>
                     </div>
-                    <Button asChild size="icon" variant="ghost" className="text-muted-foreground" onClick={onLinkClick}>
+                    <Button asChild size="icon" variant="ghost" className="text-red-500/80" onClick={onLinkClick}>
                         <Link href={`/?product=${product.id}`}>
                             <ArrowRight className="h-5 w-5" />
                         </Link>
@@ -134,18 +134,18 @@ const SearchResultCard = ({ result, onLinkClick }: { result: SearchResult, onLin
     if (result.type === 'dispensary') {
         const { data: dispensary } = result;
         return (
-            <Card className="overflow-hidden shadow-sm liquid-glass-static">
+            <Card className="overflow-hidden shadow-sm bg-red-500/10 border-red-500/20">
                 <CardContent className="p-3 flex items-center gap-4">
                     <div className="relative h-16 w-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
                         <Image src={dispensary.logo} alt={dispensary.name} fill className="object-cover" data-ai-hint={dispensary.hint} />
                     </div>
                     <div className="flex-grow min-w-0">
-                        <p className="text-xs text-muted-foreground font-medium flex items-center gap-1"><Store className="h-3 w-3" />DISPENSARY</p>
+                        <p className="text-xs text-red-500/80 font-medium flex items-center gap-1"><Store className="h-3 w-3" />DISPENSARY</p>
                         <h4 className="font-semibold text-sm truncate" title={dispensary.name}>{dispensary.name}</h4>
-                        <p className="text-xs text-muted-foreground truncate">{dispensary.address}</p>
-                        <p className="text-xs text-muted-foreground">{dispensary.rating} ★ | {dispensary.deliveryTime} min delivery</p>
+                        <p className="text-xs text-red-500/70 truncate">{dispensary.address}</p>
+                        <p className="text-xs text-red-500/70">{dispensary.rating} ★ | {dispensary.deliveryTime} min delivery</p>
                     </div>
-                     <Button asChild size="icon" variant="ghost" className="text-muted-foreground" onClick={onLinkClick}>
+                     <Button asChild size="icon" variant="ghost" className="text-red-500/80" onClick={onLinkClick}>
                         <Link href={`/?dispensary=${dispensary.id}`}>
                             <ArrowRight className="h-5 w-5" />
                         </Link>
