@@ -94,9 +94,9 @@ const UploadsSheet = ({ uploads, open, onOpenChange }: { uploads: UploadItem[], 
         </SheetHeader>
         <ScrollArea className="flex-1">
             {uploads.length > 0 ? (
-                <div className="p-2 grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3">
                     {uploads.map(upload => (
-                        <div key={upload.id} className="relative aspect-square rounded-md overflow-hidden group">
+                        <div key={upload.id} className="relative aspect-square group border border-red-500">
                            <Image src={upload.url} alt={upload.name} fill className="object-cover" />
                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                            </div>
