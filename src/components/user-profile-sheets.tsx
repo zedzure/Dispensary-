@@ -47,9 +47,9 @@ const getRelativeTime = (date: Date): string => {
 const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none">
+      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
         <SheetHeader className="p-4 border-b text-red-500">
-          <SheetTitle className="flex items-center"><Receipt className="mr-2 h-5 w-5"/>My Receipts</SheetTitle>
+          <SheetTitle className="flex items-center text-red-500"><Receipt className="mr-2 h-5 w-5"/>My Receipts</SheetTitle>
         </SheetHeader>
         <ScrollArea className="flex-1">
             {mockReceiptsData.length > 0 ? (
@@ -87,9 +87,9 @@ const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (o
 const UploadsSheet = ({ uploads, open, onOpenChange }: { uploads: UploadItem[], open: boolean, onOpenChange: (open: boolean) => void }) => {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0">
-        <SheetHeader className="p-4 border-b">
-          <SheetTitle className="flex items-center"><Camera className="mr-2 h-5 w-5"/>My Uploads</SheetTitle>
+      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
+        <SheetHeader className="p-4 border-b text-red-500">
+          <SheetTitle className="flex items-center text-red-500"><Camera className="mr-2 h-5 w-5"/>My Uploads</SheetTitle>
         </SheetHeader>
         <ScrollArea className="flex-1">
             {uploads.length > 0 ? (
@@ -103,7 +103,7 @@ const UploadsSheet = ({ uploads, open, onOpenChange }: { uploads: UploadItem[], 
                     ))}
                 </div>
             ) : (
-                <div className="h-full flex items-center justify-center text-muted-foreground">
+                <div className="h-full flex items-center justify-center text-red-500">
                     <p>No uploads yet.</p>
                 </div>
             )}
