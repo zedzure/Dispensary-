@@ -28,6 +28,7 @@ export function Header() {
     { href: "/#menu", label: "Menu" },
     { href: "/#new", label: "New" },
     { href: "/about", label: "About" },
+    { href: "/post-its", label: "Post-its" },
     { href: "/notes", label: "Notes" },
   ];
 

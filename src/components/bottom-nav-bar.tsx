@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, User, ClipboardList, Info, Zap, Store } from 'lucide-react';
+import { Home, User, ClipboardList, Info, Zap, Store, StickyNote } from 'lucide-react';
 import { useUser } from '@/firebase';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -12,7 +12,7 @@ export function BottomNavBar() {
 
   const navItems = [
     { href: '/', icon: Store, label: 'Marketplace' },
-    { href: '/#new', icon: Zap, label: 'New' },
+    { href: '/post-its', icon: StickyNote, label: 'Post-its' },
     { href: '/about', icon: Info, label: 'About' },
     { href: '/notes', icon: ClipboardList, label: 'Notes' },
   ];
