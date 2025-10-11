@@ -20,9 +20,10 @@ interface UserProfileCardProps {
   profile: UserProfile;
   setActiveSheet: (sheet: ActiveSheet) => void;
   onUpdate: (updatedProfile: Partial<UserProfile>) => void;
+  children?: React.ReactNode;
 }
 
-export function UserProfileCard({ profile, setActiveSheet, onUpdate }: UserProfileCardProps) {
+export function UserProfileCard({ profile, setActiveSheet, onUpdate, children }: UserProfileCardProps) {
     const { user } = useUser();
     const db = useFirestore();
     const { toast } = useToast();
@@ -151,6 +152,8 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate }: UserProfi
                     </div>
                 </div>
 
+                {children}
+
                 <div className="glass-profile-card-actions">
                      {actionLinks.map(link => (
                         <button key={link.name} onClick={() => handleActionClick(link.sheet as ActiveSheet)} className="glass-profile-card-action-btn glass">
@@ -173,3 +176,5 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate }: UserProfi
         </>
     );
 }
+
+    

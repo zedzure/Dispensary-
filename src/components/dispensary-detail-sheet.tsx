@@ -202,6 +202,16 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
   };
 
   const handleSetSheet = (sheetName: SheetName | null) => {
+    if (sheetName === 'map' && !user) {
+        toast({ 
+            title: 'Authentication Required', 
+            description: 'Please log in to view the map.', 
+            variant: 'destructive',
+            action: <Button onClick={() => router.push('/login')}>Login</Button>
+        });
+        return;
+    }
+
     const dispensaryId = searchParams.get('dispensary');
     const newParams = new URLSearchParams();
     if (dispensaryId) {
@@ -430,3 +440,5 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
     </>
   );
 }
+
+    

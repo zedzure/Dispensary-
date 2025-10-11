@@ -162,22 +162,23 @@ export default function ProfilePage() {
     <>
     <div className="flex flex-col min-h-screen">
        <div className="fixed inset-0 -z-10 h-full w-full bg-background bg-cover bg-center bg-no-repeat" 
-         style={{backgroundImage: "url('https://storage.googleapis.com/project-13773344-54196.appspot.com/assets/2a1c68f7733d0615e3c790a6183f95b5.png')"}}
+         style={{backgroundImage: "url('https://storage.googleapis.com/project-13773344-54196.appspot.com/assets/leaf-background.png')"}}
        >
-        <div className="absolute inset-0 bg-background/40 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-background/40" />
       </div>
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
         <div className="w-full">
-            <UserProfileCard profile={adaptedProfile} setActiveSheet={setActiveSheet} onUpdate={handleProfileUpdate} />
-             {authUser?.uid === userId && (
-                 <div className="text-center mt-6">
-                     <Button onClick={handleLogout} variant="destructive" className="glass">
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Sign Out
-                    </Button>
-                 </div>
-             )}
+            <UserProfileCard profile={adaptedProfile} setActiveSheet={setActiveSheet} onUpdate={handleProfileUpdate} >
+                {authUser?.uid === userId && (
+                    <div className="text-center mt-6">
+                        <Button onClick={handleLogout} variant="destructive" className="glass">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Sign Out
+                        </Button>
+                    </div>
+                )}
+            </UserProfileCard>
         </div>
       </main>
       <Footer />
@@ -194,3 +195,5 @@ export default function ProfilePage() {
     </>
   );
 }
+
+    
