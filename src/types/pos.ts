@@ -204,7 +204,7 @@ export interface ChatMessage {
   timestamp: Timestamp | string; // ISO string
   likes: number;
   isLiked: boolean; // Client-side state
-  image?: string;
+  imageUrl?: string;
   replyingTo?: {
     user: string;
     text: string;

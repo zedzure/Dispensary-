@@ -30,6 +30,7 @@ import {
   AtSign,
   Plus,
   Trash2,
+  Loader2,
 } from "lucide-react";
 import type { Dispensary, ChatUser, ChatMessage as ChatMessageType } from "@/types/pos";
 import { ScrollArea } from "../ui/scroll-area";
@@ -41,6 +42,9 @@ import { UserProfileModal } from "../user-profile-modal";
 import { useViewportHeight } from "@/hooks/use-viewport-height";
 import { motion, AnimatePresence } from "framer-motion";
 import { collection, query, orderBy, limit, serverTimestamp, doc } from "firebase/firestore";
+import { uploadImage } from "@/lib/image-upload";
+import { useToast } from "@/hooks/use-toast";
+
 
 const MAX_MESSAGE_LENGTH = 280;
 
@@ -57,24 +61,8 @@ const formatTimestamp = (timestamp: any) => {
 };
 
 const parseMessage = (text: string) => {
-  const parts = text.split(/([@#]\w+)/g);
-  return parts.map((part, index) => {
-    if (part.startsWith("@")) {
-      return (
-        <strong key={index} className="text-primary cursor-pointer">
-          {part}
-        </strong>
-      );
-    }
-    if (part.startsWith("#")) {
-      return (
-        <span key={index} className="text-blue-500 cursor-pointer">
-          {part}
-        </span>
-      );
-    }
-    return part;
-  });
+  // Use a safer method to render HTML content
+  return <div dangerouslySetInnerHTML={{ __html: text }} />;
 };
 
 function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: ChatMessageType; onLike: () => void; onReply: () => void; onAvatarClick: (user: ChatUser) => void; onDelete: () => void; }) {
@@ -104,13 +92,13 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: C
                         </div>
                     )}
                     
-                    <p className="text-sm text-foreground/90">{parseMessage(msg.text)}</p>
+                    <div className="text-sm text-foreground/90 break-words">{parseMessage(msg.text)}</div>
                 </div>
             </div>
 
-            {msg.image && (
+            {msg.imageUrl && (
                 <div className="relative w-full max-w-xs h-48 mt-2 rounded-lg overflow-hidden border ml-13">
-                    <Image src={msg.image} alt="Chat image" fill className="object-cover" />
+                    <Image src={msg.imageUrl} alt="Chat image" fill className="object-cover" />
                 </div>
             )}
 
@@ -157,10 +145,16 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   const [isProfileModalOpen, setProfileModalOpen] = useState(false);
   const [autoScroll, setAutoScroll] = useState(true);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
   const vh = useViewportHeight();
 
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -198,28 +192,51 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     if (autoScroll && scrollViewportRef.current) {
       scrollViewportRef.current.scrollTop = scrollViewportRef.current.scrollHeight;
     }
-  }, [messages, autoScroll]);
+  }, [messages, autoScroll, imagePreview]);
 
-
-  const handleSendMessage = useCallback(() => {
-    if (!newMessage.trim() || !user || !firestore || !dispensary) return;
-    const messagesCol = collection(firestore, 'dispensaries', dispensary.id, 'messages');
-
-    const messageToSend: Omit<ChatMessageType, 'id'> = {
-      user: { id: user.uid, name: user.displayName || 'Anonymous', avatar: user.photoURL || "", isOnline: true },
-      text: newMessage,
-      timestamp: serverTimestamp() as any,
-      likes: 0,
-      isLiked: false,
-      replyingTo: replyingTo ? { user: replyingTo.user.name, text: replyingTo.text } : undefined,
-    };
-    addDocumentNonBlocking(messagesCol, messageToSend);
-    
+  const resetForm = () => {
     setNewMessage("");
     if (inputRef.current) inputRef.current.innerHTML = '';
     setReplyingTo(null);
+    setImageFile(null);
+    setImagePreview(null);
+    if(fileInputRef.current) fileInputRef.current.value = '';
     setAutoScroll(true);
-  }, [newMessage, replyingTo, user, firestore, dispensary]);
+  }
+
+  const handleSendMessage = useCallback(async () => {
+    const messageText = inputRef.current?.innerHTML || '';
+    if (!messageText.trim() && !imageFile) return;
+    if (!user || !firestore || !dispensary) return;
+
+    setIsSubmitting(true);
+
+    try {
+        let imageUrl: string | undefined;
+        if (imageFile) {
+            imageUrl = await uploadImage(imageFile, `chatImages/${dispensary.id}/${Date.now()}-${imageFile.name}`);
+        }
+
+        const messagesCol = collection(firestore, 'dispensaries', dispensary.id, 'messages');
+        const messageToSend: Omit<ChatMessageType, 'id'> = {
+          user: { id: user.uid, name: user.displayName || 'Anonymous', avatar: user.photoURL || "", isOnline: true },
+          text: messageText,
+          timestamp: serverTimestamp() as any,
+          likes: 0,
+          isLiked: false,
+          replyingTo: replyingTo ? { user: replyingTo.user.name, text: replyingTo.text } : undefined,
+          imageUrl: imageUrl,
+        };
+        addDocumentNonBlocking(messagesCol, messageToSend);
+        
+        resetForm();
+    } catch(e) {
+        console.error("Failed to send message:", e);
+        toast({ title: 'Error Sending Message', description: 'Could not send message. Please try again.', variant: 'destructive' });
+    } finally {
+        setIsSubmitting(false);
+    }
+  }, [imageFile, replyingTo, user, firestore, dispensary, toast]);
 
   const handleLike = useCallback((id: string) => {
     // In a real app, this would update Firestore.
@@ -237,23 +254,44 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     if (inputRef.current) {
         inputRef.current.focus();
     }
-    setNewMessage(`@${msg.user.name} `);
+    // Don't set text here as it breaks contentEditable logic
   }, []);
 
-  const charsLeft = MAX_MESSAGE_LENGTH - newMessage.length;
+  const handleFormat = (command: string) => {
+    document.execCommand(command, false);
+    if (inputRef.current) {
+        inputRef.current.focus();
+        setNewMessage(inputRef.current.innerHTML);
+    }
+  }
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+          if (file.size > 5 * 1024 * 1024) { // 5MB limit
+              toast({ title: 'Image too large', description: "Please upload an image smaller than 5MB.", variant: 'destructive'});
+              return;
+          }
+          setImageFile(file);
+          setImagePreview(URL.createObjectURL(file));
+          setIsToolsOpen(false);
+      }
+  }
   
   const editingIcons = [
-    { icon: Bold, name: 'Bold' },
-    { icon: Italic, name: 'Italic' },
-    { icon: Underline, name: 'Underline' },
-    { icon: Smile, name: 'Emoji' },
-    { icon: Camera, name: 'Camera' },
-    { icon: ImageIcon, name: 'Image' },
-    { icon: LinkIcon, name: 'Link' },
-    { icon: Mic, name: 'Mic' },
-    { icon: Hash, name: 'Tag' },
-    { icon: AtSign, name: 'Mention' },
+    { icon: Bold, name: 'Bold', action: () => handleFormat('bold') },
+    { icon: Italic, name: 'Italic', action: () => handleFormat('italic') },
+    { icon: Underline, name: 'Underline', action: () => handleFormat('underline') },
+    { icon: Camera, name: 'Camera', action: () => fileInputRef.current?.click() },
+    { icon: ImageIcon, name: 'Image', action: () => fileInputRef.current?.click() },
+    { icon: Smile, name: 'Emoji', action: () => toast({title: 'Coming Soon!'}) },
+    { icon: LinkIcon, name: 'Link', action: () => toast({title: 'Coming Soon!'}) },
+    { icon: Mic, name: 'Mic', action: () => toast({title: 'Coming Soon!'}) },
+    { icon: Hash, name: 'Tag', action: () => toast({title: 'Coming Soon!'}) },
+    { icon: AtSign, name: 'Mention', action: () => toast({title: 'Coming Soon!'}) },
   ];
+  
+  const hasContent = (inputRef.current?.innerHTML || '').trim() !== '' || !!imageFile;
 
   return (
     <>
@@ -274,10 +312,30 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
         <ScrollArea className="flex-1 min-h-0" onScroll={handleScroll} ref={scrollViewportRef}>
             {isLoading && <div className="text-center p-4 text-muted-foreground">Loading messages...</div>}
             {!isLoading && messages.length > 0 && <MessageList messages={messages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} onDelete={handleDelete} />}
-            {!isLoading && messages.length === 0 && <div className="text-center p-8 text-muted-foreground">Be the first to say something!</div>}
+            {!isLoading && messages.length === 0 && !imagePreview && <div className="text-center p-8 text-muted-foreground">Be the first to say something!</div>}
+             {imagePreview && (
+                <div className="p-4">
+                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-primary mx-auto">
+                        <Image src={imagePreview} alt="Image preview" fill className="object-cover" />
+                        <Button
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-1 right-1 h-6 w-6"
+                            onClick={() => {
+                                setImageFile(null);
+                                setImagePreview(null);
+                                if (fileInputRef.current) fileInputRef.current.value = '';
+                            }}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
         </ScrollArea>
     
         <div className="relative p-2 pt-0">
+            <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" accept="image/*" />
             {user ? (
             <div className="relative">
                 <AnimatePresence>
@@ -290,9 +348,9 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                             transition={{ type: "spring", damping: 30, stiffness: 300 }}
                         >
                             <div className="grid grid-cols-5 gap-4">
-                                {editingIcons.map(({ icon: Icon, name }) => (
+                                {editingIcons.map(({ icon: Icon, name, action }) => (
                                     <div key={name} className="flex flex-col items-center">
-                                        <button className="h-14 w-14 liquid-glass rounded-full flex items-center justify-center">
+                                        <button className="h-14 w-14 liquid-glass rounded-full flex items-center justify-center" onClick={action}>
                                             <Icon className="h-6 w-6 text-blue-500" />
                                         </button>
                                         <span className="text-xs mt-2 text-muted-foreground">{name}</span>
@@ -328,15 +386,15 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                         contentEditable
                         onInput={(e) => {
                             const target = e.currentTarget as HTMLDivElement;
-                            setNewMessage(target.innerText);
+                            setNewMessage(target.innerHTML);
                         }}
                         onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
                         className="w-full bg-transparent outline-none text-sm px-2 flex-grow min-h-[2.25rem] flex items-center"
                         data-placeholder="Type your message..."
                     />
-                    {newMessage.trim() && (
-                        <Button size="icon" className="h-9 w-9 rounded-full flex-shrink-0" onClick={handleSendMessage} >
-                            <Send className="h-4 w-4" />
+                    {hasContent && (
+                        <Button size="icon" className="h-9 w-9 rounded-full flex-shrink-0" onClick={handleSendMessage} disabled={isSubmitting}>
+                            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4" />}
                         </Button>
                     )}
                 </div>
