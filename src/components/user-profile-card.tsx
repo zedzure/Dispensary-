@@ -34,14 +34,14 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate, children }:
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const actionLinks = [
-        { name: 'Photos', icon: Camera, sheet: 'uploads' },
-        { name: 'Music', icon: Music, sheet: null },
-        { name: 'Video', icon: Video, sheet: null },
-        { name: 'Receipts', icon: Receipt, sheet: 'receipts' },
-        { name: 'Wallet', icon: Wallet, sheet: null },
-        { name: 'Messages', icon: MessageSquare, sheet: 'notes' },
-        { name: 'Notes', icon: FileText, sheet: 'notes' },
-        { name: 'Saved', icon: Bookmark, sheet: null },
+        { name: 'Photos', icon: Camera, sheet: 'uploads' as ActiveSheet },
+        { name: 'Music', icon: Music, sheet: 'music' as ActiveSheet },
+        { name: 'Video', icon: Video, sheet: 'video' as ActiveSheet },
+        { name: 'Receipts', icon: Receipt, sheet: 'receipts' as ActiveSheet },
+        { name: 'Wallet', icon: Wallet, sheet: 'wallet' as ActiveSheet },
+        { name: 'Messages', icon: MessageSquare, sheet: 'notes' as ActiveSheet },
+        { name: 'Notes', icon: FileText, sheet: 'notes' as ActiveSheet },
+        { name: 'Saved', icon: Bookmark, sheet: 'saved' as ActiveSheet },
     ];
 
     const handleFollow = () => {
@@ -156,7 +156,7 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate, children }:
 
                 <div className="glass-profile-card-actions">
                      {actionLinks.map(link => (
-                        <button key={link.name} onClick={() => handleActionClick(link.sheet as ActiveSheet)} className="glass-profile-card-action-btn glass">
+                        <button key={link.name} onClick={() => handleActionClick(link.sheet)} className="glass-profile-card-action-btn glass">
                            <link.icon />
                         </button>
                     ))}
@@ -176,5 +176,3 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate, children }:
         </>
     );
 }
-
-    

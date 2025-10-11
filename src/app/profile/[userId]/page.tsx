@@ -19,7 +19,7 @@ import { UserProfileSheets } from '@/components/user-profile-sheets';
 import type { UploadItem } from '@/types/pos';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
 
-export type ActiveSheet = 'receipts' | 'uploads' | 'notes' | 'search' | null;
+export type ActiveSheet = 'receipts' | 'uploads' | 'notes' | 'search' | 'music' | 'video' | 'wallet' | 'saved' | null;
 
 
 function ProfilePageSkeleton() {

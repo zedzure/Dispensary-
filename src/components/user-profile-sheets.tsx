@@ -1,9 +1,10 @@
 
+
 "use client";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { X, FileText, Camera, Receipt, Send } from "lucide-react";
+import { X, FileText, Camera, Receipt, Send, Music, Video, Wallet, Bookmark } from "lucide-react";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ActiveSheet } from "@/app/profile/[userId]/page";
 import type { UploadItem, Receipt as ReceiptType } from "@/types/pos";
@@ -204,6 +205,63 @@ const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: bo
     );
 };
 
+const MusicSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
+        <SheetHeader className="p-4 border-b text-red-500">
+          <SheetTitle className="flex items-center text-red-500"><Music className="mr-2 h-5 w-5"/>My Music</SheetTitle>
+        </SheetHeader>
+        <div className="h-full flex flex-col items-center justify-center text-red-500">
+            <Music className="h-12 w-12 mb-4" />
+            <p>Your uploaded music will appear here.</p>
+        </div>
+      </SheetContent>
+    </Sheet>
+);
+
+const VideoSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
+        <SheetHeader className="p-4 border-b text-red-500">
+          <SheetTitle className="flex items-center text-red-500"><Video className="mr-2 h-5 w-5"/>My Videos</SheetTitle>
+        </SheetHeader>
+        <div className="h-full flex flex-col items-center justify-center text-red-500">
+            <Video className="h-12 w-12 mb-4" />
+            <p>Your uploaded videos will appear here.</p>
+        </div>
+      </SheetContent>
+    </Sheet>
+);
+
+const WalletSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
+        <SheetHeader className="p-4 border-b text-red-500">
+          <SheetTitle className="flex items-center text-red-500"><Wallet className="mr-2 h-5 w-5"/>My Wallet</SheetTitle>
+        </SheetHeader>
+        <div className="h-full flex flex-col items-center justify-center text-red-500">
+            <Wallet className="h-12 w-12 mb-4" />
+            <p>Your loyalty points and rewards will be shown here.</p>
+        </div>
+      </SheetContent>
+    </Sheet>
+);
+
+const SavedSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
+        <SheetHeader className="p-4 border-b text-red-500">
+          <SheetTitle className="flex items-center text-red-500"><Bookmark className="mr-2 h-5 w-5"/>Saved Items</SheetTitle>
+        </SheetHeader>
+        <div className="h-full flex flex-col items-center justify-center text-red-500">
+            <Bookmark className="h-12 w-12 mb-4" />
+            <p>Your saved products and dispensaries will appear here.</p>
+        </div>
+      </SheetContent>
+    </Sheet>
+);
+
+
 interface UserProfileSheetsProps {
   activeSheet: ActiveSheet;
   setActiveSheet: (sheet: ActiveSheet) => void;
@@ -226,6 +284,22 @@ export function UserProfileSheets({ activeSheet, setActiveSheet, user, uploads }
       <NotesSheet 
         user={user} 
         open={activeSheet === 'notes'} 
+        onOpenChange={(open) => !open && setActiveSheet(null)} 
+      />
+       <MusicSheet 
+        open={activeSheet === 'music'} 
+        onOpenChange={(open) => !open && setActiveSheet(null)} 
+      />
+      <VideoSheet 
+        open={activeSheet === 'video'} 
+        onOpenChange={(open) => !open && setActiveSheet(null)} 
+      />
+      <WalletSheet 
+        open={activeSheet === 'wallet'} 
+        onOpenChange={(open) => !open && setActiveSheet(null)} 
+      />
+      <SavedSheet 
+        open={activeSheet === 'saved'} 
         onOpenChange={(open) => !open && setActiveSheet(null)} 
       />
       <SearchSheet
