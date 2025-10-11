@@ -62,7 +62,7 @@
 
 .glass-profile-card-stats {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
     margin-bottom: 1.5rem;
     padding: 1rem;
@@ -212,3 +212,5 @@
         flex-direction: column;
     }
 }
+
+    

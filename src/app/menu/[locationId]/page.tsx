@@ -43,14 +43,14 @@ function MenuPageSkeleton() {
                 <div className="space-y-16">
                     <div>
                         <Skeleton className="h-10 w-1/4 mb-8" />
-                        <div className="flex gap-6 overflow-hidden">
-                            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-96 w-72 flex-shrink-0" />)}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-96 w-full" />)}
                         </div>
                     </div>
                      <div>
                         <Skeleton className="h-10 w-1/4 mb-8" />
-                        <div className="flex gap-6 overflow-hidden">
-                            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-96 w-72 flex-shrink-0" />)}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-96 w-full" />)}
                         </div>
                     </div>
                 </div>
@@ -59,3 +59,5 @@ function MenuPageSkeleton() {
         </div>
     );
 }
+
+    

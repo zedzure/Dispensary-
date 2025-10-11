@@ -172,42 +172,11 @@ export default function BudtenderPOSPage() {
     return (
         <div className="flex flex-col min-h-screen bg-muted/40 font-sans">
             <Header />
-            <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-12rem)]">
-                        <div className="p-4 border-b">
-                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                <Input 
-                                    placeholder="Search products..." 
-                                    className="pl-10 h-10 text-base"
-                                    value={searchTerm}
-                                    onChange={e => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <ScrollArea className="flex-1">
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
-                                {filteredProducts.map(product => (
-                                    <Card 
-                                        key={product.id} 
-                                        className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden group bg-card/60 backdrop-blur-sm"
-                                        onClick={() => addToCart(product)}
-                                    >
-                                        <div className="relative aspect-square">
-                                            <Image src={product.image} alt={product.name} fill style={{objectFit: 'cover'}} className="group-hover:scale-105 transition-transform" data-ai-hint={product.hint} />
-                                        </div>
-                                        <div className="p-3">
-                                            <p className="font-semibold text-sm truncate">{product.name}</p>
-                                            <p className="text-xs text-muted-foreground">{product.category}</p>
-                                        </div>
-                                    </Card>
-                                ))}
-                            </div>
-                        </ScrollArea>
-                    </div>
-
-                    <div className="bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-12rem)]">
+            <main className="flex-grow container mx-auto px-2 sm:px-4 md:px-6 py-4 md:py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8 h-full">
+                    
+                    {/* Right Column (Cart & Customer) - Appears on top on mobile */}
+                    <div className="lg:order-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-18rem)] sm:h-[calc(100vh-15rem)] lg:h-[calc(100vh-12rem)]">
                         <div className="p-4 border-b">
                             {activeCustomer ? (
                                 <div className="flex items-center gap-3">
@@ -278,8 +247,45 @@ export default function BudtenderPOSPage() {
                             </div>
                         )}
                     </div>
+
+                    {/* Left Column (Product Grid) - Appears below on mobile */}
+                    <div className="lg:order-1 lg:col-span-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-18rem)] sm:h-[calc(100vh-15rem)] lg:h-[calc(100vh-12rem)] mt-4 lg:mt-0">
+                        <div className="p-4 border-b">
+                             <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input 
+                                    placeholder="Search products..." 
+                                    className="pl-10 h-10 text-base"
+                                    value={searchTerm}
+                                    onChange={e => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <ScrollArea className="flex-1">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
+                                {filteredProducts.map(product => (
+                                    <Card 
+                                        key={product.id} 
+                                        className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden group bg-card/60 backdrop-blur-sm"
+                                        onClick={() => addToCart(product)}
+                                    >
+                                        <div className="relative aspect-square">
+                                            <Image src={product.image} alt={product.name} fill style={{objectFit: 'cover'}} className="group-hover:scale-105 transition-transform" data-ai-hint={product.hint} />
+                                        </div>
+                                        <div className="p-2 sm:p-3">
+                                            <p className="font-semibold text-sm truncate">{product.name}</p>
+                                            <p className="text-xs text-muted-foreground">{product.category}</p>
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                    </div>
+
                 </div>
             </main>
         </div>
     );
 }
+
+    
