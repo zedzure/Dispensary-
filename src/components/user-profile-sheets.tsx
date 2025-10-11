@@ -47,13 +47,13 @@ const getRelativeTime = (date: Date): string => {
 const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
-        <SheetHeader className="p-4 border-b">
+      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none">
+        <SheetHeader className="p-4 border-b text-red-500">
           <SheetTitle className="flex items-center"><Receipt className="mr-2 h-5 w-5"/>My Receipts</SheetTitle>
         </SheetHeader>
         <ScrollArea className="flex-1">
             {mockReceiptsData.length > 0 ? (
-              <ul className="p-4 space-y-3">
+              <ul className="p-4 space-y-3 text-red-500">
                 {mockReceiptsData.map(receipt => (
                   <li key={receipt.id} className="p-3 bg-muted/50 rounded-lg flex items-center gap-4">
                     <div className="p-2 rounded-full bg-background">
@@ -73,7 +73,7 @@ const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (o
                 ))}
               </ul>
             ) : (
-                <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
+                <div className="h-full flex flex-col items-center justify-center text-red-500">
                     <Receipt className="h-12 w-12 mb-4" />
                     <p>No receipts found.</p>
                 </div>
