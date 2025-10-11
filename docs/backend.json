@@ -101,6 +101,42 @@
         "userId",
         "createdAt"
       ]
+    },
+    "Dispensary": {
+      "title": "Dispensary",
+      "type": "object",
+      "description": "Represents a dispensary location.",
+      "properties": {
+        "name": { "type": "string" },
+        "address": { "type": "string" }
+      }
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "type": "object",
+      "description": "A message in a chat room.",
+      "properties": {
+        "user": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "name": { "type": "string" },
+            "avatar": { "type": "string", "format": "uri" }
+          }
+        },
+        "text": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "likes": { "type": "number" },
+        "image": { "type": "string", "format": "uri" },
+        "replyingTo": {
+          "type": "object",
+          "properties": {
+            "user": { "type": "string" },
+            "text": { "type": "string" }
+          }
+        }
+      },
+      "required": ["user", "text", "timestamp"]
     }
   },
   "auth": {
@@ -141,6 +177,26 @@
               "description": "The unique identifier for the post."
             }
           ]
+        }
+      },
+       {
+        "path": "/dispensaries/{dispensaryId}",
+        "definition": {
+          "entityName": "Dispensary",
+          "schema": {
+            "$ref": "#/entities/Dispensary"
+          },
+          "description": "Stores dispensary information."
+        }
+      },
+      {
+        "path": "/dispensaries/{dispensaryId}/messages/{messageId}",
+        "definition": {
+          "entityName": "ChatMessage",
+          "schema": {
+            "$ref": "#/entities/ChatMessage"
+          },
+          "description": "Stores chat messages for a specific dispensary."
         }
       }
     ]

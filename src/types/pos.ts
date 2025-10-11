@@ -194,9 +194,14 @@ export interface ChatUser {
 
 export interface ChatMessage {
   id: string;
-  user: ChatUser;
+  user: {
+    id: string;
+    name: string;
+    avatar: string;
+    isOnline?: boolean;
+  };
   text: string;
-  timestamp: string; // ISO string
+  timestamp: Timestamp | string; // ISO string
   likes: number;
   isLiked: boolean; // Client-side state
   image?: string;

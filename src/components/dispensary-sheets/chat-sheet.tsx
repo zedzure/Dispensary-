@@ -29,67 +29,31 @@ import {
   Hash,
   AtSign,
   Plus,
+  Trash2,
 } from "lucide-react";
-import type { Dispensary, ChatUser, ChatMessage } from "@/types/pos";
+import type { Dispensary, ChatUser, ChatMessage as ChatMessageType } from "@/types/pos";
 import { ScrollArea } from "../ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { realImageUrls } from "@/lib/products";
-import { useUser } from "@/firebase";
+import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
 import { cn } from "@/lib/utils";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { UserProfileModal } from "../user-profile-modal";
 import { useViewportHeight } from "@/hooks/use-viewport-height";
 import { motion, AnimatePresence } from "framer-motion";
+import { collection, query, orderBy, limit, serverTimestamp, doc } from "firebase/firestore";
 
 const MAX_MESSAGE_LENGTH = 280;
-const MESSAGES_PER_PAGE = 25;
 
-const mockUsers: ChatUser[] = Array.from({ length: 15 }, (_, i) => ({
-  id: `user-${i}`,
-  name: [
-    "Cannabis Connoisseur",
-    "Sativa_Steve",
-    "Indica_Ivy",
-    "Terpene_Terry",
-    "VapeQueen",
-    "Bud_Buddy",
-    "GroovyGrandma",
-    "PuffDaddy",
-    "KushKween",
-    "420Explorer",
-    "GanjaGuru",
-    "Highlander",
-    "MaryJaneFan",
-    "DankDave",
-    "BlazeMaster",
-  ][i % 15],
-  avatar: realImageUrls[i % realImageUrls.length],
-  isOnline: Math.random() > 0.5,
-}));
+const formatTimestamp = (timestamp: any) => {
+    if (!timestamp) return '...';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-const initialMockMessages = Array.from({ length: 100 }, (_, i) => {
-  const user = mockUsers[i % mockUsers.length];
-  const time = new Date(Date.now() - (100 - i) * 5 * 60000); // 5 minutes apart
-  return {
-    id: `msg-${i}`,
-    user,
-    text: `This is mock message #${i + 1}. What does everyone think of the new OG Kush batch? #review @Sativa_Steve`,
-    timestamp: time.toISOString(),
-    likes: Math.floor(Math.random() * 25),
-    isLiked: Math.random() > 0.8,
-    image: i % 10 === 0 ? realImageUrls[(i + 5) % realImageUrls.length] : undefined,
-  };
-});
-
-const formatTimestamp = (isoString: string) => {
-  const now = new Date();
-  const then = new Date(isoString);
-  const diffInSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
-
-  if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-  return then.toLocaleDateString();
+    if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    return date.toLocaleDateString();
 };
 
 const parseMessage = (text: string) => {
@@ -113,12 +77,12 @@ const parseMessage = (text: string) => {
   });
 };
 
-function MessageItem({ msg, onLike, onReply, onAvatarClick }: { msg: ChatMessage; onLike: () => void; onReply: () => void; onAvatarClick: (user: ChatUser) => void; }) {
+function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: ChatMessageType; onLike: () => void; onReply: () => void; onAvatarClick: (user: ChatUser) => void; onDelete: () => void; }) {
     const { user: currentUser } = useUser();
     const isCurrentUser = msg.user.id === currentUser?.uid;
 
   return (
-    <div className="w-full">
+    <div className="w-full group">
         <div className="p-3 rounded-2xl liquid-glass">
             <div className="flex items-start gap-3">
                  <button onClick={() => onAvatarClick(msg.user)} className="relative">
@@ -157,25 +121,22 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick }: { msg: ChatMessage
                 <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1" onClick={onReply} aria-label="Reply to message">
                     <MessageSquareReply className="h-4 w-4" /> Reply
                 </Button>
-                <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1">
-                    <UserPlus className="h-4 w-4" /> Follow
-                </Button>
+                {isCurrentUser && (
+                   <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={onDelete} aria-label="Delete message">
+                        <Trash2 className="h-4 w-4" /> Delete
+                    </Button>
+                )}
             </div>
         </div>
     </div>
   );
 }
 
-function MessageList({ messages, hasMore, loadMore, onLike, onReply, onAvatarClick }: { messages: ChatMessage[]; hasMore: boolean; loadMore: () => void; onLike: (id: string) => void; onReply: (msg: ChatMessage) => void; onAvatarClick: (user: ChatUser) => void; }) {
+function MessageList({ messages, onLike, onReply, onAvatarClick, onDelete }: { messages: ChatMessageType[]; onLike: (id: string) => void; onReply: (msg: ChatMessageType) => void; onAvatarClick: (user: ChatUser) => void; onDelete: (id: string) => void; }) {
   return (
     <div className="p-4 space-y-4">
-      {hasMore && (
-        <div className="text-center">
-          <Button variant="outline" size="sm" onClick={loadMore}>Load More</Button>
-        </div>
-      )}
       {messages.map((msg) => (
-        <MessageItem key={msg.id} msg={msg} onLike={() => onLike(msg.id)} onReply={() => onReply(msg)} onAvatarClick={onAvatarClick} />
+        <MessageItem key={msg.id} msg={msg} onLike={() => onLike(msg.id)} onReply={() => onReply(msg)} onAvatarClick={onAvatarClick} onDelete={() => onDelete(msg.id)} />
       ))}
     </div>
   );
@@ -189,12 +150,9 @@ interface DispensarySheetProps {
 
 export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: DispensarySheetProps) {
   const { user } = useUser();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const firestore = useFirestore();
   const [newMessage, setNewMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
+  const [replyingTo, setReplyingTo] = useState<ChatMessageType | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<ChatUser | null>(null);
   const [isProfileModalOpen, setProfileModalOpen] = useState(false);
   const [autoScroll, setAutoScroll] = useState(true);
@@ -207,6 +165,18 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const messagesQuery = useMemoFirebase(
+    () =>
+      firestore && dispensary
+        ? query(collection(firestore, "dispensaries", dispensary.id, "messages"), orderBy("timestamp", "desc"), limit(50))
+        : null,
+    [firestore, dispensary]
+  );
+  
+  const { data: messagesData, isLoading } = useCollection<ChatMessageType>(messagesQuery);
+  const messages = useMemo(() => messagesData?.slice().reverse() || [], [messagesData]);
+
+
   const handleAvatarClick = (user: ChatUser) => {
     setSelectedProfile(user);
     setProfileModalOpen(true);
@@ -217,24 +187,6 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     params.delete("sheet");
     router.push(pathname + "?" + params.toString());
   };
-
-  useEffect(() => {
-    if (isOpen) {
-      setMessages(initialMockMessages.slice(0, MESSAGES_PER_PAGE).reverse());
-      setPage(1);
-      setHasMore(initialMockMessages.length > MESSAGES_PER_PAGE);
-      setAutoScroll(true);
-    }
-  }, [isOpen]);
-
-  const loadMoreMessages = useCallback(() => {
-    setAutoScroll(false);
-    const nextPage = page + 1;
-    const newMessages = initialMockMessages.slice(0, nextPage * MESSAGES_PER_PAGE);
-    setMessages(newMessages.reverse());
-    setPage(nextPage);
-    if (newMessages.length >= initialMockMessages.length) setHasMore(false);
-  }, [page]);
   
   const handleScroll = (e: UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -249,37 +201,38 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   }, [messages, autoScroll]);
 
 
-  useEffect(() => {
-    if (!isTyping) return;
-    const typingTimer = setTimeout(() => setIsTyping(false), 2000);
-    return () => clearTimeout(typingTimer);
-  }, [isTyping, newMessage]);
-
   const handleSendMessage = useCallback(() => {
-    if (!newMessage.trim() || !user) return;
-    const messageToSend: ChatMessage = {
-      id: `msg-${Date.now()}`,
+    if (!newMessage.trim() || !user || !firestore || !dispensary) return;
+    const messagesCol = collection(firestore, 'dispensaries', dispensary.id, 'messages');
+
+    const messageToSend: Omit<ChatMessageType, 'id'> = {
       user: { id: user.uid, name: user.displayName || 'Anonymous', avatar: user.photoURL || "", isOnline: true },
       text: newMessage,
-      timestamp: new Date().toISOString(),
+      timestamp: serverTimestamp() as any,
       likes: 0,
       isLiked: false,
       replyingTo: replyingTo ? { user: replyingTo.user.name, text: replyingTo.text } : undefined,
     };
-    setMessages((prev) => [...prev, messageToSend]);
+    addDocumentNonBlocking(messagesCol, messageToSend);
+    
     setNewMessage("");
     if (inputRef.current) inputRef.current.innerHTML = '';
     setReplyingTo(null);
     setAutoScroll(true);
-  }, [newMessage, replyingTo, user]);
+  }, [newMessage, replyingTo, user, firestore, dispensary]);
 
   const handleLike = useCallback((id: string) => {
-    setMessages((prev) =>
-      prev.map((msg) => msg.id === id ? { ...msg, isLiked: !msg.isLiked, likes: msg.isLiked ? msg.likes - 1 : msg.likes + 1 } : msg)
-    );
+    // In a real app, this would update Firestore.
+    console.log("Liking message:", id);
   }, []);
 
-  const handleReply = useCallback((msg: ChatMessage) => {
+  const handleDelete = useCallback((id: string) => {
+      if (!firestore || !dispensary) return;
+      const messageRef = doc(firestore, 'dispensaries', dispensary.id, 'messages', id);
+      deleteDocumentNonBlocking(messageRef);
+  }, [firestore, dispensary]);
+
+  const handleReply = useCallback((msg: ChatMessageType) => {
     setReplyingTo(msg);
     if (inputRef.current) {
         inputRef.current.focus();
@@ -319,11 +272,12 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
         </SheetHeader>
         
         <ScrollArea className="flex-1 min-h-0" onScroll={handleScroll} ref={scrollViewportRef}>
-            <MessageList messages={messages} hasMore={hasMore} loadMore={loadMoreMessages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} />
+            {isLoading && <div className="text-center p-4 text-muted-foreground">Loading messages...</div>}
+            {!isLoading && messages.length > 0 && <MessageList messages={messages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} onDelete={handleDelete} />}
+            {!isLoading && messages.length === 0 && <div className="text-center p-8 text-muted-foreground">Be the first to say something!</div>}
         </ScrollArea>
     
         <div className="relative p-2 pt-0">
-             {isTyping && <p className="text-xs text-muted-foreground px-4 py-1 italic flex-shrink-0">A user is typing...</p>}
             {user ? (
             <div className="relative">
                 <AnimatePresence>
@@ -375,7 +329,6 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                         onInput={(e) => {
                             const target = e.currentTarget as HTMLDivElement;
                             setNewMessage(target.innerText);
-                            setIsTyping(true);
                         }}
                         onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
                         className="w-full bg-transparent outline-none text-sm px-2 flex-grow min-h-[2.25rem] flex items-center"
