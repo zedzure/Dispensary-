@@ -2,426 +2,105 @@
 {
   "entities": {
     "User": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user of the GreenLeaf Guide application.",
+      "description": "Represents a user of the application.",
       "properties": {
-        "id": {
+        "username": {
           "type": "string",
-          "description": "Unique identifier for the user."
-        },
-        "email": {
-          "type": "string",
-          "description": "User's email address.",
-          "format": "email"
+          "description": "The user's unique username."
         },
         "displayName": {
           "type": "string",
-          "description": "User's display name or username."
+          "description": "The user's display name."
         },
-        "phoneNumber": {
-          "type": "string",
-          "description": "User's phone number."
-        },
-        "profileImageUrl": {
+        "photoURL": {
           "type": "string",
           "description": "URL of the user's profile image.",
           "format": "uri"
         },
-        "loyaltyPoints": {
+        "bio": {
+          "type": "string",
+          "description": "A short biography of the user."
+        },
+        "followersCount": {
           "type": "number",
-          "description": "User's accumulated loyalty points."
+          "description": "The number of followers the user has."
         },
-        "address": {
-          "type": "string",
-          "description": "User's address."
-        },
-        "city": {
-          "type": "string",
-          "description": "User's city."
-        },
-        "state": {
-          "type": "string",
-          "description": "User's state."
-        },
-        "zipCode": {
-          "type": "string",
-          "description": "User's zip code."
-        }
-      },
-      "required": [
-        "id",
-        "email",
-        "displayName"
-      ]
-    },
-    "Product": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Product",
-      "type": "object",
-      "description": "Represents a product available for sale.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the product."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the product."
-        },
-        "description": {
-          "type": "string",
-          "description": "Detailed description of the product."
-        },
-        "categoryId": {
-          "type": "string",
-          "description": "Reference to Category. (Relationship: Category 1:N Product)"
-        },
-        "price": {
+        "followingCount": {
           "type": "number",
-          "description": "Price of the product."
-        },
-        "imageUrl": {
-          "type": "string",
-          "description": "URL of the product image.",
-          "format": "uri"
-        },
-        "thcPercentage": {
-          "type": "number",
-          "description": "THC percentage of the product."
-        },
-        "cbdPercentage": {
-          "type": "number",
-          "description": "CBD percentage of the product."
-        },
-        "stockQuantity": {
-          "type": "number",
-          "description": "The amount of product currently in stock"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "description",
-        "categoryId",
-        "price",
-        "imageUrl",
-        "stockQuantity"
-      ]
-    },
-    "Category": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Category",
-      "type": "object",
-      "description": "Represents a category of products.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the category."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the category (e.g., Flower, Edibles, Vapes)."
-        },
-        "description": {
-          "type": "string",
-          "description": "Description of the category."
-        },
-        "imageUrl": {
-          "type": "string",
-          "description": "URL of the category image.",
-          "format": "uri"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "description"
-      ]
-    },
-    "Order": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Order",
-      "type": "object",
-      "description": "Represents a customer order.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the order."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to User. (Relationship: User 1:N Order)"
-        },
-        "orderDate": {
-          "type": "string",
-          "description": "Date and time when the order was placed.",
-          "format": "date-time"
-        },
-        "totalAmount": {
-          "type": "number",
-          "description": "Total amount of the order."
-        },
-        "status": {
-          "type": "string",
-          "description": "Status of the order (e.g., Pending, Processing, Shipped, Delivered)."
-        },
-        "orderItems": {
-          "type": "array",
-          "description": "An array of order item ids",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "id",
-        "userId",
-        "orderDate",
-        "totalAmount",
-        "status"
-      ]
-    },
-    "OrderItem": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "OrderItem",
-      "type": "object",
-      "description": "Represents an item within an order.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the order item."
-        },
-        "orderId": {
-          "type": "string",
-          "description": "Reference to Order. (Relationship: Order 1:N OrderItem)"
-        },
-        "productId": {
-          "type": "string",
-          "description": "Reference to Product. (Relationship: Product 1:N OrderItem)"
-        },
-        "quantity": {
-          "type": "number",
-          "description": "Quantity of the product in the order item."
-        },
-        "price": {
-          "type": "number",
-          "description": "Price of the product at the time of the order."
-        }
-      },
-      "required": [
-        "id",
-        "orderId",
-        "productId",
-        "quantity",
-        "price"
-      ]
-    },
-    "Review": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Review",
-      "type": "object",
-      "description": "Represents a user review for a product.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the review."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to User. (Relationship: User 1:N Review)"
-        },
-        "productId": {
-          "type": "string",
-          "description": "Reference to Product. (Relationship: Product 1:N Review)"
-        },
-        "rating": {
-          "type": "number",
-          "description": "Rating given by the user (e.g., 1 to 5 stars)."
-        },
-        "comment": {
-          "type": "string",
-          "description": "User's comment or feedback about the product."
-        },
-        "reviewDate": {
-          "type": "string",
-          "description": "Date and time when the review was submitted.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "userId",
-        "productId",
-        "rating",
-        "comment",
-        "reviewDate"
-      ]
-    },
-    "LoyaltyProgram": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "LoyaltyProgram",
-      "type": "object",
-      "description": "Represents the loyalty program rules and settings.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the loyalty program."
-        },
-        "pointsPerDollar": {
-          "type": "number",
-          "description": "Number of loyalty points earned per dollar spent."
-        },
-        "redemptionRate": {
-          "type": "number",
-          "description": "Value of each loyalty point when redeemed (e.g., 0.01 for $0.01 per point)."
-        },
-        "rewards": {
-          "type": "array",
-          "description": "An array of reward ids",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "id",
-        "pointsPerDollar",
-        "redemptionRate"
-      ]
-    },
-    "Reward": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Reward",
-      "type": "object",
-      "description": "Represents a reward available to users in the loyalty program.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the reward."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the reward (e.g., Free Pre-roll)."
-        },
-        "description": {
-          "type": "string",
-          "description": "Description of the reward."
-        },
-        "pointsRequired": {
-          "type": "number",
-          "description": "Number of loyalty points required to redeem the reward."
-        },
-        "productId": {
-          "type": "string",
-          "description": "Reference to Product (optional). The product that is given as a reward."
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "description",
-        "pointsRequired"
-      ]
-    },
-    "Budtender": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Budtender",
-      "type": "object",
-      "description": "Represents a budtender user with POS access.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the budtender user."
-        },
-        "email": {
-          "type": "string",
-          "description": "Budtender's email address.",
-          "format": "email"
-        },
-        "displayName": {
-          "type": "string",
-          "description": "Budtender's display name."
-        },
-        "phoneNumber": {
-          "type": "string",
-          "description": "Budtender's phone number."
-        },
-        "profileImageUrl": {
-          "type": "string",
-          "description": "URL of the budtender's profile image.",
-          "format": "uri"
-        }
-      },
-      "required": [
-        "id",
-        "email",
-        "displayName"
-      ]
-    },
-    "Admin": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Admin",
-      "type": "object",
-      "description": "Represents an admin user with full control over the system.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the admin user."
-        },
-        "email": {
-          "type": "string",
-          "description": "Admin's email address.",
-          "format": "email"
-        },
-        "displayName": {
-          "type": "string",
-          "description": "Admin's display name."
-        },
-        "phoneNumber": {
-          "type": "string",
-          "description": "Admin's phone number."
-        },
-        "profileImageUrl": {
-          "type": "string",
-          "description": "URL of the admin's profile image.",
-          "format": "uri"
-        }
-      },
-      "required": [
-        "id",
-        "email",
-        "displayName"
-      ]
-    },
-    "PostIt": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "PostIt",
-      "type": "object",
-      "description": "A short text note created by a user.",
-      "properties": {
-        "content": {
-          "type": "string",
-          "description": "The text content of the note."
-        },
-        "color": {
-          "type": "string",
-          "description": "Background color of the note.",
-          "enum": ["yellow", "pink", "blue", "green"]
+          "description": "The number of users this user is following."
         },
         "createdAt": {
           "type": "string",
-          "description": "Timestamp of when the note was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp of when the note was last updated.",
+          "description": "Timestamp of when the user account was created.",
           "format": "date-time"
         }
       },
-      "required": ["content", "createdAt", "updatedAt"]
+      "required": [
+        "username",
+        "displayName",
+        "createdAt"
+      ]
+    },
+    "Post": {
+      "title": "Post",
+      "type": "object",
+      "description": "Represents a post created by a user.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The type of the post.",
+          "enum": ["photo", "video", "music", "text"]
+        },
+        "fileUrl": {
+          "type": "string",
+          "description": "Link to the file in Firebase Storage.",
+          "format": "uri"
+        },
+        "thumbnail": {
+          "type": "string",
+          "description": "Optional thumbnail for video or photo posts.",
+          "format": "uri"
+        },
+        "caption": {
+          "type": "string",
+          "description": "Text caption for the post."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who created the post."
+        },
+        "likes": {
+          "type": "number",
+          "description": "The number of likes the post has received."
+        },
+        "commentsCount": {
+          "type": "number",
+          "description": "The number of comments on the post."
+        },
+        "duration": {
+          "type": "number",
+          "description": "Duration in seconds for music or video posts."
+        },
+        "tags": {
+          "type": "array",
+          "description": "Hashtags or categories for the post.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the post was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "type",
+        "userId",
+        "createdAt"
+      ]
     }
   },
   "auth": {
@@ -437,9 +116,9 @@
         "definition": {
           "entityName": "User",
           "schema": {
-            "$ref": "#/backend/entities/User"
+            "$ref": "#/entities/User"
           },
-          "description": "Stores user profile information. Path-based ownership ensures only the user can access their own data.",
+          "description": "Stores user profile information.",
           "params": [
             {
               "name": "userId",
@@ -449,182 +128,21 @@
         }
       },
       {
-        "path": "/categories/{categoryId}",
+        "path": "/posts/{postId}",
         "definition": {
-          "entityName": "Category",
+          "entityName": "Post",
           "schema": {
-            "$ref": "#/backend/entities/Category"
+            "$ref": "#/entities/Post"
           },
-          "description": "Stores product category information. Publicly accessible.",
+          "description": "Stores all posts created by users.",
           "params": [
             {
-              "name": "categoryId",
-              "description": "The unique identifier for the category."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/products/{productId}",
-        "definition": {
-          "entityName": "Product",
-          "schema": {
-            "$ref": "#/backend/entities/Product"
-          },
-          "description": "Stores product information. Includes 'categoryId' for category association.",
-          "params": [
-            {
-              "name": "productId",
-              "description": "The unique identifier for the product."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/orders/{orderId}",
-        "definition": {
-          "entityName": "Order",
-          "schema": {
-            "$ref": "#/backend/entities/Order"
-          },
-          "description": "Stores order information for a specific user. Path-based ownership.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            },
-            {
-              "name": "orderId",
-              "description": "The unique identifier for the order."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/orders/{orderId}/orderItems/{orderItemId}",
-        "definition": {
-          "entityName": "OrderItem",
-          "schema": {
-            "$ref": "#/backend/entities/OrderItem"
-          },
-          "description": "Stores order item information for a specific order. Uses hierarchical path.",
-          "params": [
-            {
-              "name": "orderId",
-              "description": "The unique identifier for the order."
-            },
-            {
-              "name": "orderItemId",
-              "description": "The unique identifier for the order item."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/products/{productId}/reviews/{reviewId}",
-        "definition": {
-          "entityName": "Review",
-          "schema": {
-            "$ref": "#/backend/entities/Review"
-          },
-          "description": "Stores reviews for a specific product. Uses hierarchical path.",
-          "params": [
-            {
-              "name": "productId",
-              "description": "The unique identifier for the product."
-            },
-            {
-              "name": "reviewId",
-              "description": "The unique identifier for the review."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/loyaltyPrograms/{loyaltyProgramId}",
-        "definition": {
-          "entityName": "LoyaltyProgram",
-          "schema": {
-            "$ref": "#/backend/entities/LoyaltyProgram"
-          },
-          "description": "Stores loyalty program settings. Accessible by admins.",
-          "params": [
-            {
-              "name": "loyaltyProgramId",
-              "description": "The unique identifier for the loyalty program."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/rewards/{rewardId}",
-        "definition": {
-          "entityName": "Reward",
-          "schema": {
-            "$ref": "#/backend/entities/Reward"
-          },
-          "description": "Stores reward information. Accessible by admins.",
-          "params": [
-            {
-              "name": "rewardId",
-              "description": "The unique identifier for the reward."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/budtenders/{budtenderId}",
-        "definition": {
-          "entityName": "Budtender",
-          "schema": {
-            "$ref": "#/backend/entities/Budtender"
-          },
-          "description": "Stores budtender profile information.  Separate collection for role-based access.",
-          "params": [
-            {
-              "name": "budtenderId",
-              "description": "The unique identifier for the budtender."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/admins/{adminId}",
-        "definition": {
-          "entityName": "Admin",
-          "schema": {
-            "$ref": "#/backend/entities/Admin"
-          },
-          "description": "Stores admin profile information. Separate collection for role-based access.",
-          "params": [
-            {
-              "name": "adminId",
-              "description": "The unique identifier for the admin."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/post-its/{postItId}",
-        "definition": {
-          "entityName": "PostIt",
-          "schema": {
-            "$ref": "#/backend/entities/PostIt"
-          },
-          "description": "Stores individual post-it notes for a specific user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            },
-            {
-              "name": "postItId",
-              "description": "The unique identifier for the post-it note."
+              "name": "postId",
+              "description": "The unique identifier for the post."
             }
           ]
         }
       }
-    ],
-    "reasoning": "The Firestore data structure is designed to support the GreenLeaf Guide application, prioritizing security, scalability, and debuggability as per the core design principles.  Authorization Independence is achieved through denormalization, specifically by embedding user roles and permissions within documents where access control is needed. This eliminates the need for `get()` calls in security rules, enabling atomic operations. Structural Segregation ensures that each collection has a homogeneous security posture, simplifying rules.  The structure leverages path-based ownership for user-related data and employs membership maps for collaborative access. Dedicated collections manage global roles, enhancing security. This structure supports QAPs, enabling secure `list` operations through segregation and membership models."
+    ]
   }
 }

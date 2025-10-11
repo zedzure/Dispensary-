@@ -3,19 +3,19 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser, useAuth, useFirestore, setDocumentNonBlocking } from '@/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { useUser, useAuth, useFirestore, setDocumentNonBlocking, useDoc } from '@/firebase';
+import { doc, serverTimestamp } from 'firebase/firestore';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { UserProfileCard } from '@/components/user-profile-card';
-import type { UserProfile } from '@/types/pos';
+import type { UserProfile as OldUserProfile } from '@/types/pos';
+import type { User as NewUser } from '@/types/user';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UserProfileSheets } from '@/components/user-profile-sheets';
 import type { UploadItem } from '@/types/pos';
-import { useFileUpload } from '@/hooks/useFileUpload';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
 
 export type ActiveSheet = 'receipts' | 'uploads' | 'notes' | 'search' | null;
@@ -74,86 +74,53 @@ export default function ProfilePage() {
   const { user, isUserLoading: authLoading } = useUser();
   const auth = useAuth();
   const db = useFirestore();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
   const [uploads, setUploads] = useState<UploadItem[]>([]);
   const router = useRouter();
-  
-  const handleProfileUpdate = (updatedProfile: Partial<UserProfile>) => {
-    setProfile(prev => prev ? { ...prev, ...updatedProfile } : null);
-  };
+
+  const userDocRef = (user && db) ? doc(db, 'users', user.uid) : null;
+  const { data: profile, isLoading: profileLoading } = useDoc<NewUser>(userDocRef);
 
   useEffect(() => {
-    const fetchOrCreateProfile = async () => {
-      if (user) {
+    const createProfileIfNeeded = async () => {
+      if (user && !profileLoading && !profile) {
         try {
           const userDocRef = doc(db, 'users', user.uid);
-          const userDoc = await getDoc(userDocRef);
-          
-          if (userDoc.exists()) {
-            setProfile(userDoc.data() as UserProfile);
-          } else {
-            let newProfile: UserProfile;
-
-            // Create a special detailed profile for the specified UID
-            if (user.uid === 'p9ZjS1zAbTWrxryVd1HA1ftUcl32') {
-                newProfile = {
-                    id: user.uid,
-                    firstName: 'Kim',
-                    lastName: 'Possible',
-                    email: user.email || 'kim@gmail.com',
-                    memberSince: user.metadata.creationTime || new Date().toISOString(),
-                    avatarUrl: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=400',
-                    dataAiHint: 'person face',
-                    points: 123,
-                    followers: [],
-                    following: [],
-                    followersCount: 1598,
-                    followingCount: 65,
-                    bio: `Front-end Developer from <strong>Mesopotamia</strong>`,
-                    reviewsToday: 123,
-                    receiptsThisWeek: 85,
-                };
-            } else {
-                // Create and save a new default profile for other users
-                newProfile = {
-                    id: user.uid,
-                    firstName: user.displayName?.split(' ')[0] || 'New',
-                    lastName: user.displayName?.split(' ').slice(1).join(' ') || 'User',
-                    email: user.email || '',
-                    memberSince: user.metadata.creationTime || new Date().toISOString(),
-                    avatarUrl: user.photoURL || `https://avatar.vercel.sh/${user.uid}`,
-                    points: 123,
-                    followers: [],
-                    following: [],
-                    followersCount: 1598,
-                    followingCount: 65,
-                    bio: `Front-end Developer from <strong>Mesopotamia</strong>`,
-                    reviewsToday: 123,
-                    receiptsThisWeek: 85,
-                };
-            }
-            setDocumentNonBlocking(userDocRef, newProfile, { merge: true });
-            setProfile(newProfile);
-          }
+          const newProfile: NewUser = {
+            username: user.email?.split('@')[0] || user.uid,
+            displayName: user.displayName || 'Anonymous User',
+            photoURL: user.photoURL || `https://avatar.vercel.sh/${user.uid}`,
+            bio: 'Welcome to my profile!',
+            followersCount: 0,
+            followingCount: 0,
+            createdAt: serverTimestamp(),
+            uid: user.uid
+          };
+          setDocumentNonBlocking(userDocRef, newProfile, { merge: true });
         } catch (error) {
-          console.error("Error fetching or creating user profile:", error);
-        } finally {
-          setProfileLoading(false);
+          console.error("Error creating user profile:", error);
         }
-      } else if (!authLoading) {
-        // If not loading and no user, stop loading and trigger redirect
-        setProfileLoading(false);
       }
     };
 
-    fetchOrCreateProfile();
-  }, [user, authLoading, db]);
+    if (!authLoading) {
+        if (user) {
+            createProfileIfNeeded();
+        } else {
+            router.replace('/login');
+        }
+    }
+  }, [user, profile, profileLoading, authLoading, db, router]);
+
 
   const handleLogout = async () => {
     await signOut(auth);
     router.push('/login');
+  };
+
+  const handleProfileUpdate = (updatedProfile: Partial<OldUserProfile>) => {
+    // This function is now more complex because the profile data is from Firestore.
+    // We'll handle updates directly via Firestore now.
   };
   
   if (authLoading || profileLoading) {
@@ -161,11 +128,30 @@ export default function ProfilePage() {
   }
   
   if (!user) {
-    router.replace('/login');
-    return <ProfilePageSkeleton />;
+    return <ProfilePageSkeleton />; // Or a redirect component
   }
 
-  if (!profile) {
+  // This is a temporary adapter to make the old UserProfileCard work with the new User data structure.
+  // In a real refactor, you'd update UserProfileCard to accept the new User type.
+  const adaptedProfile: OldUserProfile | null = profile ? {
+      id: user.uid,
+      firstName: profile.displayName?.split(' ')[0] || '',
+      lastName: profile.displayName?.split(' ').slice(1).join(' ') || '',
+      email: user.email || '',
+      memberSince: profile.createdAt?.toDate ? profile.createdAt.toDate().toISOString() : new Date().toISOString(),
+      avatarUrl: profile.photoURL || '',
+      bio: profile.bio,
+      followersCount: profile.followersCount,
+      followingCount: profile.followingCount,
+      // Defaulting other fields as they don't exist on the new User model
+      points: 0,
+      followers: [],
+      following: [],
+      reviewsToday: 0,
+      receiptsThisWeek: 0,
+  } : null;
+
+  if (!adaptedProfile) {
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
@@ -194,7 +180,7 @@ export default function ProfilePage() {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
         <div className="w-full">
-            <UserProfileCard profile={profile} setActiveSheet={setActiveSheet} onUpdate={handleProfileUpdate} />
+            <UserProfileCard profile={adaptedProfile} setActiveSheet={setActiveSheet} onUpdate={handleProfileUpdate} />
              <div className="text-center mt-4">
                  <Button onClick={handleLogout} variant="destructive">
                     <LogOut className="mr-2 h-4 w-4" />
