@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useUser, useAuth, useFirestore, setDocumentNonBlocking, useDoc } from '@/firebase';
-import { doc, serverTimestamp } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
@@ -87,6 +87,7 @@ export default function ProfilePage() {
     const createProfileIfNeeded = async () => {
       // Create profile only if viewing own profile and it doesn't exist
       if (authUser && authUser.uid === userId && !profileLoading && !profile) {
+        if (!db) return;
         try {
           const newUserDocRef = doc(db, 'users', authUser.uid);
           const newProfile: NewUser = {
@@ -96,7 +97,7 @@ export default function ProfilePage() {
             bio: 'Welcome to my profile!',
             followersCount: 0,
             followingCount: 0,
-            createdAt: serverTimestamp(),
+            createdAt: new Date(),
             uid: authUser.uid
           };
           setDocumentNonBlocking(newUserDocRef, newProfile, { merge: true });
@@ -109,7 +110,7 @@ export default function ProfilePage() {
     if (!authLoading && authUser) {
         createProfileIfNeeded();
     }
-  }, [authUser, userId, profile, profileLoading, authLoading, db, router]);
+  }, [authUser, userId, profile, profileLoading, authLoading, db]);
 
 
   const handleLogout = async () => {
@@ -148,7 +149,7 @@ export default function ProfilePage() {
       firstName: profile.displayName?.split(' ')[0] || '',
       lastName: profile.displayName?.split(' ').slice(1).join(' ') || '',
       email: '', // Not available on the new user model publicly
-      memberSince: profile.createdAt?.toDate ? profile.createdAt.toDate().toISOString() : new Date().toISOString(),
+      memberSince: profile.createdAt ? (profile.createdAt as any).toDate ? (profile.createdAt as any).toDate().toISOString() : new Date(profile.createdAt as any).toISOString() : new Date().toISOString(),
       avatarUrl: profile.photoURL || '',
       bio: profile.bio,
       followersCount: profile.followersCount,

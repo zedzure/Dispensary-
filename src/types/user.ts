@@ -9,5 +9,5 @@ export interface User {
   bio: string;
   followersCount: number;
   followingCount: number;
-  createdAt: Timestamp;
+  createdAt: Timestamp | Date;
 }
