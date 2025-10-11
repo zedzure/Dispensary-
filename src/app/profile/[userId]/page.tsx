@@ -161,10 +161,10 @@ export default function ProfilePage() {
   return (
     <>
     <div className="flex flex-col min-h-screen">
-       <div className="fixed inset-0 -z-10 h-full w-full bg-gradient-to-br from-indigo-500 to-purple-500 bg-cover bg-center bg-no-repeat bg-fixed" 
-         style={{backgroundImage: "url('https://images.unsplash.com/photo-1539635278303-d4002c07eae3?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDk1Njc4NTB8&ixlib=rb-4.1.0&q=85')"}}
+       <div className="fixed inset-0 -z-10 h-full w-full bg-background bg-cover bg-center bg-no-repeat bg-fixed" 
+         style={{backgroundImage: "url('https://storage.googleapis.com/project-13773344-54196.appspot.com/assets/2a1c68f7733d0615e3c790a6183f95b5.png')"}}
        >
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/30 to-purple-500/30" />
+        <div className="absolute inset-0 bg-background/80" />
       </div>
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
