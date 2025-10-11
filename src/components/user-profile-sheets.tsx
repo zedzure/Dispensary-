@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/com
 import { Button } from "@/components/ui/button";
 import { X, FileText, Camera, Receipt, Send } from "lucide-react";
 import type { User as FirebaseUser } from "firebase/auth";
-import type { ActiveSheet } from "@/app/profile/page";
+import type { ActiveSheet } from "@/app/profile/[userId]/page";
 import type { UploadItem, Receipt as ReceiptType } from "@/types/pos";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +47,7 @@ const getRelativeTime = (date: Date): string => {
 const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 liquid-glass shadow-2xl shadow-blue-500/20">
+      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none">
         <SheetHeader className="p-4 border-b">
           <SheetTitle className="flex items-center"><Receipt className="mr-2 h-5 w-5"/>My Receipts</SheetTitle>
         </SheetHeader>
