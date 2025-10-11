@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useRef, useCallback, UIEvent } from "react";
+import { useState, useEffect, useRef, useCallback, UIEvent, useMemo } from "react";
 import Image from "next/image";
 import {
   Sheet,
