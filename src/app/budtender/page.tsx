@@ -174,7 +174,7 @@ export default function BudtenderPOSPage() {
             <Header />
             <main className="flex-grow container mx-auto px-4 md:px-6 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col">
+                    <div className="lg:col-span-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-12rem)]">
                         <div className="p-4 border-b">
                              <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -186,7 +186,7 @@ export default function BudtenderPOSPage() {
                                 />
                             </div>
                         </div>
-                        <ScrollArea>
+                        <ScrollArea className="flex-1">
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
                                 {filteredProducts.map(product => (
                                     <Card 
@@ -207,7 +207,7 @@ export default function BudtenderPOSPage() {
                         </ScrollArea>
                     </div>
 
-                    <div className="bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col">
+                    <div className="bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-12rem)]">
                         <div className="p-4 border-b">
                             {activeCustomer ? (
                                 <div className="flex items-center gap-3">
@@ -258,7 +258,7 @@ export default function BudtenderPOSPage() {
                         </ScrollArea>
                         
                         {cart.length > 0 && (
-                            <div className="p-4 border-t mt-auto space-y-3">
+                            <div className="p-4 border-t mt-auto space-y-3 bg-background/80 rounded-b-lg">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-muted-foreground">Subtotal</span>
                                     <span>${subtotal.toFixed(2)}</span>

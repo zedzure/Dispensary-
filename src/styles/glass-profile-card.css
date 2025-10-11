@@ -11,6 +11,7 @@
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     max-width: 400px;
     margin: auto;
+    width: 100%;
 }
 
 .glass-profile-card-header {
@@ -180,4 +181,34 @@
   z-index: -1;
   filter: blur(1px) drop-shadow(10px 4px 6px black) brightness(115%);
   pointer-events: none;
+}
+
+@media (max-width: 480px) {
+    .glass-profile-card {
+        padding: 1rem;
+        border-radius: 1.5rem;
+    }
+    .glass-profile-card-avatar-wrapper {
+        width: 100px;
+        height: 100px;
+    }
+    .glass-profile-card-name {
+        font-size: 1.5rem;
+    }
+    .glass-profile-card-stats {
+        padding: 0.75rem;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .glass-profile-card-stat-value {
+        font-size: 1.25rem;
+    }
+    .glass-profile-card-stat-label {
+        font-size: 0.7rem;
+    }
+    .glass-profile-card-actions {
+        gap: 0.5rem;
+    }
+    .glass-profile-card-footer {
+        flex-direction: column;
+    }
 }
