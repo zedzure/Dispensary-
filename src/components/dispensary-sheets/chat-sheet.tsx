@@ -40,6 +40,7 @@ import { cn } from "@/lib/utils";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { UserProfileModal } from "../user-profile-modal";
 import { useViewportHeight } from "@/hooks/use-viewport-height";
+import { useMobileViewportFix } from '@/hooks/use-mobile-viewport-fix';
 import { motion, AnimatePresence } from "framer-motion";
 import { collection, query, orderBy, limit, serverTimestamp, doc } from "firebase/firestore";
 import { uploadImage } from "@/lib/image-upload";
@@ -151,6 +152,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   const { toast } = useToast();
 
   const vh = useViewportHeight();
+  useMobileViewportFix();
 
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);

@@ -15,6 +15,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Textarea } from "./ui/textarea";
 import { SearchSheet } from "./search-sheet";
 import { cn } from "@/lib/utils";
+import { useMobileViewportFix } from "@/hooks/use-mobile-viewport-fix";
 
 interface Notification {
   id: string;
@@ -117,6 +118,7 @@ const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: bo
     const [messages, setMessages] = useState<Notification[]>([]);
     const [replyingTo, setReplyingTo] = useState<Notification | null>(null);
     const [newMessage, setNewMessage] = useState('');
+    useMobileViewportFix();
 
     useEffect(() => {
         if(open) {

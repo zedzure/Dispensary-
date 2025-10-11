@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useViewportHeight } from '@/hooks/use-viewport-height';
+import { useMobileViewportFix } from '@/hooks/use-mobile-viewport-fix';
 
 
 import { DispensaryPromotionsSheet } from './dispensary-sheets/promotions-sheet';
@@ -177,6 +178,7 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
   const { user } = useUser();
   const { toast } = useToast();
   const vh = useViewportHeight();
+  useMobileViewportFix();
   
   const [reviews, setReviews] = useState<Review[]>([]);
 
