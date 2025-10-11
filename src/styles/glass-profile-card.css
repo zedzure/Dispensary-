@@ -1,0 +1,183 @@
+
+.glass-profile-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 2rem;
+    padding: 1.5rem;
+    color: white;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    max-width: 400px;
+    margin: auto;
+}
+
+.glass-profile-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.glass-profile-card-avatar-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.glass-profile-card-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 20px rgba(120, 219, 255, 0.5);
+}
+
+.glass-profile-card-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.glass-profile-card-name {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.glass-profile-card-bio {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    line-height: 1.5;
+}
+
+.glass-profile-card-bio strong {
+    color: hsl(var(--primary));
+    font-weight: 600;
+}
+
+.glass-profile-card-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 1rem;
+}
+
+.glass-profile-card-stat {
+    text-align: center;
+}
+
+.glass-profile-card-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: hsl(var(--primary));
+}
+
+.glass-profile-card-stat-label {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.glass-profile-card-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.glass-profile-card-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1;
+    font-size: 1.25rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.glass-profile-card-action-btn.glass {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+}
+
+.glass-profile-card-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.glass-profile-card-footer {
+    display: flex;
+    gap: 1rem;
+}
+
+.glass-profile-card-button {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    border-radius: 0.75rem;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.glass-profile-card-button.message-btn {
+    background: hsl(var(--primary));
+    box-shadow: 0 4px 15px hsla(var(--primary) / 0.3);
+}
+
+.glass-profile-card-button.message-btn:hover {
+    background: hsla(var(--primary) / 0.8);
+    box-shadow: 0 6px 20px hsla(var(--primary) / 0.4);
+    transform: translateY(-2px);
+}
+
+.glass-profile-card-button.follow-btn {
+    background: hsl(var(--accent));
+     box-shadow: 0 4px 15px hsla(var(--accent) / 0.3);
+}
+
+.glass-profile-card-button.follow-btn:hover {
+    background: hsla(var(--accent) / 0.8);
+    box-shadow: 0 6px 20px hsla(var(--accent) / 0.4);
+    transform: translateY(-2px);
+}
+
+/* Glass effect utility */
+.glass {
+  position: relative;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(2px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2), inset 0 4px 20px rgba(255, 255, 255, 0.3);
+}
+
+.glass::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(1px);
+  box-shadow: inset -10px -8px 0px -11px rgba(255, 255, 255, 1),
+    inset 0px -9px 0px -8px rgba(255, 255, 255, 1);
+  opacity: 0.6;
+  z-index: -1;
+  filter: blur(1px) drop-shadow(10px 4px 6px black) brightness(115%);
+  pointer-events: none;
+}

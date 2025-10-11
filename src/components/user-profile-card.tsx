@@ -5,12 +5,12 @@
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import type { UserProfile } from '@/types/pos';
-import { Camera, Music, Video, Receipt, Wallet, MessageSquare, FileText, Bookmark, Edit, Save, Loader2 } from 'lucide-react';
+import { Camera, Music, Video, Receipt, Wallet, MessageSquare, FileText, Bookmark, Edit, Save, Loader2, UserPlus } from 'lucide-react';
 import { useUser, useFirestore, setDocumentNonBlocking } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Textarea } from './ui/textarea';
-import type { ActiveSheet } from '@/app/profile/page';
+import type { ActiveSheet } from '@/app/profile/[userId]/page';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { doc } from 'firebase/firestore';
 import { Button } from './ui/button';
@@ -31,7 +31,6 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate }: UserProfi
     const [isEditingBio, setIsEditingBio] = useState(false);
     const [bio, setBio] = useState(profile.bio || '');
     const fileInputRef = useRef<HTMLInputElement>(null);
-
 
     const actionLinks = [
         { name: 'Photos', icon: Camera, sheet: 'uploads' },
@@ -62,11 +61,11 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate }: UserProfi
 
     const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file && user) {
+        if (file && user && db) {
             try {
-                const { url } = await uploadFile(file);
+                const url = await uploadFile(file);
                 const userRef = doc(db, 'users', user.uid);
-                setDocumentNonBlocking(userRef, { avatarUrl: url }, { merge: true });
+                setDocumentNonBlocking(userRef, { photoURL: url }, { merge: true }); // Use photoURL for consistency with new User type
                 onUpdate({ avatarUrl: url });
                 toast({ title: 'Avatar updated!' });
             } catch (error: any) {
@@ -87,11 +86,11 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate }: UserProfi
     
     return (
         <>
-            <div className="wrapper">
-                <div className="profile-card js-profile-card">
-                    <div className="profile-card__img group">
-                        <Image src={profile.avatarUrl} alt={`${profile.firstName} ${profile.lastName}`} width={150} height={150} data-ai-hint="person face" />
-                        {user?.uid === profile.id && (
+            <div className="glass-profile-card">
+                <div className="glass-profile-card-header">
+                    <div className="glass-profile-card-avatar-wrapper group">
+                        <Image src={profile.avatarUrl} alt={`${profile.firstName} ${profile.lastName}`} width={100} height={100} className="glass-profile-card-avatar" data-ai-hint="person face" />
+                         {user?.uid === profile.id && (
                             <button onClick={() => fileInputRef.current?.click()} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
                                 {uploading ? <Loader2 className="h-8 w-8 text-white animate-spin" /> : <Camera className="h-8 w-8 text-white" />}
                             </button>
@@ -104,17 +103,15 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate }: UserProfi
                             accept="image/*"
                         />
                     </div>
-
-                    <div className="profile-card__cnt js-profile-cnt">
-                        <div className="profile-card__name">{profile.firstName} {profile.lastName}</div>
-                        
-                        <div className="profile-card__txt relative">
-                            {isEditingBio && user?.uid === profile.id ? (
+                    <div className="glass-profile-card-user-info">
+                        <h3 className="glass-profile-card-name">{profile.firstName} {profile.lastName}</h3>
+                        <div className="glass-profile-card-bio relative">
+                           {isEditingBio && user?.uid === profile.id ? (
                                 <div className='space-y-2'>
                                 <Textarea 
                                         value={bio} 
                                         onChange={(e) => setBio(e.target.value)} 
-                                        className="bg-transparent text-foreground border-primary/50"
+                                        className="bg-transparent text-white border-primary/50"
                                     />
                                     <div className='flex gap-2 justify-center'>
                                         <Button size="sm" onClick={handleSaveBio}><Save className="h-4 w-4 mr-2"/>Save</Button>
@@ -125,50 +122,49 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate }: UserProfi
                                 <>
                                     <span dangerouslySetInnerHTML={{ __html: profile.bio || `A cannabis enthusiast from <strong>Earth</strong>` }} />
                                     {user?.uid === profile.id && (
-                                        <button onClick={() => setIsEditingBio(true)} className="absolute -top-2 -right-2 p-1.5 rounded-full bg-muted/50 hover:bg-muted transition">
-                                            <Edit className="h-4 w-4" />
+                                        <button onClick={() => setIsEditingBio(true)} className="absolute -top-1 -right-2 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition">
+                                            <Edit className="h-3 w-3" />
                                         </button>
                                     )}
                                 </>
                             )}
                         </div>
-                        
-                        <div className="profile-card-inf">
-                            <div className="profile-card-inf__item">
-                                <div className="profile-card-inf__title text-primary">{profile.followersCount || 0}</div>
-                                <div className="profile-card-inf__txt">Followers</div>
-                            </div>
-                            <div className="profile-card-inf__item">
-                                <div className="profile-card-inf__title text-primary">{profile.followingCount || 0}</div>
-                                <div className="profile-card-inf__txt">Following</div>
-                            </div>
-                            <div className="profile-card-inf__item">
-                                <div className="profile-card-inf__title text-primary">{profile.reviewsToday || 0}</div>
-                                <div className="profile-card-inf__txt">Reviews</div>
-                            </div>
-                            <div className="profile-card-inf__item">
-                                <div className="profile-card-inf__title text-primary">{profile.receiptsThisWeek || 0}</div>
-                                <div className="profile-card-inf__txt">Receipts</div>
-                            </div>
-                        </div>
-
-                        <div className="profile-card-social">
-                            {actionLinks.map(link => (
-                                <button key={link.name} onClick={() => handleActionClick(link.sheet as ActiveSheet)} className={`profile-card-social__item ${link.name.toLowerCase()}`}>
-                                    <span className="icon-font">
-                                        <link.icon />
-                                    </span>
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="profile-card-ctr">
-                            <button className="profile-card__button button--blue js-message-btn" onClick={() => setMessageActive(true)}>Message</button>
-                            <button className="profile-card__button button--orange" onClick={handleFollow}>Follow</button>
-                        </div>
                     </div>
                 </div>
+
+                <div className="glass-profile-card-stats">
+                    <div className="glass-profile-card-stat">
+                        <div className="glass-profile-card-stat-value">{profile.followersCount || 0}</div>
+                        <div className="glass-profile-card-stat-label">Followers</div>
+                    </div>
+                    <div className="glass-profile-card-stat">
+                        <div className="glass-profile-card-stat-value">{profile.followingCount || 0}</div>
+                        <div className="glass-profile-card-stat-label">Following</div>
+                    </div>
+                    <div className="glass-profile-card-stat">
+                        <div className="glass-profile-card-stat-value">{profile.reviewsToday || 0}</div>
+                        <div className="glass-profile-card-stat-label">Reviews</div>
+                    </div>
+                     <div className="glass-profile-card-stat">
+                        <div className="glass-profile-card-stat-value">{profile.receiptsThisWeek || 0}</div>
+                        <div className="glass-profile-card-stat-label">Receipts</div>
+                    </div>
+                </div>
+
+                <div className="glass-profile-card-actions">
+                     {actionLinks.map(link => (
+                        <button key={link.name} onClick={() => handleActionClick(link.sheet as ActiveSheet)} className="glass-profile-card-action-btn glass">
+                           <link.icon />
+                        </button>
+                    ))}
+                </div>
+
+                <div className="glass-profile-card-footer">
+                    <button className="glass-profile-card-button message-btn" onClick={() => setMessageActive(true)}>Message</button>
+                    <button className="glass-profile-card-button follow-btn" onClick={handleFollow}>Follow</button>
+                </div>
             </div>
+
             <MessageSheet 
                 isOpen={isMessageActive} 
                 onClose={() => setMessageActive(false)}

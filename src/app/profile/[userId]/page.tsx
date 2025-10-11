@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -26,41 +27,28 @@ function ProfilePageSkeleton() {
         <div className="flex flex-col min-h-screen">
             <Header />
             <main className="flex-grow flex items-center justify-center">
-                 <div className="wrapper">
-                    <div className="profile-card js-profile-card">
-                         <div className="profile-card__img">
-                             <Skeleton className="h-full w-full rounded-full" />
-                         </div>
-                         <div className="profile-card__cnt js-profile-cnt">
-                             <Skeleton className="h-8 w-48 mx-auto mb-4" />
-                             <Skeleton className="h-4 w-3/4 mx-auto mb-4" />
-                             <Skeleton className="h-4 w-1/2 mx-auto mb-6" />
-                             <div className="profile-card-inf">
-                                <div className="profile-card-inf__item">
-                                    <Skeleton className="h-6 w-12 mx-auto mb-2" />
-                                    <Skeleton className="h-4 w-20 mx-auto" />
-                                </div>
-                                <div className="profile-card-inf__item">
-                                    <Skeleton className="h-6 w-12 mx-auto mb-2" />
-                                    <Skeleton className="h-4 w-20 mx-auto" />
-                                </div>
-                                 <div className="profile-card-inf__item">
-                                    <Skeleton className="h-6 w-12 mx-auto mb-2" />
-                                    <Skeleton className="h-4 w-20 mx-auto" />
-                                </div>
-                                 <div className="profile-card-inf__item">
-                                    <Skeleton className="h-6 w-12 mx-auto mb-2" />
-                                    <Skeleton className="h-4 w-20 mx-auto" />
-                                </div>
-                             </div>
-                             <div className="profile-card-social">
-                                {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-12 w-12 rounded-full" />)}
-                             </div>
-                              <div className="profile-card-ctr">
-                                <Skeleton className="h-14 w-48 rounded-full" />
-                                <Skeleton className="h-14 w-48 rounded-full" />
-                             </div>
-                         </div>
+                 <div className="glass-profile-card">
+                    <div className="flex flex-col items-center gap-4 mb-6">
+                        <Skeleton className="h-32 w-32 rounded-full" />
+                        <div className="flex flex-col gap-2 items-center">
+                            <Skeleton className="h-8 w-48" />
+                            <Skeleton className="h-4 w-64" />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-black/10 rounded-2xl">
+                        {[...Array(4)].map((_,i) => (
+                             <div key={i} className="text-center">
+                                <Skeleton className="h-7 w-12 mx-auto mb-2" />
+                                <Skeleton className="h-4 w-20 mx-auto" />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="grid grid-cols-4 gap-3 mb-6">
+                        {[...Array(8)].map((_, i) => <Skeleton key={i} className="aspect-square w-full rounded-2xl" />)}
+                    </div>
+                    <div className="flex gap-4">
+                        <Skeleton className="h-12 flex-1 rounded-xl" />
+                        <Skeleton className="h-12 flex-1 rounded-xl" />
                     </div>
                 </div>
             </main>
@@ -117,6 +105,7 @@ export default function ProfilePage() {
 
 
   const handleLogout = async () => {
+    if(!auth) return;
     await signOut(auth);
     router.push('/login');
   };
@@ -172,18 +161,18 @@ export default function ProfilePage() {
   return (
     <>
     <div className="flex flex-col min-h-screen">
-      <div className="hole">
-        <div className="aura"></div>
-        <div className="overlay"></div>
-        <canvas id="canvas"></canvas>
+       <div className="fixed inset-0 -z-10 h-full w-full bg-gradient-to-br from-indigo-500 to-purple-500 bg-cover bg-center bg-no-repeat bg-fixed" 
+         style={{backgroundImage: "url('https://images.unsplash.com/photo-1539635278303-d4002c07eae3?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDk1Njc4NTB8&ixlib=rb-4.1.0&q=85')"}}
+       >
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/30 to-purple-500/30" />
       </div>
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
         <div className="w-full">
             <UserProfileCard profile={adaptedProfile} setActiveSheet={setActiveSheet} onUpdate={handleProfileUpdate} />
              {authUser?.uid === userId && (
-                 <div className="text-center mt-4">
-                     <Button onClick={handleLogout} variant="destructive">
+                 <div className="text-center mt-6">
+                     <Button onClick={handleLogout} variant="destructive" className="glass">
                         <LogOut className="mr-2 h-4 w-4" />
                         Sign Out
                     </Button>
