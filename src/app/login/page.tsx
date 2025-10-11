@@ -2,25 +2,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser, useAuth } from '@/firebase';
+import { useUser, useAuth, useFirestore, setDocumentNonBlocking, initiateEmailSignUp, initiateEmailSignIn } from '@/firebase';
 import {
   GoogleAuthProvider,
   GithubAuthProvider,
   signInWithPopup,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
+  onAuthStateChanged,
 } from 'firebase/auth';
+import { doc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Leaf, Loader2, Github } from 'lucide-react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
+import type { User as NewUser } from '@/types/user';
 
 export default function LoginPage() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
+  const db = useFirestore();
   const router = useRouter();
   const { toast } = useToast();
   const [isFlipped, setIsFlipped] = useState(false);
@@ -38,31 +39,46 @@ export default function LoginPage() {
     }
   }, [user, isUserLoading, router]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     if (!signInEmail || !signInPassword) {
       toast({ title: "Missing Fields", description: "Please enter both email and password.", variant: "destructive" });
       return;
     }
-    try {
-        await signInWithEmailAndPassword(auth, signInEmail, signInPassword);
-    } catch(e: any) {
-        toast({ title: "Sign In Failed", description: e.message, variant: "destructive" });
-    }
+    initiateEmailSignIn(auth, signInEmail, signInPassword);
   }
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
      if (!signUpName || !signUpEmail || !signUpPassword) {
       toast({ title: "Missing Fields", description: "Please fill out all sign up fields.", variant: "destructive" });
       return;
     }
-    try {
-        const cred = await createUserWithEmailAndPassword(auth, signUpEmail, signUpPassword);
-        await updateProfile(cred.user, { displayName: signUpName });
-    } catch (e: any) {
-        toast({ title: "Sign Up Failed", description: e.message, variant: "destructive" });
-    }
+
+    const unsubscribe = onAuthStateChanged(auth, (newUser) => {
+        if (newUser && newUser.email === signUpEmail) {
+            // Unsubscribe immediately to prevent this from running on subsequent auth changes
+            unsubscribe();
+
+            // Now that we have the new user, create their profile document
+            if (db) {
+                const newUserDocRef = doc(db, 'users', newUser.uid);
+                const newProfile: NewUser = {
+                    username: newUser.email?.split('@')[0] || newUser.uid,
+                    displayName: signUpName,
+                    photoURL: newUser.photoURL || `https://avatar.vercel.sh/${newUser.uid}`,
+                    bio: 'Welcome to my profile!',
+                    followersCount: 0,
+                    followingCount: 0,
+                    createdAt: new Date(),
+                    uid: newUser.uid
+                };
+                setDocumentNonBlocking(newUserDocRef, newProfile, { merge: true });
+            }
+        }
+    });
+    
+    initiateEmailSignUp(auth, signUpEmail, signUpPassword);
   }
 
   const handleGoogleSignIn = async () => {
@@ -183,3 +199,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    
