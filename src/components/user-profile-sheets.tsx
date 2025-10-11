@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
@@ -13,6 +14,7 @@ import { useState, useCallback, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Textarea } from "./ui/textarea";
 import { SearchSheet } from "./search-sheet";
+import { cn } from "@/lib/utils";
 
 interface Notification {
   id: string;
@@ -45,7 +47,7 @@ const getRelativeTime = (date: Date): string => {
 const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0">
+      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 liquid-glass shadow-2xl shadow-blue-500/20">
         <SheetHeader className="p-4 border-b">
           <SheetTitle className="flex items-center"><Receipt className="mr-2 h-5 w-5"/>My Receipts</SheetTitle>
         </SheetHeader>
