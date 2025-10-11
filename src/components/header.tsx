@@ -1,12 +1,12 @@
 
 'use client';
 
-import { Leaf, ShoppingCart, User } from "lucide-react";
+import { Leaf, ShoppingCart, User, LogOut, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/cart-context";
 import { Badge } from "@/components/ui/badge";
-import { useUser } from '@/firebase';
+import { useUser, useAuth } from '@/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "next-themes";
 import {
@@ -14,14 +14,27 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { Sun, Moon, ChevronDown, Menu } from 'lucide-react';
+import { Sun, Moon, Menu } from 'lucide-react';
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 
 export function Header() {
   const { totalItems, setCartOpen } = useCart();
   const { user } = useUser();
   const { setTheme, theme } = useTheme();
+  const auth = useAuth();
+  const router = useRouter();
+
+
+  const handleLogout = async () => {
+    if(!auth) return;
+    await signOut(auth);
+    router.push('/login');
+  };
 
   const navItems = [
     { href: "/", label: "Marketplace" },
@@ -71,14 +84,27 @@ export function Header() {
           </Button>
 
           {user ? (
-              <Button asChild variant="ghost" size="icon">
-                <Link href={profileLink}>
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={user.photoURL || `https://avatar.vercel.sh/${user.uid}`} alt={user.displayName || 'User'} data-ai-hint="person face" />
-                      <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
-                    </Avatar>
-                </Link>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                   <Button variant="ghost" size="icon">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage src={user.photoURL || `https://avatar.vercel.sh/${user.uid}`} alt={user.displayName || 'User'} data-ai-hint="person face" />
+                        <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
+                      </Avatar>
+                   </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href={profileLink}><User className="mr-2 h-4 w-4" />Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
           ) : (
             <Button variant="default" size="sm" asChild className="hidden md:flex">
               <Link href="/login">
@@ -102,6 +128,15 @@ export function Header() {
                     <Link href={item.href}>{item.label}</Link>
                   </DropdownMenuItem>
                 ))}
+                 {user && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sign Out</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

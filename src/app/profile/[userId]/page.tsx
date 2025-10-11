@@ -169,16 +169,7 @@ export default function ProfilePage() {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
         <div className="w-full">
-            <UserProfileCard profile={adaptedProfile} setActiveSheet={setActiveSheet} onUpdate={handleProfileUpdate} >
-                {authUser?.uid === userId && (
-                    <div className="text-center mt-6">
-                        <Button onClick={handleLogout} variant="destructive" className="glass">
-                            <LogOut className="mr-2 h-4 w-4" />
-                            Sign Out
-                        </Button>
-                    </div>
-                )}
-            </UserProfileCard>
+            <UserProfileCard profile={adaptedProfile} setActiveSheet={setActiveSheet} onUpdate={handleProfileUpdate} />
         </div>
       </main>
       <Footer />
@@ -195,5 +186,3 @@ export default function ProfilePage() {
     </>
   );
 }
-
-    
