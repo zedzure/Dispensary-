@@ -19,7 +19,7 @@ export default function PostItsPage() {
   const firestore = useFirestore();
 
   const postItsQuery = useMemoFirebase(
-    () => (user ? collection(firestore, 'users', user.uid, 'post-its') : null),
+    () => (user && firestore ? collection(firestore, 'users', user.uid, 'post-its') : null),
     [firestore, user]
   );
   
