@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useUser, useAuth, useFirestore, setDocumentNonBlocking, useDoc } from '@/firebase';
+import { useUser, useAuth, useFirestore, setDocumentNonBlocking, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -80,7 +80,10 @@ export default function ProfilePage() {
   const params = useParams();
   const userId = params.userId as string;
 
-  const userDocRef = (userId && db) ? doc(db, 'users', userId) : null;
+  const userDocRef = useMemoFirebase(
+    () => (userId && db ? doc(db, 'users', userId) : null),
+    [userId, db]
+  );
   const { data: profile, isLoading: profileLoading } = useDoc<NewUser>(userDocRef);
 
   useEffect(() => {
