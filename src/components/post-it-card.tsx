@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 
 interface PostItCardProps {
   note: PostIt;
+  onClick: () => void;
 }
 
 const colorClasses = {
@@ -16,14 +17,15 @@ const colorClasses = {
   green: 'bg-green-200/80 border-green-300/80 text-green-900',
 };
 
-export function PostItCard({ note }: PostItCardProps) {
+export function PostItCard({ note, onClick }: PostItCardProps) {
   const noteColor = note.color || 'yellow';
   const date = note.createdAt?.toDate ? format(note.createdAt.toDate(), 'MMM d, yyyy') : '...';
 
   return (
-    <div
+    <button
+      onClick={onClick}
       className={cn(
-        'p-4 rounded-lg shadow-md flex flex-col h-48 border transition-transform hover:scale-105 hover:shadow-xl',
+        'p-4 rounded-lg shadow-md flex flex-col h-48 border transition-transform hover:scale-105 hover:shadow-xl text-left w-full',
         colorClasses[noteColor]
       )}
     >
@@ -33,6 +35,6 @@ export function PostItCard({ note }: PostItCardProps) {
       <div className="text-right text-xs opacity-70 mt-2 pt-2 border-t border-current/20">
         {date}
       </div>
-    </div>
+    </button>
   );
 }

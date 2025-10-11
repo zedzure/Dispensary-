@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { Header } from '@/components/header';
@@ -13,10 +13,13 @@ import { Loader2, StickyNote } from 'lucide-react';
 import type { PostIt } from '@/types/post-it';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PostItModal } from '@/components/post-it-modal';
 
 export default function PostItsPage() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
+  const [selectedNote, setSelectedNote] = useState<PostIt | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const postItsQuery = useMemoFirebase(
     () => (user && firestore ? collection(firestore, 'users', user.uid, 'post-its') : null),
@@ -24,6 +27,24 @@ export default function PostItsPage() {
   );
   
   const { data: postIts, isLoading: postItsLoading } = useCollection<PostIt>(postItsQuery);
+
+  const handleAddNoteClick = () => {
+    setSelectedNote(null);
+    setIsModalOpen(true);
+  };
+
+  const handleNoteClick = (note: PostIt) => {
+    setSelectedNote(note);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    // Delay clearing selected note to allow for exit animation
+    setTimeout(() => {
+        setSelectedNote(null);
+    }, 300);
+  }
 
   if (isUserLoading || (user && postItsLoading)) {
     return (
@@ -58,32 +79,40 @@ export default function PostItsPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-muted/40">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold font-cursive text-primary">My Post-its</h1>
-          <Button>
-            <StickyNote className="mr-2 h-4 w-4" /> Add Note
-          </Button>
-        </div>
+    <>
+      <div className="flex flex-col min-h-screen bg-muted/40">
+        <Header />
+        <main className="flex-grow container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold font-cursive text-primary">My Post-its</h1>
+            <Button onClick={handleAddNoteClick}>
+              <StickyNote className="mr-2 h-4 w-4" /> Add Note
+            </Button>
+          </div>
 
-        {postIts && postIts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {postIts.map((note) => (
-              <PostItCard key={note.id} note={note} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20 text-muted-foreground">
-            <StickyNote className="mx-auto h-16 w-16 mb-4" />
-            <p className="text-lg">You haven't created any notes yet.</p>
-            <p>Click "Add Note" to get started!</p>
-          </div>
-        )}
-      </main>
-      <Footer />
-      <BottomNavBar />
-    </div>
+          {postIts && postIts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {postIts.map((note) => (
+                <PostItCard key={note.id} note={note} onClick={() => handleNoteClick(note)} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 text-muted-foreground">
+              <StickyNote className="mx-auto h-16 w-16 mb-4" />
+              <p className="text-lg">You haven't created any notes yet.</p>
+              <p>Click "Add Note" to get started!</p>
+            </div>
+          )}
+        </main>
+        <Footer />
+        <BottomNavBar />
+      </div>
+
+      <PostItModal 
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        note={selectedNote}
+      />
+    </>
   );
 }
