@@ -161,10 +161,10 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
 
   const messagesQuery = useMemoFirebase(
     () =>
-      firestore && dispensary
+      firestore && dispensary && user
         ? query(collection(firestore, "dispensaries", dispensary.id, "messages"), orderBy("timestamp", "desc"), limit(50))
         : null,
-    [firestore, dispensary]
+    [firestore, dispensary, user]
   );
   
   const { data: messagesData, isLoading } = useCollection<ChatMessageType>(messagesQuery);
@@ -310,9 +310,15 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
         </SheetHeader>
         
         <ScrollArea className="flex-1 min-h-0" onScroll={handleScroll} ref={scrollViewportRef}>
-            {isLoading && <div className="text-center p-4 text-muted-foreground">Loading messages...</div>}
-            {!isLoading && messages.length > 0 && <MessageList messages={messages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} onDelete={handleDelete} />}
-            {!isLoading && messages.length === 0 && !imagePreview && <div className="text-center p-8 text-muted-foreground">Be the first to say something!</div>}
+            {!user ? (
+                <div className="text-center p-8 text-muted-foreground">Please log in to view the chat.</div>
+            ) : isLoading ? (
+                <div className="text-center p-4 text-muted-foreground">Loading messages...</div>
+            ) : messages.length > 0 ? (
+                <MessageList messages={messages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} onDelete={handleDelete} />
+            ) : (
+                 !imagePreview && <div className="text-center p-8 text-muted-foreground">Be the first to say something!</div>
+            )}
              {imagePreview && (
                 <div className="p-4">
                     <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-primary mx-auto">
