@@ -35,10 +35,10 @@ function MessageItem({ msg, sender, isCurrentUser }: { msg: ChatMessageType; sen
                 </Avatar>
             )}
             <div className={cn(
-                "max-w-[75%] rounded-2xl px-4 py-2",
+                "max-w-[75%] rounded-2xl px-4 py-2 liquid-glass",
                 isCurrentUser 
                     ? "bg-primary text-primary-foreground rounded-br-none" 
-                    : "liquid-glass rounded-bl-none border-border/20"
+                    : "rounded-bl-none border-border/20"
             )}>
                 <p className="text-sm">{msg.message}</p>
                  <p className={cn("text-xs mt-1", isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground/70")}>{formatTimestamp(msg.timestamp)}</p>

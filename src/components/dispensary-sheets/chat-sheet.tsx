@@ -46,6 +46,7 @@ import { collection, query, orderBy, limit, serverTimestamp, doc } from "firebas
 import { uploadImage } from "@/lib/image-upload";
 import { useToast } from "@/hooks/use-toast";
 import { mockCustomers } from "@/lib/mockCustomers";
+import { Textarea } from "@/components/ui/textarea";
 
 
 const MAX_MESSAGE_LENGTH = 280;
@@ -155,7 +156,6 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   useMobileViewportFix();
 
   const scrollViewportRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const pathname = usePathname();
@@ -231,7 +231,6 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
 
   const resetForm = () => {
     setNewMessage("");
-    if (inputRef.current) inputRef.current.innerHTML = '';
     setReplyingTo(null);
     setImageFile(null);
     setImagePreview(null);
@@ -240,8 +239,8 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   }
 
   const handleSendMessage = useCallback(async () => {
-    const messageText = inputRef.current?.innerText || '';
-    if (!messageText.trim() && !imageFile) return;
+    const messageText = newMessage.trim();
+    if (!messageText && !imageFile) return;
     if (!user || !firestore || !dispensary) return;
 
     setIsSubmitting(true);
@@ -271,7 +270,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     } finally {
         setIsSubmitting(false);
     }
-  }, [imageFile, replyingTo, user, firestore, dispensary, toast]);
+  }, [newMessage, imageFile, replyingTo, user, firestore, dispensary, toast]);
 
   const handleLike = useCallback((id: string) => {
     // In a real app, this would update Firestore.
@@ -286,20 +285,9 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
 
   const handleReply = useCallback((msg: ChatMessageType) => {
     setReplyingTo(msg);
-    if (inputRef.current) {
-        inputRef.current.focus();
-    }
-    // Don't set text here as it breaks contentEditable logic
+    // Focus logic is handled by Textarea's autoFocus in this scenario
   }, []);
-
-  const handleFormat = (command: string) => {
-    document.execCommand(command, false);
-    if (inputRef.current) {
-        inputRef.current.focus();
-        setNewMessage(inputRef.current.innerHTML);
-    }
-  }
-
+  
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (file) {
@@ -314,19 +302,19 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   }
   
   const editingIcons = [
-    { icon: Bold, name: 'Bold', action: () => handleFormat('bold') },
-    { icon: Italic, name: 'Italic', action: () => handleFormat('italic') },
-    { icon: Underline, name: 'Underline', action: () => handleFormat('underline') },
+    { icon: Bold, name: 'Bold' },
+    { icon: Italic, name: 'Italic' },
+    { icon: Underline, name: 'Underline' },
     { icon: Camera, name: 'Camera', action: () => fileInputRef.current?.click() },
     { icon: ImageIcon, name: 'Image', action: () => fileInputRef.current?.click() },
-    { icon: Smile, name: 'Emoji', action: () => toast({title: 'Coming Soon!'}) },
-    { icon: LinkIcon, name: 'Link', action: () => toast({title: 'Coming Soon!'}) },
-    { icon: Mic, name: 'Mic', action: () => toast({title: 'Coming Soon!'}) },
-    { icon: Hash, name: 'Tag', action: () => toast({title: 'Coming Soon!'}) },
-    { icon: AtSign, name: 'Mention', action: () => toast({title: 'Coming Soon!'}) },
+    { icon: Smile, name: 'Emoji'},
+    { icon: LinkIcon, name: 'Link'},
+    { icon: Mic, name: 'Mic'},
+    { icon: Hash, name: 'Tag'},
+    { icon: AtSign, name: 'Mention'},
   ];
   
-  const hasContent = (inputRef.current?.innerText || '').trim() !== '' || !!imageFile;
+  const hasContent = newMessage.trim() !== '' || !!imageFile;
 
   return (
     <>
@@ -393,7 +381,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                             <div className="chat-tools-grid">
                                 {editingIcons.map(({ icon: Icon, name, action }) => (
                                     <div key={name} className="flex flex-col items-center">
-                                        <button className="h-14 w-14 liquid-glass rounded-full flex items-center justify-center" onClick={action}>
+                                        <button className="h-14 w-14 liquid-glass rounded-full flex items-center justify-center" onClick={action || (() => toast({title: 'Coming Soon!'}))}>
                                             <Icon className="h-6 w-6 text-blue-500" />
                                         </button>
                                         <span className="text-xs mt-2 text-muted-foreground">{name}</span>
@@ -414,7 +402,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                             </Button>
                         </div>
                     )}
-                    <div className="flex items-center gap-2 bg-muted/80 backdrop-blur-sm rounded-full p-1.5 border border-border/20">
+                    <div className="flex items-end gap-2 bg-muted/80 backdrop-blur-sm rounded-2xl p-2 border border-border/20">
                         <Button
                             variant="ghost"
                             size="icon"
@@ -423,16 +411,13 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                         >
                             <Plus className={cn("h-5 w-5 transition-transform", isToolsOpen && "rotate-45")} />
                         </Button>
-                        <div 
-                            ref={inputRef}
-                            contentEditable
-                            onInput={(e) => {
-                                const target = e.currentTarget as HTMLDivElement;
-                                setNewMessage(target.innerText);
-                            }}
-                            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                         <Textarea 
+                            placeholder="Type a message..."
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }}}
                             className="chat-input-textarea"
-                            data-placeholder="Type your message..."
+                            rows={1}
                         />
                         {hasContent && (
                             <Button size="icon" className="h-9 w-9 rounded-full flex-shrink-0" onClick={handleSendMessage} disabled={isSubmitting}>

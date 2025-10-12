@@ -1,11 +1,19 @@
 
+
 .chat-input-bar {
-    @apply fixed bottom-0 left-0 w-full bg-background/80 backdrop-blur-lg border-t border-border/20;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: hsla(var(--background) / 0.8);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid hsla(var(--border) / 0.2);
     padding: 0.5rem;
     padding-left: calc(0.5rem + env(safe-area-inset-left));
     padding-right: calc(0.5rem + env(safe-area-inset-right));
     padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
 }
+
 
 .chat-input-container {
     @apply flex items-start w-full max-w-4xl mx-auto gap-2;
@@ -16,14 +24,14 @@
 }
 
 .chat-input-textarea {
-    @apply w-full bg-muted/50 border border-border/80 rounded-2xl px-4 py-2 text-sm flex-grow;
+    @apply w-full bg-transparent border-none rounded-2xl px-4 py-2 text-sm flex-grow;
     resize: none;
     min-height: 2.5rem; /* ~40px */
     max-height: 12rem;
     overflow-y: auto;
 }
 .chat-input-textarea:focus {
-    @apply ring-2 ring-primary/50 border-primary outline-none;
+    @apply ring-0 outline-none shadow-none;
 }
 
 .chat-input-textarea[data-placeholder]:empty:before {
