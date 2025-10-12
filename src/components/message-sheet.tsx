@@ -26,6 +26,12 @@ export function MessageSheet({ isOpen, onClose, recipient }: MessageSheetProps) 
     useEffect(() => {
         if (!isOpen || !user || !firestore) return;
 
+        // Prevent user from starting a chat with themselves
+        if (user.uid === recipient.id) {
+            onClose();
+            return;
+        }
+
         const findOrCreateChat = async () => {
             setIsLoading(true);
             const participants = [user.uid, recipient.id].sort();
