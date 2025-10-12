@@ -171,6 +171,16 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   
   const { data: messagesData, isLoading } = useCollection<ChatMessageType>(messagesQuery);
   const messages = useMemo(() => messagesData?.slice().reverse() || [], [messagesData]);
+  const mockMessages = [
+    "Just picked up some Blue Dream, it's amazing! 🌿",
+    "Has anyone tried the new edibles? I'm curious about the flavor.",
+    "The staff here are so friendly and knowledgeable.",
+    "What's the best indica for sleep, in your opinion?",
+    "I love the loyalty program here, the points add up fast!",
+    "This is my favorite dispensary in town, hands down.",
+    "Are there any deals on pre-rolls today?",
+    "That OG Kush is top-notch. Highly recommend!",
+  ];
 
 
     useEffect(() => {
@@ -182,7 +192,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                 const randomMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)];
 
                 const messageToSend: Omit<ChatMessageType, 'id'> = {
-                    user: { id: randomUser.id, name: `${randomUser.firstName} ${randomUser.lastName}`, avatar: randomUser.avatarUrl || "", isOnline: true },
+                    user: { id: randomUser.id, name: `${'${randomUser.firstName}'} ${'${randomUser.lastName}'}`, avatar: randomUser.avatarUrl || "", isOnline: true },
                     text: randomMessage,
                     timestamp: serverTimestamp() as any,
                     likes: 0,
@@ -239,7 +249,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     try {
         let imageUrl: string | undefined;
         if (imageFile) {
-            imageUrl = await uploadImage(imageFile, `chatImages/${dispensary.id}/${Date.now()}-${imageFile.name}`);
+            imageUrl = await uploadImage(imageFile, `chatImages/${'${dispensary.id}'}/${'${Date.now()}'}-${'${imageFile.name}'}`);
         }
 
         const messagesCol = collection(firestore, 'dispensaries', dispensary.id, 'messages');
@@ -324,7 +334,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
       <SheetContent 
         side="left" 
         className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl"
-        style={{ height: vh ? `${vh}px` : '100dvh' }}
+        style={{ height: vh ? `${'${vh}'}px` : '100dvh' }}
        >
         <SheetHeader className="p-4 flex-row items-center gap-4 flex-shrink-0 bg-transparent border-b">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
@@ -444,3 +454,5 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     </>
   );
 }
+
+    
