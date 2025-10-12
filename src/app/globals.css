@@ -85,6 +85,12 @@
   main {
     flex-grow: 1;
   }
+
+  body.keyboard-visible {
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+  }
 }
 
 @layer utilities {

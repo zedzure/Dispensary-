@@ -134,33 +134,33 @@ export function ChatDetailSheet({ isOpen, onClose, chatId, recipient }: ChatDeta
         </SheetHeader>
         
         <ScrollArea className="flex-1 min-h-0 bg-muted/20" ref={scrollViewportRef}>
-            {isLoading ? (
-                 <div className="h-full flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary"/></div>
-            ) : (
-                <div className="p-4 space-y-4">
-                    {messages?.map(msg => (
+            <div className="p-4 space-y-4 pb-[7rem]">
+                {isLoading ? (
+                    <div className="h-full flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary"/></div>
+                ) : (
+                    messages?.map(msg => (
                         <MessageItem 
                             key={msg.id} 
                             msg={msg as any}
                             sender={msg.senderID === currentUser?.uid ? null : recipient}
                             isCurrentUser={msg.senderID === currentUser?.uid}
                         />
-                    ))}
-                </div>
-            )}
+                    ))
+                )}
+            </div>
         </ScrollArea>
     
-        <div className="relative p-4 border-t bg-background">
-            <div className="flex items-start gap-2">
+        <div className="chat-input-bar">
+            <div className="chat-input-container">
                 <Textarea 
                     placeholder="Type a message..."
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }}}
-                    className="min-h-[40px] max-h-28"
+                    className="chat-input-textarea"
                     rows={1}
                 />
-                <Button size="icon" onClick={handleSendMessage} disabled={isSubmitting || !newMessage.trim()}>
+                <Button size="icon" onClick={handleSendMessage} disabled={isSubmitting || !newMessage.trim()} className="rounded-full h-10 w-10">
                     {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4" />}
                 </Button>
             </div>

@@ -87,7 +87,7 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: C
                 <p className="text-xs text-muted-foreground">{formatTimestamp(msg.timestamp)}</p>
             </div>
 
-            <div className="p-3 rounded-2xl rounded-tl-none mt-1 liquid-glass border-border/20">
+            <div className={cn("p-3 rounded-2xl rounded-tl-none mt-1 liquid-glass border-border/20", isCurrentUser && "bg-primary text-primary-foreground")}>
                 {msg.replyingTo && (
                     <div className="text-xs text-muted-foreground mb-1">
                         Replying to <strong className="text-primary/90">@{msg.replyingTo.user}</strong>
@@ -345,50 +345,52 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
         </SheetHeader>
         
         <ScrollArea className="flex-1 min-h-0" onScroll={handleScroll} ref={scrollViewportRef}>
-            {!user ? (
-                <div className="text-center p-8 text-muted-foreground">Please log in to view the chat.</div>
-            ) : isLoading ? (
-                <div className="text-center p-4 text-muted-foreground">Loading messages...</div>
-            ) : messages.length > 0 ? (
-                <MessageList messages={messages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} onDelete={handleDelete} />
-            ) : (
-                 !imagePreview && <div className="text-center p-8 text-muted-foreground">Be the first to say something!</div>
-            )}
-             {imagePreview && (
-                <div className="p-4">
-                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-primary mx-auto">
-                        <Image src={imagePreview} alt="Image preview" fill className="object-cover" />
-                        <Button
-                            variant="destructive"
-                            size="icon"
-                            className="absolute top-1 right-1 h-6 w-6"
-                            onClick={() => {
-                                setImageFile(null);
-                                setImagePreview(null);
-                                if (fileInputRef.current) fileInputRef.current.value = '';
-                            }}
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
+             <div className="pb-[7rem]">
+                {!user ? (
+                    <div className="text-center p-8 text-muted-foreground">Please log in to view the chat.</div>
+                ) : isLoading ? (
+                    <div className="text-center p-4 text-muted-foreground">Loading messages...</div>
+                ) : messages.length > 0 ? (
+                    <MessageList messages={messages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} onDelete={handleDelete} />
+                ) : (
+                    !imagePreview && <div className="text-center p-8 text-muted-foreground">Be the first to say something!</div>
+                )}
+                {imagePreview && (
+                    <div className="p-4">
+                        <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-primary mx-auto">
+                            <Image src={imagePreview} alt="Image preview" fill className="object-cover" />
+                            <Button
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-1 right-1 h-6 w-6"
+                                onClick={() => {
+                                    setImageFile(null);
+                                    setImagePreview(null);
+                                    if (fileInputRef.current) fileInputRef.current.value = '';
+                                }}
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </ScrollArea>
     
-        <div className="p-2 border-t mt-auto flex-shrink-0">
+        <div className="chat-input-bar">
             <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" accept="image/*" />
             {user ? (
-            <div className="relative">
+            <div className="chat-input-container">
                 <AnimatePresence>
                     {isToolsOpen && (
                         <motion.div 
-                            className="absolute bottom-full left-0 right-0 p-4 bg-muted/80 backdrop-blur-sm rounded-t-2xl mb-2"
+                            className="chat-tools-sheet absolute bottom-full left-0 right-0"
                             initial={{ y: "100%", opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: "100%", opacity: 0 }}
                             transition={{ type: "spring", damping: 30, stiffness: 300 }}
                         >
-                            <div className="grid grid-cols-5 gap-4">
+                            <div className="chat-tools-grid">
                                 {editingIcons.map(({ icon: Icon, name, action }) => (
                                     <div key={name} className="flex flex-col items-center">
                                         <button className="h-14 w-14 liquid-glass rounded-full flex items-center justify-center" onClick={action}>
@@ -401,43 +403,43 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                         </motion.div>
                     )}
                 </AnimatePresence>
-
-                 {replyingTo && (
-                    <div className="text-xs p-2 bg-muted/50 rounded-t-md flex justify-between items-center mx-2">
-                        <p className="text-muted-foreground truncate">
-                        Replying to <strong className="text-primary/90">@{replyingTo.user.name}</strong>
-                        </p>
-                        <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setReplyingTo(null)}>
-                        <X className="h-3 w-3" />
-                        </Button>
-                    </div>
-                )}
-                
-                <div className="flex items-center gap-2 bg-muted/80 backdrop-blur-sm rounded-full p-1.5 border border-border/20">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 flex-shrink-0 rounded-full bg-background/50 hover:bg-background"
-                        onClick={() => setIsToolsOpen(!isToolsOpen)}
-                    >
-                        <Plus className={cn("h-5 w-5 transition-transform", isToolsOpen && "rotate-45")} />
-                    </Button>
-                    <div 
-                        ref={inputRef}
-                        contentEditable
-                        onInput={(e) => {
-                            const target = e.currentTarget as HTMLDivElement;
-                            setNewMessage(target.innerText);
-                        }}
-                        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-                        className="w-full bg-transparent outline-none text-sm px-2 flex-grow min-h-[2.25rem] flex items-center"
-                        data-placeholder="Type your message..."
-                    />
-                    {hasContent && (
-                        <Button size="icon" className="h-9 w-9 rounded-full flex-shrink-0" onClick={handleSendMessage} disabled={isSubmitting}>
-                            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4" />}
-                        </Button>
+                <div className="chat-input-main">
+                    {replyingTo && (
+                        <div className="text-xs p-2 bg-muted/50 rounded-t-md flex justify-between items-center mx-2">
+                            <p className="text-muted-foreground truncate">
+                            Replying to <strong className="text-primary/90">@{replyingTo.user.name}</strong>
+                            </p>
+                            <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setReplyingTo(null)}>
+                            <X className="h-3 w-3" />
+                            </Button>
+                        </div>
                     )}
+                    <div className="flex items-center gap-2 bg-muted/80 backdrop-blur-sm rounded-full p-1.5 border border-border/20">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 flex-shrink-0 rounded-full bg-background/50 hover:bg-background"
+                            onClick={() => setIsToolsOpen(!isToolsOpen)}
+                        >
+                            <Plus className={cn("h-5 w-5 transition-transform", isToolsOpen && "rotate-45")} />
+                        </Button>
+                        <div 
+                            ref={inputRef}
+                            contentEditable
+                            onInput={(e) => {
+                                const target = e.currentTarget as HTMLDivElement;
+                                setNewMessage(target.innerText);
+                            }}
+                            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                            className="chat-input-textarea"
+                            data-placeholder="Type your message..."
+                        />
+                        {hasContent && (
+                            <Button size="icon" className="h-9 w-9 rounded-full flex-shrink-0" onClick={handleSendMessage} disabled={isSubmitting}>
+                                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4" />}
+                            </Button>
+                        )}
+                    </div>
                 </div>
             </div>
             ) : (
