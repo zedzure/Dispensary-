@@ -34,10 +34,10 @@ function MessageItem({ msg, sender, isCurrentUser }: { msg: ChatMessageType; sen
                 </Avatar>
             )}
             <div className={cn(
-                "max-w-[75%] rounded-2xl px-4 py-2 liquid-glass",
+                "max-w-[75%] rounded-2xl px-4 py-2",
                 isCurrentUser 
                     ? "bg-primary text-primary-foreground rounded-br-none" 
-                    : "rounded-bl-none border-border/20"
+                    : "rounded-bl-none liquid-glass border-border/20"
             )}>
                 <p className="text-sm">{msg.message}</p>
                  <p className={cn("text-xs mt-1", isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground/70")}>{formatTimestamp(msg.timestamp)}</p>
@@ -133,7 +133,7 @@ export function ChatDetailSheet({ isOpen, onClose, chatId, recipient }: ChatDeta
         </SheetHeader>
         
         <ScrollArea className="flex-1 min-h-0 bg-muted/20" ref={scrollViewportRef}>
-            <div className="p-4 space-y-4 pb-[7rem]">
+            <div className="p-4 space-y-4 pb-28">
                 {isLoading ? (
                     <div className="h-full flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary"/></div>
                 ) : (

@@ -332,11 +332,11 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
         </SheetHeader>
         
         <ScrollArea className="flex-1 min-h-0 bg-muted/20" onScroll={handleScroll} ref={scrollViewportRef}>
-             <div className="pb-[7rem]">
+             <div className="pb-28">
                 {!user ? (
                     <div className="text-center p-8 text-muted-foreground">Please log in to view the chat.</div>
                 ) : isLoading ? (
-                    <div className="text-center p-4 text-muted-foreground">Loading messages...</div>
+                    <div className="h-full flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary"/></div>
                 ) : messages.length > 0 ? (
                     <MessageList messages={messages} onLike={handleLike} onReply={handleReply} onAvatarClick={handleAvatarClick} onDelete={handleDelete} />
                 ) : (
