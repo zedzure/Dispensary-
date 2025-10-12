@@ -169,3 +169,5 @@ export function ChatDetailSheet({ isOpen, onClose, chatId, recipient }: ChatDeta
     </Sheet>
   );
 }
+
+    
