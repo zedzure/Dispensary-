@@ -11,4 +11,8 @@ export interface User {
   followingCount: number;
   createdAt: Timestamp | Date;
   chatIds?: string[];
+  followers?: string[];
+  following?: string[];
+  friendRequests?: string[];
+  acceptedFriends?: string[];
 }

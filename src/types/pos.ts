@@ -194,9 +194,13 @@ export interface ChatUser {
 
 export interface Chat {
     id: string;
+    name?: string; // For group chats
     participants: string[];
     lastMessage: string;
     timestamp: number | Timestamp;
+    type: 'group' | 'private';
+    createdAt: Timestamp;
+    avatar?: string; // For group chats
 }
 
 export interface ChatMessage {
@@ -205,6 +209,9 @@ export interface ChatMessage {
     message: string;
     timestamp: number | Timestamp;
     imageUrl?: string;
+    type?: 'text' | 'image';
+    replies?: string[]; // array of message IDs
+    reposts?: string[]; // array of user IDs
 }
 
 
