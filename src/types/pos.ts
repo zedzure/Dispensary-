@@ -192,24 +192,21 @@ export interface ChatUser {
   isOnline: boolean;
 }
 
+export interface Chat {
+  id: string;
+  participants: string[];
+  lastMessage: string;
+  timestamp: number | Timestamp;
+}
+
 export interface ChatMessage {
   id: string;
-  user: {
-    id: string;
-    name: string;
-    avatar: string;
-    isOnline?: boolean;
-  };
-  text: string;
-  timestamp: Timestamp | string; // ISO string
-  likes: number;
-  isLiked: boolean; // Client-side state
+  senderID: string;
+  message: string;
+  timestamp: number | Timestamp;
   imageUrl?: string;
-  replyingTo?: {
-    user: string;
-    text: string;
-  };
 }
+
 
 export interface UploadItem {
   id: string;

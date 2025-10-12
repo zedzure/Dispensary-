@@ -111,32 +111,41 @@
         "address": { "type": "string" }
       }
     },
+    "Chat": {
+        "title": "Chat",
+        "type": "object",
+        "description": "Represents a chat conversation between two or more users.",
+        "properties": {
+            "participants": {
+                "type": "array",
+                "description": "An array of user IDs participating in the chat.",
+                "items": { "type": "string" }
+            },
+            "lastMessage": {
+                "type": "string",
+                "description": "The content of the last message sent in the chat."
+            },
+            "timestamp": {
+                "type": "number",
+                "description": "The timestamp of the last message."
+            }
+        },
+        "required": ["participants", "timestamp"]
+    },
     "ChatMessage": {
       "title": "ChatMessage",
       "type": "object",
-      "description": "A message in a chat room.",
+      "description": "A message within a chat.",
       "properties": {
-        "user": {
-          "type": "object",
-          "properties": {
-            "id": { "type": "string" },
-            "name": { "type": "string" },
-            "avatar": { "type": "string", "format": "uri" }
-          }
+        "senderID": {
+            "type": "string",
+            "description": "The ID of the user who sent the message."
         },
-        "text": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" },
-        "likes": { "type": "number" },
-        "image": { "type": "string", "format": "uri" },
-        "replyingTo": {
-          "type": "object",
-          "properties": {
-            "user": { "type": "string" },
-            "text": { "type": "string" }
-          }
-        }
+        "message": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "imageUrl": { "type": "string", "format": "uri" }
       },
-      "required": ["user", "text", "timestamp"]
+      "required": ["senderID", "message", "timestamp"]
     }
   },
   "auth": {
@@ -190,13 +199,23 @@
         }
       },
       {
-        "path": "/dispensaries/{dispensaryId}/messages/{messageId}",
+        "path": "/chats/{chatId}",
+        "definition": {
+          "entityName": "Chat",
+          "schema": {
+            "$ref": "#/entities/Chat"
+          },
+          "description": "Stores metadata for each chat session."
+        }
+      },
+      {
+        "path": "/chats/{chatId}/messages/{messageId}",
         "definition": {
           "entityName": "ChatMessage",
           "schema": {
             "$ref": "#/entities/ChatMessage"
           },
-          "description": "Stores chat messages for a specific dispensary."
+          "description": "Stores all messages for a specific chat."
         }
       }
     ]
