@@ -1,12 +1,13 @@
 
 'use client';
 
-import { useState } from 'react';
-import { useUser } from '@/firebase';
+import { useState, useEffect } from 'react';
+import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking } from '@/firebase';
+import { collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Plus, Camera, Mic, Sticker } from 'lucide-react';
 import type { UserProfile } from '@/types/pos';
-import Image from 'next/image';
+import { ChatDetailSheet } from './chat-detail-sheet';
+import { Loader2 } from 'lucide-react';
 
 interface MessageSheetProps {
     isOpen: boolean;
@@ -16,79 +17,90 @@ interface MessageSheetProps {
 
 export function MessageSheet({ isOpen, onClose, recipient }: MessageSheetProps) {
     const { user } = useUser();
+    const firestore = useFirestore();
     const { toast } = useToast();
-    const [message, setMessage] = useState('');
+    const [chatId, setChatId] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-    const handleSendMessage = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!message.trim()) return;
+    useEffect(() => {
+        if (!isOpen || !user || !firestore) return;
 
-        toast({
-            title: 'Message Sent (Mock)',
-            description: `To ${recipient.firstName}: ${message}`,
-        });
+        const findOrCreateChat = async () => {
+            setIsLoading(true);
+            const participants = [user.uid, recipient.id].sort();
+            
+            try {
+                // Check for existing chat
+                const chatsRef = collection(firestore, 'chats');
+                const q = query(chatsRef, where('participants', '==', participants));
+                const querySnapshot = await getDocs(q);
 
-        setMessage('');
-        onClose();
-    };
+                if (!querySnapshot.empty) {
+                    // Chat exists
+                    const chatDoc = querySnapshot.docs[0];
+                    setChatId(chatDoc.id);
+                } else {
+                    // Create new chat
+                    const newChatRef = await addDocumentNonBlocking(chatsRef, {
+                        participants,
+                        lastMessage: 'Chat started',
+                        timestamp: serverTimestamp(),
+                    });
+                    if (newChatRef) {
+                        setChatId(newChatRef.id);
+                    } else {
+                        throw new Error("Failed to create chat reference.");
+                    }
+                }
+            } catch(error) {
+                console.error("Error finding or creating chat:", error);
+                toast({ title: "Failed to start chat", variant: "destructive" });
+                onClose();
+            } finally {
+                setIsLoading(false);
+                setIsSheetOpen(true);
+            }
+        };
 
-    if (!isOpen) return null;
+        findOrCreateChat();
 
-    return (
-        <div className="message-sheet-overlay" onClick={onClose}>
-            <div className="message-sheet-container" onClick={(e) => e.stopPropagation()}>
-                <div className="message-sheet-header">
-                    <button className="message-sheet-close" onClick={onClose}>
-                        &times;
-                    </button>
-                    <div className="message-sheet-recipient">
-                        <Image src={recipient.avatarUrl} alt={recipient.firstName} width={40} height={40} className="rounded-full" />
-                        <span className="font-semibold">{recipient.firstName} {recipient.lastName}</span>
-                    </div>
+    }, [isOpen, user, firestore, recipient, toast, onClose]);
+
+
+    const handleSheetClose = () => {
+        setIsSheetOpen(false);
+        // Delay closing to allow for animation
+        setTimeout(() => {
+            setChatId(null);
+            onClose();
+        }, 300);
+    }
+
+    if (!isOpen) {
+        return null;
+    }
+
+    if (isLoading) {
+        return (
+             <div className="message-sheet-overlay">
+                <div className="message-sheet-container items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-
-                <div className="message-sheet-content">
-                    {/* Chat history would go here */}
-                    <div className="flex-grow" />
-                </div>
-                
-                <form className="message-sheet-input-area" onSubmit={handleSendMessage}>
-                    <div className="message-input-wrapper">
-                        <button type="button" className="message-input-action-button">
-                           <Plus />
-                        </button>
-
-                        <div className="message-input-field-wrapper">
-                            <input 
-                                type="text" 
-                                placeholder="Message..." 
-                                className="message-input-field"
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)}
-                                autoFocus
-                            />
-                            <button type="button" className="message-input-sticker-button">
-                                <Sticker />
-                            </button>
-                        </div>
-                        
-                        {message ? (
-                            <button type="submit" className="message-input-send-button">
-                                <Send />
-                            </button>
-                        ) : (
-                            <>
-                                <button type="button" className="message-input-action-button">
-                                    <Camera />
-                                </button>
-                                <button type="button" className="message-input-action-button">
-                                    <Mic />
-                                </button>
-                            </>
-                        )}
-                    </div>
-                </form>
             </div>
-        </div>
-    );
+        )
+    }
+
+    if (chatId) {
+        return (
+            <ChatDetailSheet
+                isOpen={isSheetOpen}
+                onClose={handleSheetClose}
+                chatId={chatId}
+                recipient={recipient}
+            />
+        )
+    }
+
+    return null; // Fallback
 }

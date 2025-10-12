@@ -193,18 +193,18 @@ export interface ChatUser {
 }
 
 export interface Chat {
-  id: string;
-  participants: string[];
-  lastMessage: string;
-  timestamp: number | Timestamp;
+    id: string;
+    participants: string[];
+    lastMessage: string;
+    timestamp: number | Timestamp;
 }
 
 export interface ChatMessage {
-  id: string;
-  senderID: string;
-  message: string;
-  timestamp: number | Timestamp;
-  imageUrl?: string;
+    id: string;
+    senderID: string;
+    message: string;
+    timestamp: number | Timestamp;
+    imageUrl?: string;
 }
 
 

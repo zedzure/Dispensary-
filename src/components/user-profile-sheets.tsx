@@ -4,10 +4,10 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { X, FileText, Camera, Receipt, Send, Music, Video, Wallet, Bookmark } from "lucide-react";
+import { X, FileText, Camera, Receipt, Send, Music, Video, Wallet, Bookmark, MessageSquare, Loader2 } from "lucide-react";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ActiveSheet } from "@/app/profile/[userId]/page";
-import type { UploadItem, Receipt as ReceiptType } from "@/types/pos";
+import type { UploadItem, Receipt as ReceiptType, Chat } from "@/types/pos";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
@@ -17,23 +17,18 @@ import { Textarea } from "./ui/textarea";
 import { SearchSheet } from "./search-sheet";
 import { cn } from "@/lib/utils";
 import { useMobileViewportFix } from "@/hooks/use-mobile-viewport-fix";
+import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection, query, where, doc, getDoc } from 'firebase/firestore';
+import type { UserProfile } from "@/types/pos";
+import { ChatDetailSheet } from "./chat-detail-sheet";
+import { mockCustomers } from "@/lib/mockCustomers";
 
-interface Notification {
-  id: string;
-  userId: string;
-  type: string;
-  text: string;
-  userName?: string;
-  userAvatar?: string;
-  date: Date;
-  read: boolean;
-}
 
 const mockReceiptsData: ReceiptType[] = [];
-const mockNotifications: Notification[] = [];
 
-
-const getRelativeTime = (date: Date): string => {
+const getRelativeTime = (timestamp: any): string => {
+    if (!timestamp) return '...';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
@@ -115,93 +110,113 @@ const UploadsSheet = ({ uploads, open, onOpenChange }: { uploads: UploadItem[], 
   );
 };
 
-const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: boolean, onOpenChange: (open: boolean) => void }) => {
-    const [messages, setMessages] = useState<Notification[]>([]);
-    const [replyingTo, setReplyingTo] = useState<Notification | null>(null);
-    const [newMessage, setNewMessage] = useState('');
-    useMobileViewportFix();
+const ChatListItem = ({ chat, currentUserId, onClick }: { chat: Chat, currentUserId: string, onClick: () => void }) => {
+    const firestore = useFirestore();
+    const [recipient, setRecipient] = useState<UserProfile | null>(null);
 
     useEffect(() => {
-        if(open) {
-            // In a real app, this would be a fetch.
-            setMessages(mockNotifications.filter(n => n.userId === user.uid).sort((a,b) => a.date.getTime() - b.date.getTime()));
+        const recipientId = chat.participants.find(p => p !== currentUserId);
+        if (recipientId && firestore) {
+            // In a real app, you might fetch from a 'users' collection
+            const foundUser = mockCustomers.find(c => c.id === recipientId);
+            if (foundUser) {
+                setRecipient(foundUser);
+            } else {
+                // Fallback if user not in mocks
+                setRecipient({ id: recipientId, firstName: 'Unknown', lastName: 'User', avatarUrl: '', email: '', memberSince: '' });
+            }
         }
-    }, [open, user.uid]);
+    }, [chat, currentUserId, firestore]);
 
-    const handleReply = useCallback((notification: Notification) => {
-        setReplyingTo(notification);
-        setNewMessage(`@${notification.userName} `);
-    }, []);
-
-    const handleSendMessage = () => {
-        if (!newMessage.trim()) return;
-        // Mock sending message
-        console.log("Sending message:", newMessage);
-        setNewMessage('');
-        setReplyingTo(null);
-    };
-
+    if (!recipient) {
+        return (
+            <div className="p-4 flex items-center gap-4 animate-pulse">
+                <div className="h-12 w-12 rounded-full bg-muted"></div>
+                <div className="flex-1 space-y-2">
+                    <div className="h-4 w-1/2 bg-muted rounded"></div>
+                    <div className="h-3 w-3/4 bg-muted rounded"></div>
+                </div>
+            </div>
+        );
+    }
+    
     return (
-        <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
-            <SheetHeader className="p-4 border-b">
-            <SheetTitle className="flex items-center text-red-500"><FileText className="mr-2 h-5 w-5"/>Notes & Messages</SheetTitle>
-            </SheetHeader>
-            <ScrollArea className="flex-1">
-                {messages.length > 0 ? (
-                    <div className="p-4 space-y-5">
-                        {messages.map(note => (
-                            <div key={note.id} className="flex gap-3">
-                                <Avatar className="h-10 w-10 border">
-                                    <AvatarImage src={note.userAvatar} />
-                                    <AvatarFallback>{note.userName?.[0]}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                    <p className="text-sm" dangerouslySetInnerHTML={{ __html: note.text }} />
-                                    <div className="text-xs text-muted-foreground mt-1 flex items-center gap-4">
-                                        <span>{getRelativeTime(note.date)}</span>
-                                        <button className="font-semibold hover:underline">Read</button>
-                                        <button className="font-semibold hover:underline" onClick={() => handleReply(note)}>Reply</button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-red-500">
-                        <FileText className="h-12 w-12 mb-4" />
-                        <p>No messages or notes yet.</p>
-                    </div>
-                )}
-            </ScrollArea>
-            <SheetFooter className="p-2 border-t bg-transparent">
-                <div className="w-full space-y-2">
-                    {replyingTo && (
-                        <div className="text-xs p-2 bg-muted rounded-md flex justify-between items-center text-red-500">
-                            <p className="text-muted-foreground truncate">
-                                Replying to <strong className="text-primary/90">@{replyingTo.userName}</strong>
-                            </p>
-                            <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setReplyingTo(null)}>
-                                <X className="h-3 w-3" />
-                            </Button>
+        <button onClick={onClick} className="w-full text-left p-4 flex items-center gap-4 hover:bg-muted/50 rounded-lg transition-colors text-red-500">
+            <Avatar className="h-12 w-12 border">
+                <AvatarImage src={recipient.avatarUrl} />
+                <AvatarFallback>{recipient.firstName[0]}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-baseline">
+                    <p className="font-semibold truncate">{recipient.firstName} {recipient.lastName}</p>
+                    <p className="text-xs text-muted-foreground">{getRelativeTime(chat.timestamp)}</p>
+                </div>
+                <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
+            </div>
+        </button>
+    );
+};
+
+const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: boolean, onOpenChange: (open: boolean) => void }) => {
+    const firestore = useFirestore();
+    const [selectedChat, setSelectedChat] = useState<{chatId: string, recipient: UserProfile} | null>(null);
+    useMobileViewportFix();
+
+    const chatsQuery = useMemoFirebase(() =>
+        firestore && user ? query(collection(firestore, 'chats'), where('participants', 'array-contains', user.uid)) : null
+    , [firestore, user]);
+    
+    const { data: chats, isLoading: chatsLoading } = useCollection<Chat>(chatsQuery);
+
+    const handleChatClick = (chat: Chat) => {
+        const recipientId = chat.participants.find(p => p !== user.uid);
+        if (recipientId) {
+            const recipient = mockCustomers.find(c => c.id === recipientId);
+            if (recipient) {
+                setSelectedChat({ chatId: chat.id, recipient });
+            }
+        }
+    }
+
+    const handleCloseDetail = () => {
+        setSelectedChat(null);
+    }
+    
+    return (
+        <>
+            <Sheet open={open && !selectedChat} onOpenChange={onOpenChange}>
+            <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
+                <SheetHeader className="p-4 border-b">
+                <SheetTitle className="flex items-center text-red-500"><MessageSquare className="mr-2 h-5 w-5"/>Messages</SheetTitle>
+                </SheetHeader>
+                <ScrollArea className="flex-1">
+                    {chatsLoading ? (
+                       <div className="h-full flex items-center justify-center"> <Loader2 className="h-8 w-8 animate-spin text-red-500" /></div>
+                    ) : chats && chats.length > 0 ? (
+                        <div className="p-2 space-y-1">
+                            {chats.sort((a,b) => (b.timestamp as any)?.seconds - (a.timestamp as any)?.seconds).map(chat => (
+                               <ChatListItem key={chat.id} chat={chat} currentUserId={user.uid} onClick={() => handleChatClick(chat)} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="h-full flex flex-col items-center justify-center text-red-500">
+                            <MessageSquare className="h-12 w-12 mb-4" />
+                            <p>No messages yet.</p>
+                            <p className="text-sm">Start a conversation from a user's profile.</p>
                         </div>
                     )}
-                    <div className="flex items-start gap-2">
-                        <Textarea 
-                            placeholder="Type your reply..."
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            className="min-h-[40px] max-h-28"
-                            rows={1}
-                        />
-                        <Button size="icon" onClick={handleSendMessage} disabled={!newMessage.trim()}>
-                            <Send className="h-4 w-4" />
-                        </Button>
-                    </div>
-                </div>
-            </SheetFooter>
-        </SheetContent>
-        </Sheet>
+                </ScrollArea>
+            </SheetContent>
+            </Sheet>
+            {selectedChat && (
+                <ChatDetailSheet
+                    isOpen={!!selectedChat}
+                    onClose={handleCloseDetail}
+                    chatId={selectedChat.chatId}
+                    recipient={selectedChat.recipient}
+                />
+            )}
+        </>
     );
 };
 
