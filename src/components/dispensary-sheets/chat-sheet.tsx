@@ -321,10 +321,10 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent 
         side="right" 
-        className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl"
+        className="w-full md:max-w-md p-0 flex flex-col bg-background"
         style={{ height: vh ? `${vh}px` : '100dvh' }}
        >
-        <SheetHeader className="p-4 flex-row items-center gap-4 flex-shrink-0 bg-transparent border-b">
+        <SheetHeader className="p-4 flex-row items-center gap-4 flex-shrink-0 bg-background border-b z-10">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
           <div>
             <SheetTitle>Live Group Chat</SheetTitle>
@@ -332,7 +332,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
           </div>
         </SheetHeader>
         
-        <ScrollArea className="flex-1 min-h-0" onScroll={handleScroll} ref={scrollViewportRef}>
+        <ScrollArea className="flex-1 min-h-0 bg-muted/20" onScroll={handleScroll} ref={scrollViewportRef}>
              <div className="pb-[7rem]">
                 {!user ? (
                     <div className="text-center p-8 text-muted-foreground">Please log in to view the chat.</div>
