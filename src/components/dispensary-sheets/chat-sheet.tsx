@@ -320,7 +320,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     <>
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent 
-        side="left" 
+        side="right" 
         className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl"
         style={{ height: vh ? `${vh}px` : '100dvh' }}
        >
@@ -441,5 +441,3 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     </>
   );
 }
-
-    
