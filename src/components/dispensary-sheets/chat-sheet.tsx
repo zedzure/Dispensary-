@@ -206,7 +206,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   }
 
   const handleSendMessage = useCallback(async () => {
-    const messageText = inputRef.current?.innerHTML || '';
+    const messageText = inputRef.current?.innerText || '';
     if (!messageText.trim() && !imageFile) return;
     if (!user || !firestore || !dispensary) return;
 
@@ -292,7 +292,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     { icon: AtSign, name: 'Mention', action: () => toast({title: 'Coming Soon!'}) },
   ];
   
-  const hasContent = (inputRef.current?.innerHTML || '').trim() !== '' || !!imageFile;
+  const hasContent = (inputRef.current?.innerText || '').trim() !== '' || !!imageFile;
 
   return (
     <>
@@ -393,7 +393,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                         contentEditable
                         onInput={(e) => {
                             const target = e.currentTarget as HTMLDivElement;
-                            setNewMessage(target.innerHTML);
+                            setNewMessage(target.innerText);
                         }}
                         onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
                         className="w-full bg-transparent outline-none text-sm px-2 flex-grow min-h-[2.25rem] flex items-center"
@@ -420,5 +420,3 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     </>
   );
 }
-
-    
