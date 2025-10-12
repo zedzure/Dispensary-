@@ -44,6 +44,7 @@ const getRelativeTime = (timestamp: any): string => {
 }
 
 const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+  useMobileViewportFix();
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
@@ -84,6 +85,7 @@ const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (o
 };
 
 const UploadsSheet = ({ uploads, open, onOpenChange }: { uploads: UploadItem[], open: boolean, onOpenChange: (open: boolean) => void }) => {
+  useMobileViewportFix();
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
@@ -250,67 +252,80 @@ const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: bo
     );
 };
 
-const MusicSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
-        <SheetHeader className="p-4 border-b text-red-500">
-          <SheetTitle className="flex items-center text-red-500"><Music className="mr-2 h-5 w-5"/>My Music</SheetTitle>
-        </SheetHeader>
-        <div className="h-full flex flex-col items-center justify-center text-red-500">
-            <Music className="h-12 w-12 mb-4" />
-            <p>Your uploaded music will appear here.</p>
-        </div>
-      </SheetContent>
-    </Sheet>
-);
+const MusicSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+    useMobileViewportFix();
+    return (
+        <Sheet open={open} onOpenChange={onOpenChange}>
+          <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
+            <SheetHeader className="p-4 border-b text-red-500">
+              <SheetTitle className="flex items-center text-red-500"><Music className="mr-2 h-5 w-5"/>My Music</SheetTitle>
+            </SheetHeader>
+            <div className="h-full flex flex-col items-center justify-center text-red-500">
+                <Music className="h-12 w-12 mb-4" />
+                <p>Your uploaded music will appear here.</p>
+            </div>
+          </SheetContent>
+        </Sheet>
+    );
+};
 
-const VideoSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
-        <SheetHeader className="p-4 border-b text-red-500">
-          <SheetTitle className="flex items-center text-red-500"><Video className="mr-2 h-5 w-5"/>My Videos</SheetTitle>
-        </SheetHeader>
-        <div className="h-full flex flex-col items-center justify-center text-red-500">
-            <Video className="h-12 w-12 mb-4" />
-            <p>Your uploaded videos will appear here.</p>
-        </div>
-      </SheetContent>
-    </Sheet>
-);
+const VideoSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+    useMobileViewportFix();
+    return (
+        <Sheet open={open} onOpenChange={onOpenChange}>
+          <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
+            <SheetHeader className="p-4 border-b text-red-500">
+              <SheetTitle className="flex items-center text-red-500"><Video className="mr-2 h-5 w-5"/>My Videos</SheetTitle>
+            </SheetHeader>
+            <div className="h-full flex flex-col items-center justify-center text-red-500">
+                <Video className="h-12 w-12 mb-4" />
+                <p>Your uploaded videos will appear here.</p>
+            </div>
+          </SheetContent>
+        </Sheet>
+    );
+};
 
-const WalletSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
-        <SheetHeader className="p-4 border-b text-red-500">
-          <SheetTitle className="flex items-center text-red-500"><Wallet className="mr-2 h-5 w-5"/>My Wallet</SheetTitle>
-        </SheetHeader>
-        <div className="h-full flex flex-col items-center justify-center text-red-500">
-            <Wallet className="h-12 w-12 mb-4" />
-            <p>Your loyalty points and rewards will be shown here.</p>
-        </div>
-      </SheetContent>
-    </Sheet>
-);
+const WalletSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+    useMobileViewportFix();
+    return (
+        <Sheet open={open} onOpenChange={onOpenChange}>
+          <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
+            <SheetHeader className="p-4 border-b text-red-500">
+              <SheetTitle className="flex items-center text-red-500"><Wallet className="mr-2 h-5 w-5"/>My Wallet</SheetTitle>
+            </SheetHeader>
+            <div className="h-full flex flex-col items-center justify-center text-red-500">
+                <Wallet className="h-12 w-12 mb-4" />
+                <p>Your loyalty points and rewards will be shown here.</p>
+            </div>
+          </SheetContent>
+        </Sheet>
+    );
+};
 
-const SavedSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
-        <SheetHeader className="p-4 border-b text-red-500">
-          <SheetTitle className="flex items-center text-red-500"><Bookmark className="mr-2 h-5 w-5"/>Saved Items</SheetTitle>
-        </SheetHeader>
-        <div className="h-full flex flex-col items-center justify-center text-red-500">
-            <Bookmark className="h-12 w-12 mb-4" />
-            <p>Your saved products and dispensaries will appear here.</p>
-        </div>
-      </SheetContent>
-    </Sheet>
-);
+const SavedSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+    useMobileViewportFix();
+    return (
+        <Sheet open={open} onOpenChange={onOpenChange}>
+          <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
+            <SheetHeader className="p-4 border-b text-red-500">
+              <SheetTitle className="flex items-center text-red-500"><Bookmark className="mr-2 h-5 w-5"/>Saved Items</SheetTitle>
+            </SheetHeader>
+            <div className="h-full flex flex-col items-center justify-center text-red-500">
+                <Bookmark className="h-12 w-12 mb-4" />
+                <p>Your saved products and dispensaries will appear here.</p>
+            </div>
+          </SheetContent>
+        </Sheet>
+    );
+};
 
 
 const ConnectionsSheet = ({ profile, initialTab, open, onOpenChange }: { profile: UserProfile, initialTab: 'followers' | 'following', open: boolean, onOpenChange: (open: boolean) => void }) => {
     const { toast } = useToast();
     const followers = mockCustomers.slice(0, 15);
     const following = mockCustomers.slice(10, 25);
+    useMobileViewportFix();
 
     const handleFollow = (userId: string, isFollowing: boolean) => {
         toast({

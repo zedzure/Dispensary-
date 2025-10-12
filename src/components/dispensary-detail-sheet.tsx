@@ -440,5 +440,3 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
     </>
   );
 }
-
-    
