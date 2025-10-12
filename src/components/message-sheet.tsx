@@ -2,8 +2,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking } from '@/firebase';
-import { collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
+import { collection, query, where, getDocs, serverTimestamp, doc, arrayUnion } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile } from '@/types/pos';
 import { ChatDetailSheet } from './chat-detail-sheet';
@@ -42,13 +42,22 @@ export function MessageSheet({ isOpen, onClose, recipient }: MessageSheetProps) 
                     setChatId(chatDoc.id);
                 } else {
                     // Create new chat
-                    const newChatRef = await addDocumentNonBlocking(chatsRef, {
+                    const newChatData = {
                         participants,
                         lastMessage: 'Chat started',
                         timestamp: serverTimestamp(),
-                    });
+                    };
+                    const newChatRef = await addDocumentNonBlocking(collection(firestore, 'chats'), newChatData);
+
                     if (newChatRef) {
                         setChatId(newChatRef.id);
+                        // Update both users' documents with the new chatId
+                        const currentUserRef = doc(firestore, 'users', user.uid);
+                        const recipientUserRef = doc(firestore, 'users', recipient.id);
+                        
+                        setDocumentNonBlocking(currentUserRef, { chatIds: arrayUnion(newChatRef.id) }, { merge: true });
+                        setDocumentNonBlocking(recipientUserRef, { chatIds: arrayUnion(newChatRef.id) }, { merge: true });
+
                     } else {
                         throw new Error("Failed to create chat reference.");
                     }

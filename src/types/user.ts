@@ -10,4 +10,5 @@ export interface User {
   followersCount: number;
   followingCount: number;
   createdAt: Timestamp | Date;
+  chatIds?: string[];
 }

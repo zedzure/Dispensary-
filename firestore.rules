@@ -1,77 +1,48 @@
-/**
- * @file Firestore Security Rules
- * @description This ruleset enforces a user-ownership model for user profiles and allows users to create, read, update, and delete their own posts.
- *
- * Data Structure:
- * - /users/{userId}: Stores user profile information. Access is restricted to the owning user.
- * - /posts/{postId}: Stores posts.  Posts are publicly readable, but only the author can modify them.
- *
- * Key Security Decisions:
- * - Users can only access their own profile data.
- * - Posts are publicly readable.
- * - Only the post's author can update or delete it.
- *
- * Denormalization for Authorization:
- * - The 'Post' entity requires a 'userId' field to identify the owner. This is validated on creation and used for authorization on updates and deletes.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+  
+    // Helper function to check if a user is authenticated
+    function isSignedIn() {
+      return request.auth != null;
+    }
 
-    /**
-     * @description Controls access to user profile information.
-     * @path /users/{userId}
-     * @allow (get, list) User with ID 'user123' can read their own profile: auth.uid == 'user123'
-     * @allow (create) User with ID 'user123' can create their own profile: auth.uid == 'user123'
-     * @allow (update) User with ID 'user123' can update their own profile: auth.uid == 'user123'
-     * @allow (delete) User with ID 'user123' can delete their own profile: auth.uid == 'user123'
-     * @deny (get, list) User with ID 'user456' cannot read user 'user123' profile: auth.uid != 'user123'
-     * @deny (create) User with ID 'user456' cannot create user 'user123' profile: auth.uid != 'user123'
-     * @deny (update) User with ID 'user456' cannot update user 'user123' profile: auth.uid != 'user123'
-     * @deny (delete) User with ID 'user456' cannot delete user 'user123' profile: auth.uid != 'user123'
-     * @principle Enforces document ownership for all operations.
-     */
     match /users/{userId} {
-      // Helper function to check if the user is signed in and is the owner of the document.
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get: if isOwner(userId);
-      allow list: if false; // User listing is not permitted.
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+      // Anyone can read a user's public profile data
+      allow read: if true;
+      // Only the authenticated user can write to their own document
+      allow write: if isSignedIn() && request.auth.uid == userId;
     }
 
-    /**
-     * @description Controls access to posts.  Allows public read access, but restricts writes to the post's author.
-     * @path /posts/{postId}
-     * @allow (get, list) Any user can read all posts: true
-     * @allow (create) User with ID 'user123' can create a post with userId 'user123': request.auth.uid == 'user123' && request.resource.data.userId == 'user123'
-     * @allow (update) User with ID 'user123' can update their own post with userId 'user123': resource.data.userId == 'user123'
-     * @allow (delete) User with ID 'user123' can delete their own post with userId 'user123': resource.data.userId == 'user123'
-     * @deny (create) User with ID 'user456' cannot create a post with userId 'user123': request.auth.uid == 'user456' && request.resource.data.userId == 'user123'
-     * @deny (update) User with ID 'user456' cannot update a post with userId 'user123': resource.data.userId == 'user123'
-     * @deny (delete) User with ID 'user456' cannot delete a post with userId 'user123': resource.data.userId == 'user123'
-     * @principle Allows public read access, but enforces document ownership for writes.
-     */
     match /posts/{postId} {
-       // Helper function to check if the user is signed in and is the owner of the document.
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-      allow get: if true;
-      allow list: if true;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update: if isExistingOwner(resource.data.userId);
-      allow delete: if isExistingOwner(resource.data.userId);
+      // Anyone can read posts
+      allow read: if true;
+      // Only signed-in users can create posts
+      allow create: if isSignedIn();
+      // Only the author of a post can update or delete it
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
+
+    match /dispensaries/{dispensaryId} {
+      // Anyone can read dispensary information
+      allow read: if true;
+      // Writing to dispensaries is restricted (e.g., only by admins, not defined here)
+      allow write: if false;
+    }
+    
+    match /chats/{chatId} {
+        // Users can read/write a chat document if they are a participant
+        allow read, write: if isSignedIn() && request.auth.uid in resource.data.participants;
+        
+        match /messages/{messageId} {
+            // Users can read/write messages if they are a participant of the parent chat
+            allow read, write: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+        }
+    }
+    
+     match /users/{userId}/post-its/{noteId} {
+        // Only the owner of the post-its can read or write them
+        allow read, write: if isSignedIn() && request.auth.uid == userId;
+     }
   }
 }

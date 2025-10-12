@@ -17,9 +17,10 @@ import { Textarea } from "./ui/textarea";
 import { SearchSheet } from "./search-sheet";
 import { cn } from "@/lib/utils";
 import { useMobileViewportFix } from "@/hooks/use-mobile-viewport-fix";
-import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc } from "@/firebase";
 import { collection, query, where, doc, getDoc } from 'firebase/firestore';
 import type { UserProfile } from "@/types/pos";
+import type { User } from "@/types/user";
 import { ChatDetailSheet } from "./chat-detail-sheet";
 import { mockCustomers } from "@/lib/mockCustomers";
 
@@ -157,16 +158,58 @@ const ChatListItem = ({ chat, currentUserId, onClick }: { chat: Chat, currentUse
     );
 };
 
-const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: boolean, onOpenChange: (open: boolean) => void }) => {
+const ChatList = ({ user, onChatClick }: { user: FirebaseUser, onChatClick: (chat: Chat) => void }) => {
     const firestore = useFirestore();
+    const userDocRef = useMemoFirebase(() => firestore ? doc(firestore, 'users', user.uid) : null, [firestore, user]);
+    const { data: userData, isLoading: userLoading } = useDoc<User>(userDocRef);
+    const [chats, setChats] = useState<Chat[]>([]);
+    const [chatsLoading, setChatsLoading] = useState(true);
+
+    useEffect(() => {
+        if (userData && userData.chatIds && firestore) {
+            setChatsLoading(true);
+            const fetchChats = async () => {
+                const chatPromises = userData.chatIds!.map(id => getDoc(doc(firestore, 'chats', id)));
+                const chatDocs = await Promise.all(chatPromises);
+                const chatData = chatDocs
+                    .filter(doc => doc.exists())
+                    .map(doc => ({ ...doc.data(), id: doc.id } as Chat));
+                setChats(chatData);
+                setChatsLoading(false);
+            };
+            fetchChats();
+        } else if (!userLoading) {
+            setChatsLoading(false);
+        }
+    }, [userData, userLoading, firestore]);
+    
+    if (chatsLoading) {
+        return <div className="h-full flex items-center justify-center"> <Loader2 className="h-8 w-8 animate-spin text-red-500" /></div>;
+    }
+
+    if (chats.length === 0) {
+        return (
+            <div className="h-full flex flex-col items-center justify-center text-red-500">
+                <MessageSquare className="h-12 w-12 mb-4" />
+                <p>No messages yet.</p>
+                <p className="text-sm">Start a conversation from a user's profile.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="p-2 space-y-1">
+            {chats.sort((a, b) => ((b.timestamp as any)?.seconds ?? 0) - ((a.timestamp as any)?.seconds ?? 0)).map(chat => (
+                <ChatListItem key={chat.id} chat={chat} currentUserId={user.uid} onClick={() => onChatClick(chat)} />
+            ))}
+        </div>
+    );
+};
+
+
+const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: boolean, onOpenChange: (open: boolean) => void }) => {
     const [selectedChat, setSelectedChat] = useState<{chatId: string, recipient: UserProfile} | null>(null);
     useMobileViewportFix();
-
-    const chatsQuery = useMemoFirebase(() =>
-        firestore && user ? query(collection(firestore, 'chats'), where('participants', 'array-contains', user.uid)) : null
-    , [firestore, user]);
-    
-    const { data: chats, isLoading: chatsLoading } = useCollection<Chat>(chatsQuery);
 
     const handleChatClick = (chat: Chat) => {
         const recipientId = chat.participants.find(p => p !== user.uid);
@@ -190,21 +233,7 @@ const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: bo
                 <SheetTitle className="flex items-center text-red-500"><MessageSquare className="mr-2 h-5 w-5"/>Messages</SheetTitle>
                 </SheetHeader>
                 <ScrollArea className="flex-1">
-                    {chatsLoading ? (
-                       <div className="h-full flex items-center justify-center"> <Loader2 className="h-8 w-8 animate-spin text-red-500" /></div>
-                    ) : chats && chats.length > 0 ? (
-                        <div className="p-2 space-y-1">
-                            {chats.sort((a,b) => (b.timestamp as any)?.seconds - (a.timestamp as any)?.seconds).map(chat => (
-                               <ChatListItem key={chat.id} chat={chat} currentUserId={user.uid} onClick={() => handleChatClick(chat)} />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="h-full flex flex-col items-center justify-center text-red-500">
-                            <MessageSquare className="h-12 w-12 mb-4" />
-                            <p>No messages yet.</p>
-                            <p className="text-sm">Start a conversation from a user's profile.</p>
-                        </div>
-                    )}
+                    <ChatList user={user} onChatClick={handleChatClick} />
                 </ScrollArea>
             </SheetContent>
             </Sheet>
