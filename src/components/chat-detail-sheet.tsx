@@ -24,11 +24,11 @@ const formatTimestamp = (timestamp: any) => {
 };
 
 function MessageItem({ msg, sender, isCurrentUser }: { msg: ChatMessageType; sender: UserProfile | null; isCurrentUser: boolean }) {
-    if (!sender) return null;
+    if (!sender && !isCurrentUser) return null;
     
     return (
         <div className={cn("flex items-end gap-2", isCurrentUser ? "justify-end" : "justify-start")}>
-            {!isCurrentUser && (
+            {!isCurrentUser && sender && (
                  <Avatar className="h-8 w-8 border">
                     <AvatarImage src={sender.avatarUrl} />
                     <AvatarFallback>{sender.firstName[0]}</AvatarFallback>
@@ -36,7 +36,9 @@ function MessageItem({ msg, sender, isCurrentUser }: { msg: ChatMessageType; sen
             )}
             <div className={cn(
                 "max-w-[75%] rounded-2xl px-4 py-2",
-                isCurrentUser ? "bg-primary text-primary-foreground rounded-br-none" : "bg-muted rounded-bl-none"
+                isCurrentUser 
+                    ? "bg-primary text-primary-foreground rounded-br-none" 
+                    : "liquid-glass rounded-bl-none border-border/20"
             )}>
                 <p className="text-sm">{msg.message}</p>
                  <p className={cn("text-xs mt-1", isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground/70")}>{formatTimestamp(msg.timestamp)}</p>
@@ -86,11 +88,13 @@ export function ChatDetailSheet({ isOpen, onClose, chatId, recipient }: ChatDeta
 
     try {
         const messagesCol = collection(firestore, 'chats', chatId, 'messages');
-        const messageToSend: Omit<ChatMessageType, 'id'> = {
+        const messageToSend: Omit<ChatMessageType, 'id' | 'user' > = {
           senderID: currentUser.uid,
           message: newMessage,
           timestamp: serverTimestamp(),
           type: 'text', // Assuming text type
+          replies: [],
+          reposts: [],
         };
         await addDocumentNonBlocking(messagesCol, messageToSend);
         
@@ -137,7 +141,7 @@ export function ChatDetailSheet({ isOpen, onClose, chatId, recipient }: ChatDeta
                     {messages?.map(msg => (
                         <MessageItem 
                             key={msg.id} 
-                            msg={msg}
+                            msg={msg as any}
                             sender={msg.senderID === currentUser?.uid ? null : recipient}
                             isCurrentUser={msg.senderID === currentUser?.uid}
                         />

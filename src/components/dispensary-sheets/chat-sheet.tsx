@@ -87,7 +87,7 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: C
                 <p className="text-xs text-muted-foreground">{formatTimestamp(msg.timestamp)}</p>
             </div>
 
-            <div className="p-3 rounded-2xl rounded-tl-none bg-muted/80 mt-1">
+            <div className="p-3 rounded-2xl rounded-tl-none mt-1 liquid-glass border-border/20">
                 {msg.replyingTo && (
                     <div className="text-xs text-muted-foreground mb-1">
                         Replying to <strong className="text-primary/90">@{msg.replyingTo.user}</strong>
@@ -192,7 +192,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                 const randomMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)];
 
                 const messageToSend: Omit<ChatMessageType, 'id'> = {
-                    user: { id: randomUser.id, name: `${'${randomUser.firstName}'} ${'${randomUser.lastName}'}`, avatar: randomUser.avatarUrl || "", isOnline: true },
+                    user: { id: randomUser.id, name: `${randomUser.firstName} ${randomUser.lastName}`, avatar: randomUser.avatarUrl || "", isOnline: true },
                     text: randomMessage,
                     timestamp: serverTimestamp() as any,
                     likes: 0,
@@ -203,7 +203,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
         }, 5000); // 5 seconds
 
         return () => clearInterval(intervalId);
-    }, [isOpen, firestore, dispensary]);
+    }, [isOpen, firestore, dispensary, mockMessages]);
 
 
   const handleAvatarClick = (user: ChatUser) => {
@@ -249,7 +249,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     try {
         let imageUrl: string | undefined;
         if (imageFile) {
-            imageUrl = await uploadImage(imageFile, `chatImages/${'${dispensary.id}'}/${'${Date.now()}'}-${'${imageFile.name}'}`);
+            imageUrl = await uploadImage(imageFile, `chatImages/${dispensary.id}/${Date.now()}-${imageFile.name}`);
         }
 
         const messagesCol = collection(firestore, 'dispensaries', dispensary.id, 'messages');
@@ -334,7 +334,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
       <SheetContent 
         side="left" 
         className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl"
-        style={{ height: vh ? `${'${vh}'}px` : '100dvh' }}
+        style={{ height: vh ? `${vh}px` : '100dvh' }}
        >
         <SheetHeader className="p-4 flex-row items-center gap-4 flex-shrink-0 bg-transparent border-b">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
@@ -454,5 +454,3 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     </>
   );
 }
-
-    
