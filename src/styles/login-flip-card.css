@@ -1,15 +1,20 @@
 
+
 .login-page-wrapper {
   font-family: 'Hind Guntur', sans-serif;
   color: hsl(var(--foreground));
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: hsl(var(--primary) / 0.1);
+  background-color: hsl(var(--background));
   background-image: url('https://firebasestorage.googleapis.com/v0/b/silzeycom-pos-2a13p.appspot.com/o/assets%2Fleaf.png?alt=media&token=c1e19d7d-532b-426c-845f-7d15a97de8a9');
   background-repeat: no-repeat;
   background-position: 150% -30%;
   background-size: 60%;
+}
+
+body.keyboard-visible .login-page-wrapper {
+    background-image: none;
 }
 
 .login-page-main {

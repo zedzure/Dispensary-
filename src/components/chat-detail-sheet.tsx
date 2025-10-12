@@ -90,6 +90,7 @@ export function ChatDetailSheet({ isOpen, onClose, chatId, recipient }: ChatDeta
           senderID: currentUser.uid,
           message: newMessage,
           timestamp: serverTimestamp(),
+          type: 'text', // Assuming text type
         };
         await addDocumentNonBlocking(messagesCol, messageToSend);
         

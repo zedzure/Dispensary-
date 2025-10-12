@@ -137,17 +137,6 @@ interface DispensarySheetProps {
   dispensary: Dispensary;
 }
 
-const mockChatUsers: UserProfile[] = mockCustomers.slice(0, 5);
-const mockMessages = [
-    "Just tried the new sativa, amazing!",
-    "Anyone have recommendations for edibles?",
-    "The staff here is always so friendly.",
-    "Don't forget about the 15% off deal today!",
-    "What's the best strain for creativity?",
-    "I love their pre-rolls, so convenient.",
-];
-
-
 export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: DispensarySheetProps) {
   const { user } = useUser();
   const firestore = useFirestore();
@@ -189,7 +178,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
 
         const intervalId = setInterval(() => {
             if (Math.random() < 0.2) { // 20% chance to post every 5 seconds
-                const randomUser = mockChatUsers[Math.floor(Math.random() * mockChatUsers.length)];
+                const randomUser = mockCustomers[Math.floor(Math.random() * mockCustomers.length)];
                 const randomMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)];
 
                 const messageToSend: Omit<ChatMessageType, 'id'> = {
@@ -376,7 +365,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
             )}
         </ScrollArea>
     
-        <div className="relative p-2 pt-0 border-t">
+        <div className="p-2 border-t mt-auto flex-shrink-0">
             <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" accept="image/*" />
             {user ? (
             <div className="relative">
