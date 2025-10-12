@@ -5,7 +5,7 @@
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import type { UserProfile } from '@/types/pos';
-import { Camera, Music, Video, Receipt, Wallet, MessageSquare, FileText, Bookmark, Edit, Save, Loader2, UserPlus } from 'lucide-react';
+import { Camera, Music, Video, Receipt, Wallet, MessageSquare, FileText, Bookmark, Edit, Save, Loader2, UserPlus, Users } from 'lucide-react';
 import { useUser, useFirestore, setDocumentNonBlocking } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -18,7 +18,7 @@ import { MessageSheet } from './message-sheet';
 
 interface UserProfileCardProps {
   profile: UserProfile;
-  setActiveSheet: (sheet: ActiveSheet) => void;
+  setActiveSheet: (sheet: ActiveSheet, subpage?: 'followers' | 'following') => void;
   onUpdate: (updatedProfile: Partial<UserProfile>) => void;
   children?: React.ReactNode;
 }
@@ -134,14 +134,14 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate, children }:
                 </div>
 
                 <div className="glass-profile-card-stats">
-                    <div className="glass-profile-card-stat">
+                    <button className="glass-profile-card-stat" onClick={() => setActiveSheet('connections', 'followers')}>
                         <div className="glass-profile-card-stat-value">{profile.followersCount || 0}</div>
                         <div className="glass-profile-card-stat-label">Followers</div>
-                    </div>
-                    <div className="glass-profile-card-stat">
+                    </button>
+                    <button className="glass-profile-card-stat" onClick={() => setActiveSheet('connections', 'following')}>
                         <div className="glass-profile-card-stat-value">{profile.followingCount || 0}</div>
                         <div className="glass-profile-card-stat-label">Following</div>
-                    </div>
+                    </button>
                     <div className="glass-profile-card-stat">
                         <div className="glass-profile-card-stat-value">{profile.reviewsToday || 0}</div>
                         <div className="glass-profile-card-stat-label">Reviews</div>
@@ -163,16 +163,22 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate, children }:
                 </div>
 
                 <div className="glass-profile-card-footer">
-                    <button className="glass-profile-card-button message-btn" onClick={() => setMessageActive(true)}>Message</button>
-                    <button className="glass-profile-card-button follow-btn" onClick={handleFollow}>Follow</button>
+                    <button className="glass-profile-card-button message-btn" onClick={() => setActiveSheet('connections')}>
+                        <Users className="mr-2 h-4 w-4" /> Connections
+                    </button>
+                    <button className="glass-profile-card-button follow-btn" onClick={handleFollow}>
+                        <UserPlus className="mr-2 h-4 w-4" /> Follow
+                    </button>
                 </div>
             </div>
 
-            <MessageSheet 
-                isOpen={isMessageActive} 
-                onClose={() => setMessageActive(false)}
-                recipient={profile}
-            />
+            { user?.uid !== profile.id && (
+                <MessageSheet 
+                    isOpen={isMessageActive} 
+                    onClose={() => setMessageActive(false)}
+                    recipient={profile}
+                />
+            )}
         </>
     );
 }

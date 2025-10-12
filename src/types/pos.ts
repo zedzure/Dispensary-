@@ -205,13 +205,16 @@ export interface Chat {
 
 export interface ChatMessage {
     id: string;
-    senderID: string;
-    message: string;
+    user: ChatUser;
+    text: string;
     timestamp: number | Timestamp;
+    likes: number;
+    isLiked: boolean;
+    replyingTo?: {
+        user: string;
+        text: string;
+    };
     imageUrl?: string;
-    type?: 'text' | 'image';
-    replies?: string[]; // array of message IDs
-    reposts?: string[]; // array of user IDs
 }
 
 

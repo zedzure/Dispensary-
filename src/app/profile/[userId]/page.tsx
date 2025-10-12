@@ -19,7 +19,7 @@ import { UserProfileSheets } from '@/components/user-profile-sheets';
 import type { UploadItem } from '@/types/pos';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
 
-export type ActiveSheet = 'receipts' | 'uploads' | 'notes' | 'search' | 'music' | 'video' | 'wallet' | 'saved' | null;
+export type ActiveSheet = 'receipts' | 'uploads' | 'notes' | 'search' | 'music' | 'video' | 'wallet' | 'saved' | 'connections' | null;
 
 
 function ProfilePageSkeleton() {
@@ -155,7 +155,7 @@ export default function ProfilePage() {
   } : null;
 
   if (!adaptedProfile) {
-    return <ProfilePageSkeleton />; // Should be covered by the !profile check, but good for safety
+    return <ProfilePageSkeleton />; // Should be covered by the !profile check, but for safety
   }
 
   return (
@@ -178,6 +178,7 @@ export default function ProfilePage() {
      {authUser && (
          <UserProfileSheets 
             user={authUser}
+            profile={adaptedProfile}
             activeSheet={activeSheet}
             setActiveSheet={setActiveSheet}
             uploads={uploads}

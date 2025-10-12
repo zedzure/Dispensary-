@@ -4,10 +4,10 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { X, FileText, Camera, Receipt, Send, Music, Video, Wallet, Bookmark, MessageSquare, Loader2 } from "lucide-react";
+import { X, FileText, Camera, Receipt, Send, Music, Video, Wallet, Bookmark, MessageSquare, Loader2, UserPlus, UserMinus } from "lucide-react";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ActiveSheet } from "@/app/profile/[userId]/page";
-import type { UploadItem, Receipt as ReceiptType, Chat } from "@/types/pos";
+import type { UploadItem, Receipt as ReceiptType, Chat, UserProfile } from "@/types/pos";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
@@ -19,10 +19,11 @@ import { cn } from "@/lib/utils";
 import { useMobileViewportFix } from "@/hooks/use-mobile-viewport-fix";
 import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc } from "@/firebase";
 import { collection, query, where, doc, getDoc } from 'firebase/firestore';
-import type { UserProfile } from "@/types/pos";
 import type { User } from "@/types/user";
 import { ChatDetailSheet } from "./chat-detail-sheet";
 import { mockCustomers } from "@/lib/mockCustomers";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 
 
 const mockReceiptsData: ReceiptType[] = [];
@@ -306,14 +307,94 @@ const SavedSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open
 );
 
 
+const ConnectionsSheet = ({ profile, initialTab, open, onOpenChange }: { profile: UserProfile, initialTab: 'followers' | 'following', open: boolean, onOpenChange: (open: boolean) => void }) => {
+    const { toast } = useToast();
+    const followers = mockCustomers.slice(0, 15);
+    const following = mockCustomers.slice(10, 25);
+
+    const handleFollow = (userId: string, isFollowing: boolean) => {
+        toast({
+            title: isFollowing ? `Unfollowed user ${userId}` : `Followed user ${userId}`,
+            description: "This is a mock action.",
+        });
+    };
+
+    return (
+        <Sheet open={open} onOpenChange={onOpenChange}>
+            <SheetContent side="right" className="w-full max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl border-border/20">
+                <SheetHeader className="p-4 border-b">
+                    <SheetTitle>{profile.firstName}'s Connections</SheetTitle>
+                </SheetHeader>
+                <Tabs defaultValue={initialTab} className="w-full flex-1 flex flex-col">
+                    <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
+                        <TabsTrigger value="followers">Followers</TabsTrigger>
+                        <TabsTrigger value="following">Following</TabsTrigger>
+                    </TabsList>
+                    <ScrollArea className="flex-1">
+                        <TabsContent value="followers" className="m-0">
+                            <div className="p-4 space-y-4">
+                                {followers.map(user => (
+                                    <div key={user.id} className="flex items-center gap-4">
+                                        <Avatar className="h-12 w-12">
+                                            <AvatarImage src={user.avatarUrl} />
+                                            <AvatarFallback>{user.firstName[0]}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1">
+                                            <p className="font-semibold">{user.firstName} {user.lastName}</p>
+                                            <p className="text-sm text-muted-foreground">@{user.email.split('@')[0]}</p>
+                                        </div>
+                                        <Button variant="outline" size="sm" onClick={() => handleFollow(user.id, false)}>
+                                            <UserPlus className="h-4 w-4 mr-1" /> Follow
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </TabsContent>
+                        <TabsContent value="following" className="m-0">
+                             <div className="p-4 space-y-4">
+                                {following.map(user => (
+                                    <div key={user.id} className="flex items-center gap-4">
+                                        <Avatar className="h-12 w-12">
+                                            <AvatarImage src={user.avatarUrl} />
+                                            <AvatarFallback>{user.firstName[0]}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1">
+                                            <p className="font-semibold">{user.firstName} {user.lastName}</p>
+                                            <p className="text-sm text-muted-foreground">@{user.email.split('@')[0]}</p>
+                                        </div>
+                                        <Button variant="secondary" size="sm" onClick={() => handleFollow(user.id, true)}>
+                                            <UserMinus className="h-4 w-4 mr-1" /> Unfollow
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </TabsContent>
+                    </ScrollArea>
+                </Tabs>
+            </SheetContent>
+        </Sheet>
+    );
+};
+
+
 interface UserProfileSheetsProps {
   activeSheet: ActiveSheet;
-  setActiveSheet: (sheet: ActiveSheet) => void;
+  setActiveSheet: (sheet: ActiveSheet, subpage?: 'followers' | 'following') => void;
   user: FirebaseUser;
+  profile: UserProfile;
   uploads: UploadItem[];
 }
 
-export function UserProfileSheets({ activeSheet, setActiveSheet, user, uploads }: UserProfileSheetsProps) {
+export function UserProfileSheets({ activeSheet, setActiveSheet, user, profile, uploads }: UserProfileSheetsProps) {
+    const [connectionsInitialTab, setConnectionsInitialTab] = useState<'followers' | 'following'>('followers');
+  
+    const handleSetActiveSheet = (sheet: ActiveSheet, subpage?: 'followers' | 'following') => {
+        if (sheet === 'connections') {
+            setConnectionsInitialTab(subpage || 'followers');
+        }
+        setActiveSheet(sheet);
+    }
+
   return (
     <>
       <ReceiptsSheet 
@@ -348,6 +429,12 @@ export function UserProfileSheets({ activeSheet, setActiveSheet, user, uploads }
       />
       <SearchSheet
         open={activeSheet === 'search'}
+        onOpenChange={(open) => !open && setActiveSheet(null)}
+      />
+       <ConnectionsSheet
+        profile={profile}
+        initialTab={connectionsInitialTab}
+        open={activeSheet === 'connections'}
         onOpenChange={(open) => !open && setActiveSheet(null)}
       />
     </>

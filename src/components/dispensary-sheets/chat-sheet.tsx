@@ -32,7 +32,7 @@ import {
   Trash2,
   Loader2,
 } from "lucide-react";
-import type { Dispensary, ChatUser, ChatMessage as ChatMessageType } from "@/types/pos";
+import type { Dispensary, ChatUser, ChatMessage as ChatMessageType, UserProfile } from "@/types/pos";
 import { ScrollArea } from "../ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
@@ -45,6 +45,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { collection, query, orderBy, limit, serverTimestamp, doc } from "firebase/firestore";
 import { uploadImage } from "@/lib/image-upload";
 import { useToast } from "@/hooks/use-toast";
+import { mockCustomers } from "@/lib/mockCustomers";
 
 
 const MAX_MESSAGE_LENGTH = 280;
@@ -136,6 +137,17 @@ interface DispensarySheetProps {
   dispensary: Dispensary;
 }
 
+const mockChatUsers: UserProfile[] = mockCustomers.slice(0, 5);
+const mockMessages = [
+    "Just tried the new sativa, amazing!",
+    "Anyone have recommendations for edibles?",
+    "The staff here is always so friendly.",
+    "Don't forget about the 15% off deal today!",
+    "What's the best strain for creativity?",
+    "I love their pre-rolls, so convenient.",
+];
+
+
 export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: DispensarySheetProps) {
   const { user } = useUser();
   const firestore = useFirestore();
@@ -162,14 +174,37 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
 
   const messagesQuery = useMemoFirebase(
     () =>
-      firestore && dispensary && user
+      firestore && dispensary
         ? query(collection(firestore, "dispensaries", dispensary.id, "messages"), orderBy("timestamp", "desc"), limit(50))
         : null,
-    [firestore, dispensary, user]
+    [firestore, dispensary]
   );
   
   const { data: messagesData, isLoading } = useCollection<ChatMessageType>(messagesQuery);
   const messages = useMemo(() => messagesData?.slice().reverse() || [], [messagesData]);
+
+
+    useEffect(() => {
+        if (!isOpen || !firestore || !dispensary) return;
+
+        const intervalId = setInterval(() => {
+            if (Math.random() < 0.2) { // 20% chance to post every 5 seconds
+                const randomUser = mockChatUsers[Math.floor(Math.random() * mockChatUsers.length)];
+                const randomMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)];
+
+                const messageToSend: Omit<ChatMessageType, 'id'> = {
+                    user: { id: randomUser.id, name: `${randomUser.firstName} ${randomUser.lastName}`, avatar: randomUser.avatarUrl || "", isOnline: true },
+                    text: randomMessage,
+                    timestamp: serverTimestamp() as any,
+                    likes: 0,
+                    isLiked: false,
+                };
+                 addDocumentNonBlocking(collection(firestore, 'dispensaries', dispensary.id, 'messages'), messageToSend);
+            }
+        }, 5000); // 5 seconds
+
+        return () => clearInterval(intervalId);
+    }, [isOpen, firestore, dispensary]);
 
 
   const handleAvatarClick = (user: ChatUser) => {
