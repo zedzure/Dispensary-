@@ -71,48 +71,47 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: C
     const isCurrentUser = msg.user.id === currentUser?.uid;
 
   return (
-    <div className="w-full group">
-        <div className="p-3 rounded-2xl liquid-glass">
-            <div className="flex items-start gap-3">
-                 <button onClick={() => onAvatarClick(msg.user)} className="relative">
-                    <Avatar className="h-10 w-10 border">
-                        <AvatarImage src={msg.user.avatar} />
-                        <AvatarFallback>{msg.user.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    {msg.user.isOnline && <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />}
-                </button>
-                <div className="flex-1">
-                    <div className="flex items-baseline gap-2">
-                        <p className="font-semibold text-sm">{msg.user.name}</p>
-                        <p className="text-xs text-muted-foreground">{formatTimestamp(msg.timestamp)}</p>
-                    </div>
+    <div className="w-full group flex items-start gap-3">
+        <button onClick={() => onAvatarClick(msg.user)} className="relative flex-shrink-0">
+            <Avatar className="h-10 w-10 border">
+                <AvatarImage src={msg.user.avatar} />
+                <AvatarFallback>{msg.user.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            {msg.user.isOnline && <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />}
+        </button>
 
-                    {msg.replyingTo && (
-                        <div className="text-xs text-muted-foreground pl-2 border-l-2 border-border ml-1 mt-1 mb-1">
-                            Replying to <strong className="text-primary/90">@{msg.replyingTo.user}</strong>: {msg.replyingTo.text.substring(0, 50)}...
-                        </div>
-                    )}
-                    
-                    <div className="text-sm text-foreground/90 break-words">{parseMessage(msg.text)}</div>
-                </div>
+        <div className="flex-1">
+            <div className="flex items-baseline gap-2">
+                <button onClick={() => onAvatarClick(msg.user)} className="font-semibold text-sm hover:underline">{msg.user.name}</button>
+                <p className="text-xs text-muted-foreground">{formatTimestamp(msg.timestamp)}</p>
             </div>
 
-            {msg.imageUrl && (
-                <div className="relative w-full max-w-xs h-48 mt-2 rounded-lg overflow-hidden border ml-13">
-                    <Image src={msg.imageUrl} alt="Chat image" fill className="object-cover" />
-                </div>
-            )}
+            <div className="p-3 rounded-2xl rounded-tl-none bg-muted/80 mt-1">
+                {msg.replyingTo && (
+                    <div className="text-xs text-muted-foreground mb-1">
+                        Replying to <strong className="text-primary/90">@{msg.replyingTo.user}</strong>
+                    </div>
+                )}
+                
+                <div className="text-sm text-foreground/90 break-words">{parseMessage(msg.text)}</div>
 
-            <div className="flex items-center gap-4 mt-2 text-muted-foreground text-xs ml-13">
-                <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1" onClick={onLike} aria-label="Like message">
+                {msg.imageUrl && (
+                    <div className="relative w-full max-w-xs h-48 mt-2 rounded-lg overflow-hidden border">
+                        <Image src={msg.imageUrl} alt="Chat image" fill className="object-cover" />
+                    </div>
+                )}
+            </div>
+
+            <div className="flex items-center gap-2 mt-1 text-muted-foreground text-xs pl-2">
+                <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1 hover:text-red-500" onClick={onLike} aria-label="Like message">
                     <Heart className={cn("h-4 w-4", msg.isLiked && "fill-red-500 text-red-500")} /> {msg.likes}
                 </Button>
-                <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1" onClick={onReply} aria-label="Reply to message">
+                <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1 hover:text-primary" onClick={onReply} aria-label="Reply to message">
                     <MessageSquareReply className="h-4 w-4" /> Reply
                 </Button>
                 {isCurrentUser && (
                    <Button variant="ghost" size="sm" className="p-1 h-auto flex items-center gap-1 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={onDelete} aria-label="Delete message">
-                        <Trash2 className="h-4 w-4" /> Delete
+                        <Trash2 className="h-4 w-4" />
                     </Button>
                 )}
             </div>
@@ -123,7 +122,7 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: C
 
 function MessageList({ messages, onLike, onReply, onAvatarClick, onDelete }: { messages: ChatMessageType[]; onLike: (id: string) => void; onReply: (msg: ChatMessageType) => void; onAvatarClick: (user: ChatUser) => void; onDelete: (id: string) => void; }) {
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-6">
       {messages.map((msg) => (
         <MessageItem key={msg.id} msg={msg} onLike={() => onLike(msg.id)} onReply={() => onReply(msg)} onAvatarClick={onAvatarClick} onDelete={() => onDelete(msg.id)} />
       ))}
@@ -181,7 +180,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("sheet");
-    router.push(pathname + "?" + params.toString());
+    router.push(pathname + "?" + params.toString(), { scroll: false });
   };
   
   const handleScroll = (e: UIEvent<HTMLDivElement>) => {
@@ -303,7 +302,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
         className="w-full md:max-w-md p-0 flex flex-col bg-background/80 backdrop-blur-xl"
         style={{ height: vh ? `${vh}px` : '100dvh' }}
        >
-        <SheetHeader className="p-4 flex-row items-center gap-4 flex-shrink-0 bg-transparent border-b-0">
+        <SheetHeader className="p-4 flex-row items-center gap-4 flex-shrink-0 bg-transparent border-b">
           <Button variant="ghost" size="icon" onClick={handleClose}><ArrowLeft /></Button>
           <div>
             <SheetTitle>Live Group Chat</SheetTitle>
@@ -342,7 +341,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
             )}
         </ScrollArea>
     
-        <div className="relative p-2 pt-0">
+        <div className="relative p-2 pt-0 border-t">
             <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" accept="image/*" />
             {user ? (
             <div className="relative">
@@ -421,3 +420,5 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     </>
   );
 }
+
+    
