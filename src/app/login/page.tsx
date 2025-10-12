@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -8,6 +7,7 @@ import {
   GithubAuthProvider,
   signInWithPopup,
   onAuthStateChanged,
+  User as FirebaseUser
 } from 'firebase/auth';
 import { doc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
@@ -47,6 +47,24 @@ export default function LoginPage() {
     }
     initiateEmailSignIn(auth, signInEmail, signInPassword);
   }
+  
+  const createUserProfile = (newUser: FirebaseUser, name: string) => {
+    if (db) {
+        const newUserDocRef = doc(db, 'users', newUser.uid);
+        const newProfile: NewUser = {
+            username: newUser.email?.split('@')[0] || newUser.uid,
+            displayName: name || newUser.displayName || 'Anonymous',
+            photoURL: newUser.photoURL || `https://avatar.vercel.sh/${newUser.uid}`,
+            bio: 'Welcome to my profile!',
+            followersCount: 0,
+            followingCount: 0,
+            createdAt: new Date(),
+            uid: newUser.uid
+        };
+        setDocumentNonBlocking(newUserDocRef, newProfile, { merge: true });
+    }
+  }
+
 
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,24 +75,8 @@ export default function LoginPage() {
 
     const unsubscribe = onAuthStateChanged(auth, (newUser) => {
         if (newUser && newUser.email === signUpEmail) {
-            // Unsubscribe immediately to prevent this from running on subsequent auth changes
             unsubscribe();
-
-            // Now that we have the new user, create their profile document
-            if (db) {
-                const newUserDocRef = doc(db, 'users', newUser.uid);
-                const newProfile: NewUser = {
-                    username: newUser.email?.split('@')[0] || newUser.uid,
-                    displayName: signUpName,
-                    photoURL: newUser.photoURL || `https://avatar.vercel.sh/${newUser.uid}`,
-                    bio: 'Welcome to my profile!',
-                    followersCount: 0,
-                    followingCount: 0,
-                    createdAt: new Date(),
-                    uid: newUser.uid
-                };
-                setDocumentNonBlocking(newUserDocRef, newProfile, { merge: true });
-            }
+            createUserProfile(newUser, signUpName);
         }
     });
     
@@ -199,5 +201,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    

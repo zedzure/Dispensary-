@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -141,7 +139,7 @@ export default function ProfilePage() {
       firstName: profile.displayName?.split(' ')[0] || '',
       lastName: profile.displayName?.split(' ').slice(1).join(' ') || '',
       email: '', // Not available on the new user model publicly
-      memberSince: profile.createdAt ? (profile.createdAt as any).toDate ? (profile.createdAt as any).toDate().toISOString() : new Date(profile.createdAt as any).toISOString() : new Date().toISOString(),
+      memberSince: profile.createdAt instanceof Date ? profile.createdAt.toISOString() : new Date().toISOString(),
       avatarUrl: profile.photoURL || '',
       bio: profile.bio,
       followersCount: profile.followersCount,
