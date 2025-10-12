@@ -1,7 +1,7 @@
 
 import type { Timestamp } from 'firebase/firestore';
 
-export type PostItColor = 'yellow' | 'pink' | 'blue' | 'green';
+export type PostItColor = 'yellow' | 'pink' | 'blue' | 'green' | 'purple' | 'orange';
 
 export interface PostIt {
   id: string;

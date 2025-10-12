@@ -15,6 +15,8 @@ const colorClasses = {
   pink: 'bg-pink-200/80 border-pink-300/80 text-pink-900',
   blue: 'bg-blue-200/80 border-blue-300/80 text-blue-900',
   green: 'bg-green-200/80 border-green-300/80 text-green-900',
+  purple: 'bg-purple-200/80 border-purple-300/80 text-purple-900',
+  orange: 'bg-orange-200/80 border-orange-300/80 text-orange-900',
 };
 
 export function PostItCard({ note, onClick }: PostItCardProps) {
