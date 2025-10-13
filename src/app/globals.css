@@ -77,7 +77,7 @@
     height: 100%;
     height: -webkit-fill-available;
     height: 100dvh;
-    @apply text-foreground;
+    @apply font-sans text-foreground;
     background-color: hsl(var(--background));
     overflow: hidden;
   }
