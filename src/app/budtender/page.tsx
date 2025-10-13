@@ -178,117 +178,115 @@ export default function BudtenderPOSPage() {
     return (
         <div className="flex flex-col h-screen bg-muted/40 font-sans">
             <Header />
-            <main className="flex-grow container mx-auto px-2 sm:px-4 md:px-6 py-4 md:py-8 overflow-hidden">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8 h-full">
-                    
-                    {/* Right Column (Cart & Customer) */}
-                    <div className="lg:order-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-18rem)] sm:h-[calc(100vh-15rem)] lg:h-auto">
-                        <div className="p-4 border-b">
-                            {activeCustomer ? (
-                                <div className="flex items-center gap-3">
-                                    <Avatar className="h-12 w-12 border-2 border-primary">
-                                        <AvatarImage src={activeCustomer.avatarUrl} alt={activeCustomer.firstName} data-ai-hint={activeCustomer.dataAiHint} />
-                                        <AvatarFallback>{activeCustomer.firstName[0]}{activeCustomer.lastName[0]}</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <p className="font-bold">{activeCustomer.firstName} {activeCustomer.lastName}</p>
-                                        <p className="text-xs text-muted-foreground">Member Since: {new Date(activeCustomer.memberSince).toLocaleDateString()}</p>
-                                    </div>
-                                    <Button variant="ghost" size="icon" className="ml-auto" onClick={() => setActiveCustomer(null)}><X className="h-4 w-4" /></Button>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col gap-2">
-                                    <Input placeholder="Search Customer..." className="h-10" />
-                                    <Button><User className="mr-2 h-5 w-5"/>Add New Customer</Button>
-                                </div>
-                            )}
+            <main className="flex-grow flex flex-col lg:flex-row container mx-auto px-2 sm:px-4 md:px-6 py-4 md:py-8 gap-4 md:gap-8 overflow-hidden">
+                
+                {/* Left Column (Product Grid) */}
+                <div className="flex-grow lg:col-span-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-full">
+                    <div className="p-4 border-b">
+                         <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input 
+                                placeholder="Search products..." 
+                                className="pl-10 h-10 text-base"
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
+                            />
                         </div>
-
-                        <ScrollArea className="flex-1">
-                            <div className="p-4 space-y-3">
-                                {cart.length === 0 ? (
-                                    <div className="text-center py-10 text-muted-foreground">
-                                        <ShoppingCart className="mx-auto h-10 w-10 mb-2"/>
-                                        <p>Cart is empty</p>
+                    </div>
+                    <ScrollArea className="flex-1">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
+                            {filteredProducts.map(product => (
+                                <Card 
+                                    key={product.id} 
+                                    className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden group bg-card/60 backdrop-blur-sm"
+                                    onClick={() => addToCart(product)}
+                                >
+                                    <div className="relative aspect-square">
+                                        <Image src={product.image} alt={product.name} fill style={{objectFit: 'cover'}} className="group-hover:scale-105 transition-transform" data-ai-hint={product.hint} />
                                     </div>
-                                ) : (
-                                    cart.map(item => (
-                                        <div key={item.id} className="flex items-center gap-3">
-                                            <div className="relative h-12 w-12 rounded-md overflow-hidden flex-shrink-0">
-                                                <Image src={item.image} alt={item.name} fill style={{objectFit:'cover'}} data-ai-hint={item.hint} />
-                                            </div>
-                                            <div className="flex-grow">
-                                                <p className="text-sm font-medium truncate">{item.name}</p>
-                                                <p className="text-xs text-muted-foreground">${item.price?.toFixed(2)}</p>
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                                <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, -1)}><Minus className="h-4 w-4"/></Button>
-                                                <span className="w-6 text-center text-sm font-bold">{item.quantity}</span>
-                                                <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, 1)}><Plus className="h-4 w-4"/></Button>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
+                                    <div className="p-2 sm:p-3">
+                                        <p className="font-semibold text-sm truncate">{product.name}</p>
+                                        <p className="text-xs text-muted-foreground">{product.category}</p>
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    </ScrollArea>
+                </div>
+
+                {/* Right Column (Cart & Customer) */}
+                <div className="w-full lg:w-96 flex-shrink-0 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-full">
+                    <div className="p-4 border-b">
+                        {activeCustomer ? (
+                            <div className="flex items-center gap-3">
+                                <Avatar className="h-12 w-12 border-2 border-primary">
+                                    <AvatarImage src={activeCustomer.avatarUrl} alt={activeCustomer.firstName} data-ai-hint={activeCustomer.dataAiHint} />
+                                    <AvatarFallback>{activeCustomer.firstName[0]}{activeCustomer.lastName[0]}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="font-bold">{activeCustomer.firstName} {activeCustomer.lastName}</p>
+                                    <p className="text-xs text-muted-foreground">Member Since: {new Date(activeCustomer.memberSince).toLocaleDateString()}</p>
+                                </div>
+                                <Button variant="ghost" size="icon" className="ml-auto" onClick={() => setActiveCustomer(null)}><X className="h-4 w-4" /></Button>
                             </div>
-                        </ScrollArea>
-                        
-                        {cart.length > 0 && (
-                            <div className="p-4 border-t mt-auto space-y-3 bg-background/80 rounded-b-lg">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Subtotal</span>
-                                    <span>${subtotal.toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Tax (15%)</span>
-                                    <span>${tax.toFixed(2)}</span>
-                                </div>
-                                <Separator />
-                                <div className="flex justify-between text-lg font-bold">
-                                    <span>Total</span>
-                                    <span>${total.toFixed(2)}</span>
-                                </div>
-                                <Button className="w-full h-12 text-lg" size="lg" onClick={handleCheckout} disabled={cart.length === 0 || !activeCustomer}>
-                                    <DollarSign className="mr-2 h-5 w-5" /> Charge ${total.toFixed(2)}
-                                </Button>
+                        ) : (
+                            <div className="flex flex-col gap-2">
+                                <Input placeholder="Search Customer..." className="h-10" />
+                                <Button><User className="mr-2 h-5 w-5"/>Add New Customer</Button>
                             </div>
                         )}
                     </div>
 
-                    {/* Left Column (Product Grid) */}
-                    <div className="lg:order-1 lg:col-span-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-18rem)] sm:h-[calc(100vh-15rem)] lg:h-auto mt-4 lg:mt-0">
-                        <div className="p-4 border-b">
-                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                <Input 
-                                    placeholder="Search products..." 
-                                    className="pl-10 h-10 text-base"
-                                    value={searchTerm}
-                                    onChange={e => setSearchTerm(e.target.value)}
-                                />
-                            </div>
+                    <ScrollArea className="flex-1">
+                        <div className="p-4 space-y-3">
+                            {cart.length === 0 ? (
+                                <div className="text-center py-10 text-muted-foreground">
+                                    <ShoppingCart className="mx-auto h-10 w-10 mb-2"/>
+                                    <p>Cart is empty</p>
+                                </div>
+                            ) : (
+                                cart.map(item => (
+                                    <div key={item.id} className="flex items-center gap-3">
+                                        <div className="relative h-12 w-12 rounded-md overflow-hidden flex-shrink-0">
+                                            <Image src={item.image} alt={item.name} fill style={{objectFit:'cover'}} data-ai-hint={item.hint} />
+                                        </div>
+                                        <div className="flex-grow">
+                                            <p className="text-sm font-medium truncate">{item.name}</p>
+                                            <p className="text-xs text-muted-foreground">${item.price?.toFixed(2)}</p>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, -1)}><Minus className="h-4 w-4"/></Button>
+                                            <span className="w-6 text-center text-sm font-bold">{item.quantity}</span>
+                                            <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, 1)}><Plus className="h-4 w-4"/></Button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
-                        <ScrollArea className="flex-1">
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
-                                {filteredProducts.map(product => (
-                                    <Card 
-                                        key={product.id} 
-                                        className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden group bg-card/60 backdrop-blur-sm"
-                                        onClick={() => addToCart(product)}
-                                    >
-                                        <div className="relative aspect-square">
-                                            <Image src={product.image} alt={product.name} fill style={{objectFit: 'cover'}} className="group-hover:scale-105 transition-transform" data-ai-hint={product.hint} />
-                                        </div>
-                                        <div className="p-2 sm:p-3">
-                                            <p className="font-semibold text-sm truncate">{product.name}</p>
-                                            <p className="text-xs text-muted-foreground">{product.category}</p>
-                                        </div>
-                                    </Card>
-                                ))}
+                    </ScrollArea>
+                    
+                    {cart.length > 0 && (
+                        <div className="p-4 border-t mt-auto space-y-3 bg-background/80 rounded-b-lg">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Subtotal</span>
+                                <span>${subtotal.toFixed(2)}</span>
                             </div>
-                        </ScrollArea>
-                    </div>
-
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Tax (15%)</span>
+                                <span>${tax.toFixed(2)}</span>
+                            </div>
+                            <Separator />
+                            <div className="flex justify-between text-lg font-bold">
+                                <span>Total</span>
+                                <span>${total.toFixed(2)}</span>
+                            </div>
+                            <Button className="w-full h-12 text-lg" size="lg" onClick={handleCheckout} disabled={cart.length === 0 || !activeCustomer}>
+                                <DollarSign className="mr-2 h-5 w-5" /> Charge ${total.toFixed(2)}
+                            </Button>
+                        </div>
+                    )}
                 </div>
+
             </main>
         </div>
     );
