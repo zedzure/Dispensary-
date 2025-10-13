@@ -142,7 +142,7 @@ function MarketplaceContent() {
           <HeroSlider />
         </header>
         
-        <div className="mb-8">
+        <div className="mb-12">
           <StateStoryReel />
         </div>
 
