@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, useCallback, UIEvent, useMemo } from "react";
@@ -162,10 +163,10 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
 
   const messagesQuery = useMemoFirebase(
     () =>
-      firestore && dispensary
+      firestore && dispensary && user
         ? query(collection(firestore, "dispensaries", dispensary.id, "messages"), orderBy("timestamp", "desc"), limit(50))
         : null,
-    [firestore, dispensary]
+    [firestore, dispensary, user]
   );
   
   const { data: messagesData, isLoading } = useCollection<ChatMessageType>(messagesQuery);
@@ -440,3 +441,5 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     </>
   );
 }
+
+    
