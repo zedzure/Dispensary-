@@ -1,4 +1,5 @@
 
+
 import type { UserProfile } from '@/types/pos';
 import { realImageUrls } from './products';
 import { generateInitialMockOrders } from './mockOrderData';
@@ -78,8 +79,8 @@ const kenyaProfile: UserProfile = {
     points: 2450,
     nextReward: 3000,
     bio: `Cannabis connoisseur and avid hiker. Exploring the best strains that nature has to offer.`,
-    followers: [],
-    following: [],
+    followers: ['p9ZjS1zAbTWrxryVd1HA1ftUcl32', 'CUST-1026'],
+    following: ['p9ZjS1zAbTWrxryVd1HA1ftUcl32', 'CUST-1026', 'CUST-1027'],
     followersCount: 842,
     followingCount: 123,
     reviewsToday: 7,
@@ -103,13 +104,13 @@ export const mockCustomers: UserProfile[] = [
     const memberSince = new Date();
     memberSince.setDate(memberSince.getDate() - (i * 15 + 5));
     
-    const orders = generateInitialMockOrders().filter(o => o.customerName === `\${firstName} \${lastName}`);
+    const orders = generateInitialMockOrders().filter(o => o.customerName === `${firstName} ${lastName}`);
 
     return {
         id: `CUST-${1001 + i}`,
         firstName: firstName,
         lastName: lastName,
-        email: `\${firstName.toLowerCase()}.\${lastName.toLowerCase()}@example.com`,
+        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
         memberSince: memberSince.toISOString(),
         avatarUrl: realImageUrls[i % realImageUrls.length],
         dataAiHint: 'person face',
@@ -119,8 +120,8 @@ export const mockCustomers: UserProfile[] = [
         tier: i % 3 === 0 ? 'Gold' : (i % 3 === 1 ? 'Silver' : 'Bronze'),
         nextTier: i % 3 === 0 ? 'Platinum' : (i % 3 === 1 ? 'Gold' : 'Silver'),
         pointsToNextTier: Math.floor(Math.random() * 200) + 50,
-        followers: Array.from({length: Math.floor(Math.random() * 50)}, () => ''),
-        following: Array.from({length: Math.floor(Math.random() * 50)}, () => ''),
+        followers: [],
+        following: [],
         reviewsToday: Math.floor(Math.random() * 3),
         receiptsThisWeek: Math.floor(Math.random() * 5),
     };

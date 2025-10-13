@@ -331,7 +331,7 @@ const WalletSheet = ({ open, onOpenChange, profile }: { open: boolean, onOpenCha
     useMobileViewportFix();
     const hasData = profile.firstName === 'Kenya';
     const points = profile.points || 0;
-    const nextTierPoints = profile.tier === 'Gold' ? 3000 : 500;
+    const nextTierPoints = (profile.tier === 'Gold' ? 3000 : 500);
     const progress = (points / nextTierPoints) * 100;
 
     return (
@@ -423,9 +423,15 @@ const SavedSheet = ({ open, onOpenChange, profile }: { open: boolean, onOpenChan
 
 const ConnectionsSheet = ({ profile, initialTab, open, onOpenChange }: { profile: UserProfile, initialTab: 'followers' | 'following', open: boolean, onOpenChange: (open: boolean) => void }) => {
     const { toast } = useToast();
-    const followers = mockCustomers.slice(0, 15);
-    const following = mockCustomers.slice(10, 25);
+    const [followers, setFollowers] = useState<UserProfile[]>([]);
+    const [following, setFollowing] = useState<UserProfile[]>([]);
     useMobileViewportFix();
+    
+    useEffect(() => {
+        setFollowers(mockCustomers.filter(c => profile.followers?.includes(c.id)));
+        setFollowing(mockCustomers.filter(c => profile.following?.includes(c.id)));
+    }, [profile]);
+
 
     const handleFollow = (userId: string, isFollowing: boolean) => {
         toast({

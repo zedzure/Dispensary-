@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -7,7 +8,7 @@ import type { ChatUser } from "@/types/pos";
 import { useEffect, useState } from "react";
 import { mockCustomers } from "@/lib/mockCustomers";
 import type { UserProfile } from "@/types/pos";
-import type { ActiveSheet } from "@/app/profile/page";
+import type { ActiveSheet } from "@/app/profile/[userId]/page";
 
 interface UserProfileModalProps {
   user: ChatUser | null;
