@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useRef, ChangeEvent, useCallback } from 'react';
 import Image from 'next/image';
-import type { Dispensary, Review, ChatUser } from '@/types/pos';
+import type { Dispensary, Review, ChatUser, UserProfile } from '@/types/pos';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -198,8 +198,21 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
     }
   }, [dispensary]);
 
-  const handleAvatarClick = (user: ChatUser) => {
-    setSelectedProfile(user);
+  const handleAvatarClick = (review: Review) => {
+    const userProfile: UserProfile = {
+      id: review.userId,
+      firstName: review.userName,
+      lastName: '',
+      email: '',
+      memberSince: '',
+      avatarUrl: review.userAvatar
+    };
+    setSelectedProfile({
+      id: userProfile.id,
+      name: userProfile.firstName,
+      avatar: userProfile.avatarUrl,
+      isOnline: true
+    });
     setProfileModalOpen(true);
   };
 
@@ -359,7 +372,7 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
               <div className="space-y-4">
                 {reviews.map(review => (
                   <div key={review.id} className="flex gap-3">
-                    <button onClick={() => handleAvatarClick({ id: review.userId, name: review.userName, avatar: review.userAvatar, isOnline: true })}>
+                    <button onClick={() => handleAvatarClick(review)}>
                         <Avatar className="h-10 w-10">
                           <AvatarImage src={review.userAvatar} alt={review.userName} />
                           <AvatarFallback>{review.userName?.charAt(0)}</AvatarFallback>

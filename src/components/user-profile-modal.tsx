@@ -21,7 +21,7 @@ export function UserProfileModal({ user, isOpen, onClose }: UserProfileModalProp
 
   useEffect(() => {
     if (user && isOpen) {
-      const foundUser = mockCustomers.find(c => c.id === user.id || c.email.split('@')[0].toLowerCase() === user.name.toLowerCase());
+      const foundUser = mockCustomers.find(c => c.id === user.id || (c.email && c.email.split('@')[0].toLowerCase() === user.name.toLowerCase()));
       
       if (foundUser) {
         setProfile(foundUser);
