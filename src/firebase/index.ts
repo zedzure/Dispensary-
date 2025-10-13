@@ -11,7 +11,6 @@ import type { Firestore } from 'firebase/firestore';
 // Re-export the providers from here to create a single entry point.
 export { FirebaseProvider } from './provider';
 export { FirebaseClientProvider } from './client-provider';
-export { initializeFirebase } from './client-provider';
 
 
 // All hooks are now defined or re-exported from this central file.
@@ -21,39 +20,25 @@ export interface FirebaseServicesAndUser extends FirebaseContextState {
   auth: Auth;
 }
 
-export const useFirebase = (): FirebaseServicesAndUser => {
+export const useFirebase = (): FirebaseContextState => {
   const context = useContext(FirebaseContext);
-
   if (context === undefined) {
     throw new Error('useFirebase must be used within a FirebaseProvider.');
   }
-
-  if (!context.firebaseApp || !context.firestore || !context.auth) {
-    // This can happen during SSR or if the provider is not set up correctly.
-    // Instead of throwing, we could return a loading/unavailable state.
-    // For now, we throw to make it clear that the services are not available.
-    throw new Error('Firebase core services not available. This may be due to SSR or a misconfigured provider.');
-  }
-  
-  return {
-    ...context,
-    firebaseApp: context.firebaseApp,
-    firestore: context.firestore,
-    auth: context.auth,
-  };
+  return context;
 };
 
-export const useAuth = (): Auth => {
+export const useAuth = (): Auth | null => {
   const { auth } = useFirebase();
   return auth;
 };
 
-export const useFirestore = (): Firestore => {
+export const useFirestore = (): Firestore | null => {
   const { firestore } = useFirebase();
   return firestore;
 };
 
-export const useFirebaseApp = (): FirebaseApp => {
+export const useFirebaseApp = (): FirebaseApp | null => {
   const { firebaseApp } = useFirebase();
   return firebaseApp;
 };
@@ -69,15 +54,14 @@ export const useUser = (): UserHookResult => {
    if (context === undefined) {
     throw new Error('useUser must be used within a FirebaseProvider.');
   }
+  // isUserLoading is true on initial load, which is correct.
   const { user, isUserLoading, userError } = context;
   return { user, isUserLoading, userError };
 };
 
 
 // The memoization hook remains here.
-type MemoFirebase <T> = T & {__memo?: boolean};
-
-export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T {
+export function useMemoFirebase<T>(factory: () => T, deps: DependencyList | undefined): T {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoized = useMemo(factory, deps);
   return memoized;

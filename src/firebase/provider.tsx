@@ -41,20 +41,19 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     isUserLoading: boolean;
     userError: Error | null;
   }>({
-    user: null,
-    isUserLoading: true,
+    user: null, // Start with null user
+    isUserLoading: true, // Start in a loading state
     userError: null,
   });
 
   useEffect(() => {
+    // If auth service is not available (e.g., on the server), do nothing.
     if (!auth) {
-      setUserAuthState({ user: null, isUserLoading: false, userError: new Error("Auth service not provided.") });
+      setUserAuthState({ user: null, isUserLoading: false, userError: null });
       return;
     }
 
-    // Set loading to true only when auth becomes available.
-    setUserAuthState(prevState => ({ ...prevState, isUserLoading: true }));
-
+    // Subscribe to auth state changes.
     const unsubscribe = onAuthStateChanged(
       auth,
       (firebaseUser) => {
@@ -65,6 +64,8 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
         setUserAuthState({ user: null, isUserLoading: false, userError: error });
       }
     );
+
+    // Cleanup subscription on unmount.
     return () => unsubscribe();
   }, [auth]);
 
