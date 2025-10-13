@@ -15,10 +15,8 @@ export interface Review {
     createdAt: Timestamp | string;
     updatedAt?: Timestamp | string;
     // For display purposes, denormalized
-    user: {
-        name: string;
-        avatar: string;
-    };
+    userName: string;
+    userAvatar: string;
     followers?: number;
 }
 
@@ -215,7 +213,8 @@ export interface ChatMessage {
         text: string;
     };
     imageUrl?: string;
-    user?: ChatUser;
+    userName: string;
+    userAvatar: string;
     type: 'text' | 'image';
 }
 

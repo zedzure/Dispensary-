@@ -69,17 +69,17 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: C
 
   return (
     <div className="w-full group flex items-start gap-3">
-        <button onClick={() => onAvatarClick(msg.user)} className="relative flex-shrink-0">
+        <button onClick={() => onAvatarClick({id: msg.senderID, name: msg.userName, avatar: msg.userAvatar, isOnline: true})} className="relative flex-shrink-0">
             <Avatar className="h-10 w-10 border">
-                <AvatarImage src={msg.user.avatar} />
-                <AvatarFallback>{msg.user.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={msg.userAvatar} />
+                <AvatarFallback>{msg.userName.charAt(0)}</AvatarFallback>
             </Avatar>
-            {msg.user.isOnline && <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />}
+            {true && <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />}
         </button>
 
         <div className="flex-1">
             <div className="flex items-baseline gap-2">
-                <button onClick={() => onAvatarClick(msg.user)} className="font-semibold text-sm hover:underline">{msg.user.name}</button>
+                <button onClick={() => onAvatarClick({id: msg.senderID, name: msg.userName, avatar: msg.userAvatar, isOnline: true})} className="font-semibold text-sm hover:underline">{msg.userName}</button>
                 <p className="text-xs text-muted-foreground">{formatTimestamp(msg.timestamp)}</p>
             </div>
 
@@ -90,7 +90,7 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: C
                     </div>
                 )}
                 
-                <div className="text-sm text-foreground/90 break-words" dangerouslySetInnerHTML={{ __html: msg.text }}/>
+                <p className="text-sm text-foreground/90 break-words">{msg.text}</p>
 
                 {msg.imageUrl && (
                     <div className="relative w-full max-w-xs h-48 mt-2 rounded-lg overflow-hidden border">
@@ -184,7 +184,8 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                 const randomMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)];
 
                 const messageToSend: Omit<ChatMessageType, 'id'> = {
-                    user: { id: randomUser.id, name: `${randomUser.firstName} ${randomUser.lastName}`, avatar: randomUser.avatarUrl || "", isOnline: true },
+                    userName: `${randomUser.firstName} ${randomUser.lastName}`,
+                    userAvatar: randomUser.avatarUrl || "",
                     text: randomMessage,
                     timestamp: serverTimestamp() as any,
                     likes: 0,
@@ -245,12 +246,13 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
 
         const messagesCol = collection(firestore, 'dispensaries', dispensary.id, 'messages');
         const messageToSend: Omit<ChatMessageType, 'id'> = {
-          user: { id: user.uid, name: user.displayName || 'Anonymous', avatar: user.photoURL || "", isOnline: true },
+          userName: user.displayName || 'Anonymous',
+          userAvatar: user.photoURL || "",
           text: messageText,
           timestamp: serverTimestamp() as any,
           likes: 0,
           isLiked: false,
-          replyingTo: replyingTo ? { user: replyingTo.user.name, text: replyingTo.text } : undefined,
+          replyingTo: replyingTo ? { user: replyingTo.userName, text: replyingTo.text } : undefined,
           imageUrl: imageUrl,
           senderID: user.uid,
           type: 'text',
@@ -401,7 +403,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                          {replyingTo && (
                             <div className="text-xs p-2 bg-muted/50 rounded-t-xl flex justify-between items-center mx-2">
                                 <p className="text-muted-foreground truncate">
-                                Replying to <strong className="text-primary/90">@{replyingTo.user.name}</strong>
+                                Replying to <strong className="text-primary/90">@{replyingTo.userName}</strong>
                                 </p>
                                 <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setReplyingTo(null)}>
                                 <X className="h-3 w-3" />

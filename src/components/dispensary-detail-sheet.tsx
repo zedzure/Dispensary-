@@ -92,7 +92,8 @@ function ReviewForm({ dispensaryId, onAddReview }: { dispensaryId: string, onAdd
             rating: rating,
             text: comment,
             photos: photoUrl ? [photoUrl] : [],
-            user: { name: user.displayName || 'Anonymous', avatar: user.photoURL || '' },
+            userName: user.displayName || 'Anonymous',
+            userAvatar: user.photoURL || '',
             likesCount: 0,
             commentsCount: 0,
             updatedAt: new Date().toISOString()
@@ -249,7 +250,8 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
         ...reviewData,
         id: Date.now().toString(),
         createdAt: new Date().toISOString() as string | Timestamp,
-        user: { name: user.displayName || 'Anonymous', avatar: user.photoURL || '' },
+        userName: user.displayName || 'Anonymous',
+        userAvatar: user.photoURL || '',
     }
     setReviews(prev => [newReview, ...prev]);
   }
@@ -357,16 +359,16 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
               <div className="space-y-4">
                 {reviews.map(review => (
                   <div key={review.id} className="flex gap-3">
-                    <button onClick={() => handleAvatarClick({ id: review.userId, name: review.user.name, avatar: review.user.avatar, isOnline: true })}>
+                    <button onClick={() => handleAvatarClick({ id: review.userId, name: review.userName, avatar: review.userAvatar, isOnline: true })}>
                         <Avatar className="h-10 w-10">
-                          <AvatarImage src={review.user?.avatar} alt={review.user?.name} />
-                          <AvatarFallback>{review.user?.name?.charAt(0)}</AvatarFallback>
+                          <AvatarImage src={review.userAvatar} alt={review.userName} />
+                          <AvatarFallback>{review.userName?.charAt(0)}</AvatarFallback>
                         </Avatar>
                     </button>
                     <div className="flex-1">
                       <div className="flex justify-between items-center">
                         <div className='flex items-center gap-2 flex-wrap'>
-                           <p className="font-semibold">{review.user?.name}</p>
+                           <p className="font-semibold">{review.userName}</p>
                            <div className="flex items-center gap-2">
                                 <div className="flex items-center gap-1 bg-yellow-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                                     <Users className="h-3 w-3" />
