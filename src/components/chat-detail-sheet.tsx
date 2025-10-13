@@ -88,13 +88,15 @@ export function ChatDetailSheet({ isOpen, onClose, chatId, recipient }: ChatDeta
 
     try {
         const messagesCol = collection(firestore, 'chats', chatId, 'messages');
-        const messageToSend: Omit<ChatMessageType, 'id' > = {
+        const messageToSend: Omit<ChatMessageType, 'id'> = {
           senderID: currentUser.uid,
           text: newMessage,
           timestamp: serverTimestamp(),
           type: 'text',
           likes: 0,
           isLiked: false,
+          userName: currentUser.displayName || 'Anonymous',
+          userAvatar: currentUser.photoURL || '',
         };
         await addDocumentNonBlocking(messagesCol, messageToSend);
         

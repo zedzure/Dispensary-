@@ -1,7 +1,7 @@
 
 
 import type { Product } from './product';
-import type { Timestamp } from 'firebase/firestore';
+import type { Timestamp, FieldValue } from 'firebase/firestore';
 
 export interface Review {
     id: string; // reviewId
@@ -206,7 +206,7 @@ export interface ChatMessage {
     id: string;
     senderID: string;
     text: string;
-    timestamp: number | Timestamp;
+    timestamp: number | Timestamp | FieldValue;
     likes: number;
     isLiked: boolean;
     replyingTo?: {
