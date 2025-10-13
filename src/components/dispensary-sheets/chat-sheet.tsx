@@ -152,9 +152,6 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
 
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const messagesQuery = useMemoFirebase(
     () =>
@@ -325,7 +322,8 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
           </div>
         </SheetHeader>
         
-        <ScrollArea className="flex-1 min-h-0 bg-muted/20" onScroll={handleScroll} ref={scrollViewportRef}>
+        <div className="flex-1 min-h-0 relative">
+          <ScrollArea className="absolute inset-0 bg-muted/20" onScroll={handleScroll} ref={scrollViewportRef}>
              <div className="pb-28">
                 {!user ? (
                     <div className="text-center p-8 text-muted-foreground">Please log in to view the chat.</div>
@@ -356,7 +354,8 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                     </div>
                 )}
             </div>
-        </ScrollArea>
+          </ScrollArea>
+        </div>
     
         <div className="chat-input-bar">
             <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" accept="image/*" />

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect, useRef, ChangeEvent, useCallback } from 'react';
@@ -223,7 +224,7 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
     router.push(pathname + '?' + newParams.toString(), { scroll: false });
   };
   
-  const handleSheetOpenChange = (open: boolean) => {
+ const handleSheetOpenChange = (open: boolean) => {
     if (!open) {
       handleSetSheet(null);
     }
@@ -291,7 +292,7 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
     return (
         <DispensaryChatSheet 
             isOpen={true} 
-            onOpenChange={(open) => handleSheetOpenChange(!open)} 
+            onOpenChange={handleSheetOpenChange} 
             dispensary={dispensary} 
         />
     )
@@ -301,7 +302,7 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
 
   return (
     <>
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={isOpen && !activeSheet} onOpenChange={onOpenChange}>
       <SheetContent 
         className="p-0 w-full md:max-w-md flex flex-col bg-blue-900/10 backdrop-blur-xl border-border/20"
         style={{ height: vh ? `${vh}px` : '100dvh' }}
@@ -435,17 +436,17 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
         </SheetFooter>
       </SheetContent>
     </Sheet>
+    
+    <DispensaryPromotionsSheet isOpen={activeSheet === 'promotions'} onOpenChange={handleSheetOpenChange} dispensary={dispensary} />
+    <DispensaryProductsSheet isOpen={activeSheet === 'products'} onOpenChange={handleSheetOpenChange} dispensary={dispensary} />
+    <DispensaryDealsSheet isOpen={activeSheet === 'deals'} onOpenChange={handleSheetOpenChange} dispensary={dispensary} />
+    <DispensaryMapSheet isOpen={activeSheet === 'map'} onOpenChange={handleSheetOpenChange} dispensary={dispensary} />
 
     <UserProfileModal
         user={selectedProfile}
         isOpen={isProfileModalOpen}
         onClose={() => setProfileModalOpen(false)}
     />
-
-    <DispensaryPromotionsSheet isOpen={activeSheet === 'promotions'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
-    <DispensaryProductsSheet isOpen={activeSheet === 'products'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
-    <DispensaryDealsSheet isOpen={activeSheet === 'deals'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
-    <DispensaryMapSheet isOpen={activeSheet === 'map'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
     </>
   );
 }

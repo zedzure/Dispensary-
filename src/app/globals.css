@@ -1,4 +1,5 @@
 
+
 @import "../styles/hero-slider.css";
 @import "../styles/glass-profile-card.css";
 @import "../styles/login-flip-card.css";
@@ -70,6 +71,7 @@
     height: 100%;
     height: -webkit-fill-available;
     height: 100dvh;
+    overscroll-behavior: none;
   }
   body {
     height: 100%;
@@ -77,6 +79,7 @@
     height: 100dvh;
     @apply text-foreground;
     background-color: hsl(var(--background));
+    overflow: hidden;
   }
   * {
     @apply border-border;
@@ -84,6 +87,13 @@
 
   main {
     flex-grow: 1;
+  }
+  
+  @supports (-webkit-touch-callout: none) {
+    body {
+      position: fixed;
+      width: 100%;
+    }
   }
 
   body.keyboard-visible {

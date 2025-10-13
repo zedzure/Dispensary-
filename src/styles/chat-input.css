@@ -6,7 +6,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 20;
+    z-index: 50;
     padding: 0.5rem;
     padding-left: calc(0.5rem + env(safe-area-inset-left));
     padding-right: calc(0.5rem + env(safe-area-inset-right));
@@ -22,16 +22,17 @@
 }
 
 .chat-input-action-button {
-    @apply h-9 w-9 flex-shrink-0 rounded-full bg-background/50 hover:bg-background;
+    @apply h-10 w-10 flex-shrink-0 rounded-full bg-background/50 hover:bg-background shadow-md;
 }
 
 .chat-input-textarea-wrapper {
-    @apply flex-grow bg-muted/80 backdrop-blur-sm rounded-2xl border border-border/20 overflow-hidden;
+    @apply flex-grow bg-muted/80 backdrop-blur-sm rounded-full border border-border/20 overflow-hidden flex items-center;
+    min-height: 2.5rem; /* 40px */
 }
 
 .chat-input-textarea {
-    @apply w-full bg-transparent border-none px-4 py-2 text-base resize-none;
-    min-height: 2.25rem; /* ~36px */
+    @apply w-full bg-transparent border-none px-4 py-2 text-base resize-none self-center;
+    min-height: 2.5rem; /* ~40px */
     max-height: 12rem;
     overflow-y: auto;
 }
@@ -40,11 +41,11 @@
 }
 
 .chat-input-send-button {
-    @apply h-9 w-9 rounded-full flex-shrink-0;
+    @apply h-10 w-10 rounded-full flex-shrink-0;
 }
 
 .chat-tools-sheet {
-    @apply bg-background/80 backdrop-blur-xl p-4 rounded-2xl mb-2 border border-border/20;
+    @apply absolute bottom-full mb-2 w-full bg-background/80 backdrop-blur-xl p-4 rounded-2xl border border-border/20;
 }
 
 .chat-tools-grid {
