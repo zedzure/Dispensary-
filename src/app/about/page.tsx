@@ -6,32 +6,38 @@ import { Footer } from "@/components/footer";
 import { BottomNavBar } from "@/components/bottom-nav-bar";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Leaf, MapPin, Percent, Search, Sparkles, Star } from "lucide-react";
+import Link from 'next/link';
 
 const features = [
     {
         icon: MapPin,
         title: "Find Local Dispensaries",
-        description: "Easily locate top-rated dispensaries near you for both delivery and in-store pickup."
+        description: "Easily locate top-rated dispensaries near you for both delivery and in-store pickup.",
+        slug: "find-local-dispensaries"
     },
     {
         icon: Search,
         title: "Explore Products",
-        description: "Browse a vast menu of flower, edibles, vapes, and concentrates with detailed descriptions."
+        description: "Browse a vast menu of flower, edibles, vapes, and concentrates with detailed descriptions.",
+        slug: "explore-products"
     },
     {
         icon: Percent,
         title: "Discover Deals",
-        description: "Never miss out on a promotion. Get access to exclusive deals and daily discounts."
+        description: "Never miss out on a promotion. Get access to exclusive deals and daily discounts.",
+        slug: "discover-deals"
     },
     {
         icon: Star,
         title: "Read Real Reviews",
-        description: "Make informed decisions with authentic reviews from a community of fellow enthusiasts."
+        description: "Make informed decisions with authentic reviews from a community of fellow enthusiasts.",
+        slug: "read-real-reviews"
     },
     {
         icon: Leaf,
         title: "Learn About Cannabis",
-        description: "Deepen your knowledge with guides on strains, consumption methods, and benefits."
+        description: "Deepen your knowledge with guides on strains, consumption methods, and benefits.",
+        slug: "learn-about-cannabis"
     }
 ]
 
@@ -50,7 +56,8 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature) => (
-                <Card key={feature.title} className="shadow-md hover:shadow-lg transition-shadow bg-card/60 backdrop-blur-sm">
+              <Link href={`/about/${feature.slug}`} key={feature.title} className="block hover:no-underline">
+                <Card className="shadow-md hover:shadow-lg transition-shadow bg-card/60 backdrop-blur-sm h-full">
                     <CardHeader className="flex flex-row items-start gap-4 p-4">
                         <feature.icon className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
                         <div>
@@ -59,6 +66,7 @@ export default function AboutPage() {
                         </div>
                     </CardHeader>
                 </Card>
+              </Link>
             ))}
           </div>
 
