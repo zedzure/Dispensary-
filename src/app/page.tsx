@@ -26,10 +26,6 @@ function MarketplaceSkeleton() {
            <Skeleton className="h-[400px] w-full max-w-[600px] rounded-lg" />
         </header>
         
-        <div className="container mx-auto px-4 md:px-6 my-8">
-            <Skeleton className="h-12 w-full max-w-xl mx-auto" />
-        </div>
-
         <div className="mb-12">
           <div className="overflow-x-auto no-scrollbar">
               <div className="flex items-start gap-4 px-4 md:px-6 pb-4">
@@ -42,6 +38,11 @@ function MarketplaceSkeleton() {
               </div>
           </div>
         </div>
+
+        <div className="container mx-auto px-4 md:px-6 my-8">
+            <Skeleton className="h-12 w-full max-w-xl mx-auto" />
+        </div>
+
       </main>
       <Footer />
       <BottomNavBar />
@@ -141,14 +142,13 @@ function MarketplaceContent() {
           <HeroSlider />
         </header>
         
-        <div className="container mx-auto px-4 md:px-6 my-8">
-            <StateSearch />
-        </div>
-
         <div className="mb-12">
           <StateStoryReel />
         </div>
-        
+
+        <div className="container mx-auto px-4 md:px-6 my-8">
+            <StateSearch />
+        </div>
 
       </main>
       <Footer />
