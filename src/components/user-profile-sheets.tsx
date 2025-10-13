@@ -2,20 +2,18 @@
 
 "use client";
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { X, FileText, Camera, Receipt, Send, Music, Video, Wallet, Bookmark, MessageSquare, Loader2, UserPlus, UserMinus } from "lucide-react";
+import { Camera, Receipt, Music, Video, Wallet, Bookmark, MessageSquare, Loader2, UserPlus, UserMinus } from "lucide-react";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ActiveSheet } from "@/app/profile/[userId]/page";
 import type { UploadItem, Receipt as ReceiptType, Chat, UserProfile } from "@/types/pos";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { Textarea } from "./ui/textarea";
 import { SearchSheet } from "./search-sheet";
-import { cn } from "@/lib/utils";
 import { useMobileViewportFix } from "@/hooks/use-mobile-viewport-fix";
 import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc } from "@/firebase";
 import { collection, query, where, doc, getDoc } from 'firebase/firestore';
@@ -24,6 +22,7 @@ import { ChatDetailSheet } from "./chat-detail-sheet";
 import { mockCustomers } from "@/lib/mockCustomers";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { MessageSheet } from "./message-sheet";
 
 
 const mockReceiptsData: ReceiptType[] = [];
@@ -87,7 +86,7 @@ const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (o
 const UploadsSheet = ({ uploads, open, onOpenChange }: { uploads: UploadItem[], open: boolean, onOpenChange: (open: boolean) => void }) => {
   useMobileViewportFix();
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange-sheets/chat-sheet.tsx onOpenChange}>
       <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
         <SheetHeader className="p-4 border-b text-red-500">
           <SheetTitle className="flex items-center text-red-500"><Camera className="mr-2 h-5 w-5"/>My Uploads</SheetTitle>
@@ -402,6 +401,8 @@ interface UserProfileSheetsProps {
 
 export function UserProfileSheets({ activeSheet, setActiveSheet, user, profile, uploads }: UserProfileSheetsProps) {
     const [connectionsInitialTab, setConnectionsInitialTab] = useState<'followers' | 'following'>('followers');
+    const [isMessageSheetOpen, setMessageSheetOpen] = useState(false);
+    const [messageRecipient, setMessageRecipient] = useState<UserProfile | null>(null);
   
     const handleSetActiveSheet = (sheet: ActiveSheet, subpage?: 'followers' | 'following') => {
         if (sheet === 'connections') {
@@ -451,6 +452,14 @@ export function UserProfileSheets({ activeSheet, setActiveSheet, user, profile, 
         initialTab={connectionsInitialTab}
         open={activeSheet === 'connections'}
         onOpenChange={(open) => !open && setActiveSheet(null)}
+      />
+      <MessageSheet 
+        isOpen={isMessageSheetOpen}
+        onClose={() => {
+            setMessageSheetOpen(false);
+            setMessageRecipient(null);
+        }}
+        recipient={messageRecipient}
       />
     </>
   );

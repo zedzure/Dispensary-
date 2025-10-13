@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
+import { useUser, useFirestore, addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
 import { collection, query, where, getDocs, serverTimestamp, doc, arrayUnion } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile } from '@/types/pos';
@@ -12,7 +12,7 @@ import { Loader2 } from 'lucide-react';
 interface MessageSheetProps {
     isOpen: boolean;
     onClose: () => void;
-    recipient: UserProfile;
+    recipient: UserProfile | null;
 }
 
 export function MessageSheet({ isOpen, onClose, recipient }: MessageSheetProps) {
@@ -24,10 +24,16 @@ export function MessageSheet({ isOpen, onClose, recipient }: MessageSheetProps) 
     const [isSheetOpen, setIsSheetOpen] = useState(false);
 
     useEffect(() => {
-        if (!isOpen || !user || !firestore) return;
+        if (!isOpen || !user || !firestore || !recipient) {
+            if (isOpen && !recipient) {
+                onClose(); // Close if sheet is opened without a recipient
+            }
+            return;
+        }
 
         // Prevent user from starting a chat with themselves
         if (user.uid === recipient.id) {
+            toast({ title: "Cannot chat with yourself", variant: "destructive" });
             onClose();
             return;
         }
@@ -52,6 +58,8 @@ export function MessageSheet({ isOpen, onClose, recipient }: MessageSheetProps) 
                         participants,
                         lastMessage: 'Chat started',
                         timestamp: serverTimestamp(),
+                        type: 'private',
+                        createdAt: serverTimestamp(),
                     };
                     const newChatRef = await addDocumentNonBlocking(collection(firestore, 'chats'), newChatData);
 
@@ -92,11 +100,8 @@ export function MessageSheet({ isOpen, onClose, recipient }: MessageSheetProps) 
         }, 300);
     }
 
-    if (!isOpen) {
-        return null;
-    }
-
-    if (isLoading) {
+    // Render loading state within the overlay
+    if (isOpen && isLoading) {
         return (
              <div className="message-sheet-overlay">
                 <div className="message-sheet-container items-center justify-center">
@@ -106,7 +111,8 @@ export function MessageSheet({ isOpen, onClose, recipient }: MessageSheetProps) 
         )
     }
 
-    if (chatId) {
+    // Render the chat sheet once loading is complete and we have a recipient and chatID
+    if (isOpen && !isLoading && isSheetOpen && chatId && recipient) {
         return (
             <ChatDetailSheet
                 isOpen={isSheetOpen}
@@ -117,5 +123,5 @@ export function MessageSheet({ isOpen, onClose, recipient }: MessageSheetProps) 
         )
     }
 
-    return null; // Fallback
+    return null; // Don't render anything if not open or if loading hasn't produced a result
 }

@@ -1,9 +1,10 @@
+
 import { Leaf } from "lucide-react";
 import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="hidden border-t bg-card/80 md:block">
+    <footer className="hidden border-t bg-card/80 md:block dark:bg-primary/10">
       <div className="container mx-auto py-8 px-4 md:px-6">
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
           <div>

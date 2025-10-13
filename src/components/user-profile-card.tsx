@@ -14,7 +14,6 @@ import type { ActiveSheet } from '@/app/profile/[userId]/page';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { doc } from 'firebase/firestore';
 import { Button } from './ui/button';
-import { MessageSheet } from './message-sheet';
 
 interface UserProfileCardProps {
   profile: UserProfile;
@@ -28,7 +27,6 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate, children }:
     const db = useFirestore();
     const { toast } = useToast();
     const { uploadFile, uploading } = useFileUpload();
-    const [isMessageActive, setMessageActive] = useState(false);
     const [isEditingBio, setIsEditingBio] = useState(false);
     const [bio, setBio] = useState(profile.bio || '');
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -171,14 +169,6 @@ export function UserProfileCard({ profile, setActiveSheet, onUpdate, children }:
                     </button>
                 </div>
             </div>
-
-            { user?.uid !== profile.id && (
-                <MessageSheet 
-                    isOpen={isMessageActive} 
-                    onClose={() => setMessageActive(false)}
-                    recipient={profile}
-                />
-            )}
         </>
     );
 }
