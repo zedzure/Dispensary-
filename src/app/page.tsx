@@ -138,11 +138,11 @@ function MarketplaceContent() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow pb-32 md:pb-0">
-        <header className="text-center mb-12 flex items-center justify-center p-4">
+        <header className="text-center mb-4 flex items-center justify-center p-4">
           <HeroSlider />
         </header>
         
-        <div className="mb-12">
+        <div className="mb-8">
           <StateStoryReel />
         </div>
 
