@@ -5,6 +5,7 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '2mb',
     },
+    serverComponentsExternalPackages: ["@genkit-ai/googleai"],
   },
   images: {
     remotePatterns: [
