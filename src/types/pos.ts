@@ -215,7 +215,7 @@ export interface ChatMessage {
         text: string;
     };
     imageUrl?: string;
-    user: ChatUser;
+    user?: ChatUser;
     type: 'text' | 'image';
 }
 

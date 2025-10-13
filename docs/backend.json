@@ -185,7 +185,7 @@
             "type": "string",
             "description": "The ID of the user who sent the message."
         },
-        "message": { "type": "string" },
+        "text": { "type": "string" },
         "timestamp": { "type": "number" },
         "imageUrl": { "type": "string", "format": "uri" },
         "type": {
@@ -204,7 +204,7 @@
           "items": { "type": "string" }
         }
       },
-      "required": ["senderID", "message", "timestamp", "type"]
+      "required": ["senderID", "text", "timestamp", "type"]
     },
     "FriendRequest": {
       "title": "FriendRequest",
