@@ -83,36 +83,57 @@ export function Header() {
             <span className="sr-only">Cart</span>
           </Button>
 
-          {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                   <Button variant="ghost" size="icon">
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage src={user.photoURL || `https://avatar.vercel.sh/${user.uid}`} alt={user.displayName || 'User'} data-ai-hint="person face" />
-                        <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
-                      </Avatar>
-                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href={profileLink}><User className="mr-2 h-4 w-4" />Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sign Out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-          ) : (
-            <Button variant="default" size="sm" asChild className="hidden md:flex">
-              <Link href="/login">
-                <User className="mr-2 h-4 w-4" />
-                Login
-              </Link>
-            </Button>
-          )}
+          <div className="hidden md:flex">
+            {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <Avatar className="h-9 w-9">
+                          <AvatarImage src={user.photoURL || `https://avatar.vercel.sh/${user.uid}`} alt={user.displayName || 'User'} data-ai-hint="person face" />
+                          <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
+                        </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href={profileLink}><User className="mr-2 h-4 w-4" />Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sign Out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+            ) : (
+              <Button variant="default" size="sm" asChild>
+                <Link href="/login">
+                  <User className="mr-2 h-4 w-4" />
+                  Login
+                </Link>
+              </Button>
+            )}
+          </div>
+
+          <div className="md:hidden">
+            {user ? (
+               <Button variant="ghost" size="icon" asChild>
+                  <Link href={profileLink}>
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user.photoURL || `https://avatar.vercel.sh/${user.uid}`} alt={user.displayName || 'User'} data-ai-hint="person face" />
+                      <AvatarFallback>{(user.displayName || 'U').charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </Link>
+               </Button>
+            ) : (
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/login">
+                  <User className="h-5 w-5" />
+                </Link>
+              </Button>
+            )}
+          </div>
 
           <div className="md:hidden">
             <DropdownMenu>
