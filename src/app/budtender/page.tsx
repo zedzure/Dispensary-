@@ -52,7 +52,7 @@ export default function BudtenderPOSPage() {
 
     useEffect(() => {
         const fetchUserRole = async () => {
-            if (user) {
+            if (user && db) {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists()) {
                     setUserRole(userDoc.data().role);
@@ -137,12 +137,18 @@ export default function BudtenderPOSPage() {
     };
     
     useEffect(() => {
-        if (!loading && (!user || userRole && userRole !== 'budtender')) {
+        if (!loading && !user) {
             router.replace('/login');
         }
-    }, [user, userRole, loading, router]);
+    }, [user, loading, router]);
     
-    if (loading || !isClient || !userRole) {
+    useEffect(() => {
+        if (user && userRole && userRole !== 'budtender') {
+             router.replace('/');
+        }
+    }, [user, userRole, router]);
+    
+    if (loading || !isClient || (user && !userRole)) {
         return (
           <div className="flex flex-col min-h-screen bg-muted/40">
             <Header />
@@ -162,7 +168,7 @@ export default function BudtenderPOSPage() {
              <div className="flex flex-col min-h-screen bg-muted/40">
                 <Header />
                 <main className="flex-grow container mx-auto px-4 md:px-6 py-8 flex items-center justify-center">
-                   <p>Redirecting to login...</p>
+                   <p>Redirecting...</p>
                 </main>
                 <Footer />
             </div>
@@ -170,13 +176,13 @@ export default function BudtenderPOSPage() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-muted/40 font-sans">
+        <div className="flex flex-col h-screen bg-muted/40 font-sans">
             <Header />
-            <main className="flex-grow container mx-auto px-2 sm:px-4 md:px-6 py-4 md:py-8">
+            <main className="flex-grow container mx-auto px-2 sm:px-4 md:px-6 py-4 md:py-8 overflow-hidden">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8 h-full">
                     
-                    {/* Right Column (Cart & Customer) - Appears on top on mobile */}
-                    <div className="lg:order-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-18rem)] sm:h-[calc(100vh-15rem)] lg:h-[calc(100vh-12rem)]">
+                    {/* Right Column (Cart & Customer) */}
+                    <div className="lg:order-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-18rem)] sm:h-[calc(100vh-15rem)] lg:h-auto">
                         <div className="p-4 border-b">
                             {activeCustomer ? (
                                 <div className="flex items-center gap-3">
@@ -248,8 +254,8 @@ export default function BudtenderPOSPage() {
                         )}
                     </div>
 
-                    {/* Left Column (Product Grid) - Appears below on mobile */}
-                    <div className="lg:order-1 lg:col-span-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-18rem)] sm:h-[calc(100vh-15rem)] lg:h-[calc(100vh-12rem)] mt-4 lg:mt-0">
+                    {/* Left Column (Product Grid) */}
+                    <div className="lg:order-1 lg:col-span-2 bg-background/60 backdrop-blur-sm rounded-lg shadow-md flex flex-col h-[calc(100vh-18rem)] sm:h-[calc(100vh-15rem)] lg:h-auto mt-4 lg:mt-0">
                         <div className="p-4 border-b">
                              <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -287,5 +293,3 @@ export default function BudtenderPOSPage() {
         </div>
     );
 }
-
-    

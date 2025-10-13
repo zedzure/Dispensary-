@@ -1,16 +1,39 @@
+/**
+ * @fileoverview Firestore Security Rules for the application.
+ *
+ * Core Philosophy:
+ * This ruleset prioritizes a user-centric security model with owner-only access to user-specific data,
+ * while allowing public read access to posts. The rules are designed for rapid prototyping,
+ * focusing on authorization and relational integrity while relaxing data shape validation.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profiles, accessible only to the user themselves.
+ * - /posts/{postId}: Stores posts, publicly readable but writable only by the post's author.
+ * - /dispensaries/{dispensaryId}: Stores dispensary information, publicly readable.
+ * - /chats/{chatId}: Stores chat metadata, accessible to chat participants.
+ * - /chats/{chatId}/messages/{messageId}: Stores chat messages, accessible to chat participants.
+ * - /friendRequests/{toUserId}/requests/{fromUserId}: Stores friend requests, accessible only to the involved users.
+ *
+ * Key Security Decisions:
+ * - Users can only read and write their own profile data under /users/{userId}.
+ * - Posts are publicly readable, but only the author can create, update, or delete them.
+ * - Dispensary information is publicly readable and writable (no authorization).
+ * - Chat data and messages are only accessible to participants of the chat.
+ * - Friend requests can only be created if the request initiator's id matches their auth id.
+ *
+ * Denormalization for Authorization:
+ * - Posts should include the `userId` of the author to enable owner-only write rules.
+ */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Rules for user profiles.
+     * @description Controls access to user profile data.
      * @path /users/{userId}
-     * @allow (create) - Authenticated user can create their own profile if the userId matches their auth UID.
-     * @allow (get, list) - Authenticated user can read their own profile.
-     * @allow (update, delete) - Authenticated user can update or delete their own profile.
-     * @deny (create) - If the userId does not match the authenticated user's UID.
-     * @deny (get, list, update, delete) - If any other user tries to access this profile.
-     * @principle Enforces document ownership.
+     * @allow (read, write) if the request is made by the user with matching userId.
+     * @deny (read, write) if the request is made by a different user.
+     * @principle Enforces document ownership for all operations.
      */
     match /users/{userId} {
       function isSignedIn() {
@@ -18,144 +41,114 @@ service cloud.firestore {
       }
 
       function isOwner(userId) {
-        return request.auth.uid == userId;
+        return isSignedIn() && request.auth.uid == userId;
       }
 
-      allow create: if isSignedIn() && isOwner(userId) && request.auth.uid == userId;
-      allow get: if isSignedIn() && isOwner(userId);
-      allow list: if isSignedIn() && isOwner(userId);
-      allow update, delete: if isSignedIn() && isOwner(userId) && resource != null;
+      allow get: if isOwner(userId);
+      allow list: if false; // Prevent listing all users
+
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+
     }
 
     /**
-     * @description Rules for posts.
+     * @description Controls access to posts.
      * @path /posts/{postId}
-     * @allow (get, list) - Any user can read posts.
-     * @allow (create) - Authenticated user can create a post with their user ID.
-     * @allow (update, delete) - Only the owner can update or delete their own post.
-     * @deny (create) - If the userId in the post does not match the authenticated user's UID.
-     * @deny (update, delete) - If any other user tries to update or delete this post.
-     * @principle Public read, owner-only writes for posts.
+     * @allow (read) to anyone.
+     * @allow (create, update, delete) only to the owner of the post.
+     * @deny (create) if the userId in the post data does not match the request auth uid.
+     * @principle Allows public read access with owner-only writes.
      */
     match /posts/{postId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
       allow get, list: if true;
+
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid && resource != null;
+      allow update: if isSignedIn() && request.resource.data.userId == request.auth.uid && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
 
     /**
-     * @description Rules for dispensaries.
+     * @description Controls access to dispensaries.
      * @path /dispensaries/{dispensaryId}
-     * @allow (get, list) - Any user can read dispensaries.
-     * @deny (create, update, delete) - No write permissions defined.
-     * @principle Public read for dispensaries.
+     * @allow (read, write) to anyone.
+     * @principle Allows public read and write access (no authorization).
      */
     match /dispensaries/{dispensaryId} {
-      allow get, list: if true;
+        allow get, list, create, update, delete: if true;
     }
 
     /**
-     * @description Rules for chats.
+     * @description Controls access to chats.
      * @path /chats/{chatId}
-     * @allow (get, list) - Only participants can read chat metadata.
-     * @allow (create) - An authenticated user can create a chat if they are a participant.
-     * @allow (update, delete) - Write operations are denied for this prototype.
-     * @deny (get, list) - Non-participants cannot access chat data.
-     * @principle Shared access for chats among participants.
+     * @allow (read, write) to participants of the chat.
+     * @principle Enforces shared access for collaborative documents.
      */
     match /chats/{chatId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
+        function isSignedIn() {
+          return request.auth != null;
+        }
 
-      function isParticipant() {
-        return request.auth.uid in resource.data.participants;
-      }
+        function isParticipant() {
+            return isSignedIn() && resource.data.participants.hasAny([request.auth.uid]);
+        }
 
-      allow get: if isSignedIn() && isParticipant();
-      allow list: if isSignedIn() && isParticipant();
-      allow create: if isSignedIn() && request.resource.data.participants.hasAny([request.auth.uid]);
-      allow update, delete: if false;
+        allow get, list: if isSignedIn() && resource.data.participants.hasAny([request.auth.uid]);
+
+        allow create: if isSignedIn() && request.resource.data.participants.hasAny([request.auth.uid]);
+        allow update: if isSignedIn() && resource.data.participants.hasAny([request.auth.uid]);
+        allow delete: if false;
     }
 
     /**
-     * @description Rules for chat messages within a chat.
+     * @description Controls access to chat messages.
      * @path /chats/{chatId}/messages/{messageId}
-     * @allow (get, list) - Only participants of the chat can read messages.
-     * @allow (create) - Only participants of the chat can create messages.
-     * @allow (update, delete) - Write operations are denied for this prototype.
-     * @deny (get, list, create) - Non-participants cannot access messages.
-     * @principle Shared access for chat messages among participants.
+     * @allow (read, write) to participants of the chat.
+     * @principle Enforces shared access for collaborative documents.
      */
     match /chats/{chatId}/messages/{messageId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
+        function isSignedIn() {
+          return request.auth != null;
+        }
 
-      function isParticipant(chatId) {
-        return get(/databases/$(database)/documents/chats/$(chatId)).data.participants.hasAny([request.auth.uid]);
-      }
+        function isParticipant(chatId) {
+            return isSignedIn() && get(/databases/$(database)/documents/chats/$(chatId)).data.participants.hasAny([request.auth.uid]);
+        }
 
-      allow get: if isSignedIn() && isParticipant(chatId);
-      allow list: if isSignedIn() && isParticipant(chatId);
-      allow create: if isSignedIn() && isParticipant(chatId);
-      allow update, delete: if false;
+        allow get, list: if isParticipant(chatId);
+        allow create: if isParticipant(chatId);
+        allow update: if isParticipant(chatId);
+        allow delete: if false;
     }
 
     /**
-     * @description Rules for friend requests.
+     * @description Controls access to friend requests.
      * @path /friendRequests/{toUserId}/requests/{fromUserId}
-     * @allow (create) - Authenticated user can create a friend request to another user.
-     * @allow (get, list) - Only the involved users can read the friend request.
-     * @allow (update, delete) - Write operations are denied for this prototype.
-     * @deny (create) - If trying to create a request as someone else.
-     * @deny (get, list) - If not one of the involved users.
-     * @principle Limits access to friend requests to involved users.
+     * @allow (create) only if the request is made by the sender (fromUserId).
+     * @allow (get, update, delete) only if the request is for the recipient (toUserId) and by the sender (fromUserId).
+     * @deny (create, get, update, delete) if the user IDs don't match.
+     * @principle Enforces user-initiated access for friend requests.
      */
     match /friendRequests/{toUserId}/requests/{fromUserId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isToUser(toUserId) {
-        return request.auth.uid == toUserId;
-      }
-
-      function isFromUser(fromUserId) {
-        return request.auth.uid == fromUserId;
-      }
-
-      allow create: if isSignedIn() && isFromUser(fromUserId) && !isToUser(toUserId);
-      allow get: if isSignedIn() && (isToUser(toUserId) || isFromUser(fromUserId));
-      allow list: if isSignedIn() && (isToUser(toUserId) || isFromUser(fromUserId));
-      allow update, delete: if false;
-    }
-
-    /**
-     * @description Rules for post-its. This rule was missing in the original set of rules. It addresses the reported error.
-     * @path /users/{userId}/post-its
-     * @allow (list) - Allows the owner to list their own post-its.
-     * @deny (get, create, update, delete) - Denies all other operations.
-     * @principle Enforces document ownership for listing post-its.
-     */
-    match /users/{userId}/post-its/{postItId} {
         function isSignedIn() {
-            return request.auth != null;
+          return request.auth != null;
         }
 
-        function isOwner(userId) {
-            return request.auth.uid == userId;
+        function isSender(fromUserId) {
+            return isSignedIn() && request.auth.uid == fromUserId;
         }
 
-        allow get, list, create, update, delete: if isSignedIn() && isOwner(userId);
+        function isRecipient(toUserId) {
+          return isSignedIn() && request.auth.uid == toUserId;
+        }
+
+        allow get: if isRecipient(toUserId) && isSender(fromUserId);
+        allow list: if false;
+
+        allow create: if isSender(fromUserId) && request.auth.uid == fromUserId;
+        allow update: if isRecipient(toUserId) && isSender(fromUserId) && request.auth.uid == fromUserId;
+        allow delete: if isRecipient(toUserId) && isSender(fromUserId);
     }
   }
 }

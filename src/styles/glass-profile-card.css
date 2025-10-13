@@ -1,4 +1,5 @@
 
+
 .glass-profile-card {
     position: relative;
     background: rgba(255, 255, 255, 0.1);
@@ -207,10 +208,9 @@
     }
     .glass-profile-card-actions {
         gap: 0.5rem;
+        grid-template-columns: repeat(4, 1fr);
     }
     .glass-profile-card-footer {
         flex-direction: column;
     }
 }
-
-    
