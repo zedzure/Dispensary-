@@ -287,6 +287,16 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
     return null;
   }
   
+  if (activeSheet === 'chat') {
+    return (
+        <DispensaryChatSheet 
+            isOpen={true} 
+            onOpenChange={(open) => handleSheetOpenChange(!open)} 
+            dispensary={dispensary} 
+        />
+    )
+  }
+
   const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${dispensary.lat},${dispensary.lng}`;
 
   return (
@@ -434,7 +444,6 @@ export function DispensaryDetailSheet({ dispensary, isOpen, onOpenChange }: Disp
 
     <DispensaryPromotionsSheet isOpen={activeSheet === 'promotions'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
     <DispensaryProductsSheet isOpen={activeSheet === 'products'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
-    <DispensaryChatSheet isOpen={activeSheet === 'chat'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
     <DispensaryDealsSheet isOpen={activeSheet === 'deals'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
     <DispensaryMapSheet isOpen={activeSheet === 'map'} onOpenChange={(open) => handleSheetOpenChange(!open)} dispensary={dispensary} />
     </>

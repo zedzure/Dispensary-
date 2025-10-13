@@ -83,7 +83,7 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: C
                 <p className="text-xs text-muted-foreground">{formatTimestamp(msg.timestamp)}</p>
             </div>
 
-            <div className={cn("p-3 rounded-2xl rounded-tl-none mt-1 liquid-glass border-border/20", isCurrentUser ? "bg-primary text-primary-foreground" : "bg-card/60 backdrop-blur-sm")}>
+            <div className={cn("p-3 rounded-2xl rounded-tl-none mt-1 liquid-glass", isCurrentUser ? "bg-primary text-primary-foreground" : "bg-card/60 backdrop-blur-sm")}>
                 {msg.replyingTo && (
                     <div className="text-xs text-muted-foreground mb-1">
                         Replying to <strong className="text-primary/90">@{msg.replyingTo.user}</strong>
@@ -207,9 +207,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
   };
 
   const handleClose = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("sheet");
-    router.push(pathname + "?" + params.toString(), { scroll: false });
+    onOpenChange(false);
   };
   
   const handleScroll = (e: UIEvent<HTMLDivElement>) => {
@@ -313,10 +311,10 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
 
   return (
     <>
-    <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+    <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent 
         side="right" 
-        className="w-full md:max-w-md p-0 flex flex-col bg-background"
+        className="w-full h-full p-0 flex flex-col bg-background"
         style={{ height: vh ? `${vh}px` : '100dvh' }}
        >
         <SheetHeader className="p-4 flex-row items-center gap-4 flex-shrink-0 bg-background border-b z-10">
@@ -367,7 +365,7 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                 <AnimatePresence>
                     {isToolsOpen && (
                         <motion.div 
-                            className="chat-tools-sheet absolute bottom-full left-0 right-0"
+                            className="chat-tools-sheet"
                             initial={{ y: "100%", opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: "100%", opacity: 0 }}
@@ -386,41 +384,43 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                         </motion.div>
                     )}
                 </AnimatePresence>
-                <div className="chat-input-main">
-                    {replyingTo && (
-                        <div className="text-xs p-2 bg-muted/50 rounded-t-md flex justify-between items-center mx-2">
-                            <p className="text-muted-foreground truncate">
-                            Replying to <strong className="text-primary/90">@{replyingTo.user.name}</strong>
-                            </p>
-                            <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setReplyingTo(null)}>
-                            <X className="h-3 w-3" />
-                            </Button>
-                        </div>
-                    )}
-                    <div className="flex items-end gap-2 bg-muted/80 backdrop-blur-sm rounded-2xl p-2 border border-border/20">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-9 w-9 flex-shrink-0 rounded-full bg-background/50 hover:bg-background"
-                            onClick={() => setIsToolsOpen(!isToolsOpen)}
-                        >
-                            <Plus className={cn("h-5 w-5 transition-transform", isToolsOpen && "rotate-45")} />
-                        </Button>
-                         <Textarea 
-                            placeholder="Type a message..."
+
+                 <div className="chat-input-main">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="chat-input-action-button"
+                        onClick={() => setIsToolsOpen(!isToolsOpen)}
+                    >
+                        <Plus className={cn("h-5 w-5 transition-transform", isToolsOpen && "rotate-45")} />
+                    </Button>
+                    <div className="chat-input-textarea-wrapper">
+                         {replyingTo && (
+                            <div className="text-xs p-2 bg-muted/50 rounded-t-xl flex justify-between items-center mx-2">
+                                <p className="text-muted-foreground truncate">
+                                Replying to <strong className="text-primary/90">@{replyingTo.user.name}</strong>
+                                </p>
+                                <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setReplyingTo(null)}>
+                                <X className="h-3 w-3" />
+                                </Button>
+                            </div>
+                        )}
+                        <Textarea 
+                            placeholder="Message"
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }}}
                             className="chat-input-textarea"
                             rows={1}
                         />
-                        {hasContent && (
-                            <Button size="icon" className="h-9 w-9 rounded-full flex-shrink-0" onClick={handleSendMessage} disabled={isSubmitting}>
-                                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4" />}
-                            </Button>
-                        )}
                     </div>
+                    {hasContent && (
+                        <Button size="icon" className="chat-input-send-button" onClick={handleSendMessage} disabled={isSubmitting}>
+                            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4" />}
+                        </Button>
+                    )}
                 </div>
+
             </div>
             ) : (
                 <p className="text-sm text-center text-muted-foreground p-4">Please log in to participate in the chat.</p>

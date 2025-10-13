@@ -1,5 +1,6 @@
 
 
+
 .chat-input-bar {
     position: fixed;
     bottom: 0;
@@ -17,18 +18,29 @@
 }
 
 .chat-input-main {
-    @apply flex-1 flex flex-col gap-2 min-w-0;
+    @apply flex items-end gap-2;
+}
+
+.chat-input-action-button {
+    @apply h-9 w-9 flex-shrink-0 rounded-full bg-background/50 hover:bg-background;
+}
+
+.chat-input-textarea-wrapper {
+    @apply flex-grow bg-muted/80 backdrop-blur-sm rounded-2xl border border-border/20 overflow-hidden;
 }
 
 .chat-input-textarea {
-    @apply w-full bg-transparent border-none px-4 py-2 text-base flex-grow;
-    resize: none;
-    min-height: 2.5rem; /* ~40px */
+    @apply w-full bg-transparent border-none px-4 py-2 text-base resize-none;
+    min-height: 2.25rem; /* ~36px */
     max-height: 12rem;
     overflow-y: auto;
 }
 .chat-input-textarea:focus {
     @apply ring-0 outline-none shadow-none;
+}
+
+.chat-input-send-button {
+    @apply h-9 w-9 rounded-full flex-shrink-0;
 }
 
 .chat-tools-sheet {
@@ -38,4 +50,3 @@
 .chat-tools-grid {
     @apply grid grid-cols-4 gap-4;
 }
-
