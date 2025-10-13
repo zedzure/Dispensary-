@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
+import React, { createContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged } from 'firebase/auth';
@@ -9,7 +9,6 @@ import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 
 // This interface remains as it defines the shape of the context's value.
 export interface FirebaseContextState {
-  areServicesAvailable: boolean;
   firebaseApp: FirebaseApp | null;
   firestore: Firestore | null;
   auth: Auth | null;
@@ -53,6 +52,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       return;
     }
 
+    // Set loading to true only when auth becomes available.
     setUserAuthState(prevState => ({ ...prevState, isUserLoading: true }));
 
     const unsubscribe = onAuthStateChanged(
@@ -68,10 +68,10 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     return () => unsubscribe();
   }, [auth]);
 
+  const areServicesAvailable = !!(firebaseApp && firestore && auth);
+
   const contextValue = useMemo((): FirebaseContextState => {
-    const servicesAvailable = !!(firebaseApp && firestore && auth);
     return {
-      areServicesAvailable: servicesAvailable,
       firebaseApp,
       firestore,
       auth,
@@ -83,7 +83,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 
   return (
     <FirebaseContext.Provider value={contextValue}>
-      {contextValue.areServicesAvailable ? <FirebaseErrorListener /> : null}
+      {areServicesAvailable ? <FirebaseErrorListener /> : null}
       {children}
     </FirebaseContext.Provider>
   );

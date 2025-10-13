@@ -18,7 +18,7 @@ export function BottomNavBar() {
   ];
   
   const authItem = user
-    ? { href: '/profile', icon: User, label: 'Profile' }
+    ? { href: `/profile/${user.uid}`, icon: User, label: 'Profile' }
     : { href: '/login', icon: User, label: 'Login' };
 
   const allNavItems = [...navItems, authItem];

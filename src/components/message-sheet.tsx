@@ -61,7 +61,7 @@ export function MessageSheet({ isOpen, onClose, recipient }: MessageSheetProps) 
                         type: 'private',
                         createdAt: serverTimestamp(),
                     };
-                    const newChatRef = await addDocumentNonBlocking(collection(firestore, 'chats'), newChatData);
+                    const newChatRef = await addDoc(collection(firestore, 'chats'), newChatData);
 
                     if (newChatRef) {
                         setChatId(newChatRef.id);

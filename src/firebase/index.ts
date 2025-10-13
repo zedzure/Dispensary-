@@ -1,30 +1,20 @@
 
 'use client';
 
-import { firebaseConfig } from '@/firebase/config';
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth, User } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
 import { DependencyList, useMemo, useContext } from 'react';
 import { FirebaseContext, FirebaseContextState } from './provider';
+import type { FirebaseApp } from 'firebase/app';
+import type { Auth, User } from 'firebase/auth';
+import type { Firestore } from 'firebase/firestore';
+
 
 // Re-export the providers from here to create a single entry point.
 export { FirebaseProvider } from './provider';
 export { FirebaseClientProvider } from './client-provider';
+export { initializeFirebase } from './client-provider';
 
-// This function should only be called on the client side.
-export function initializeFirebase(): { firebaseApp: FirebaseApp; auth: Auth; firestore: Firestore } | { firebaseApp: null; auth: null; firestore: null } {
-  if (typeof window === 'undefined') {
-    return { firebaseApp: null, auth: null, firestore: null };
-  }
-  const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  const auth = getAuth(app);
-  const firestore = getFirestore(app);
-  return { firebaseApp: app, auth, firestore };
-}
 
 // All hooks are now defined or re-exported from this central file.
-
 export interface FirebaseServicesAndUser extends FirebaseContextState {
   firebaseApp: FirebaseApp;
   firestore: Firestore;
@@ -38,8 +28,11 @@ export const useFirebase = (): FirebaseServicesAndUser => {
     throw new Error('useFirebase must be used within a FirebaseProvider.');
   }
 
-  if (!context.areServicesAvailable || !context.firebaseApp || !context.firestore || !context.auth) {
-    throw new Error('Firebase core services not available. Check FirebaseProvider props.');
+  if (!context.firebaseApp || !context.firestore || !context.auth) {
+    // This can happen during SSR or if the provider is not set up correctly.
+    // Instead of throwing, we could return a loading/unavailable state.
+    // For now, we throw to make it clear that the services are not available.
+    throw new Error('Firebase core services not available. This may be due to SSR or a misconfigured provider.');
   }
   
   return {
@@ -84,13 +77,9 @@ export const useUser = (): UserHookResult => {
 // The memoization hook remains here.
 type MemoFirebase <T> = T & {__memo?: boolean};
 
-export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | (MemoFirebase<T>) {
+export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoized = useMemo(factory, deps);
-  
-  if(typeof memoized !== 'object' || memoized === null) return memoized;
-  (memoized as MemoFirebase<T>).__memo = true;
-  
   return memoized;
 }
 

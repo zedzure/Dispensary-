@@ -86,7 +86,7 @@ const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (o
 const UploadsSheet = ({ uploads, open, onOpenChange }: { uploads: UploadItem[], open: boolean, onOpenChange: (open: boolean) => void }) => {
   useMobileViewportFix();
   return (
-    <Sheet open={open} onOpenChange-sheets/chat-sheet.tsx onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
         <SheetHeader className="p-4 border-b text-red-500">
           <SheetTitle className="flex items-center text-red-500"><Camera className="mr-2 h-5 w-5"/>My Uploads</SheetTitle>
