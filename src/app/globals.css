@@ -67,38 +67,17 @@
 }
 
 @layer base {
-  html {
-    height: 100%;
-    height: -webkit-fill-available;
-    height: 100dvh;
-    overscroll-behavior: none;
-  }
-  body {
-    height: 100%;
-    height: -webkit-fill-available;
-    height: 100dvh;
-    @apply font-sans text-foreground;
-    background-color: hsl(var(--background));
-  }
   * {
     @apply border-border;
   }
-
+  body {
+    @apply bg-background text-foreground font-sans;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
   main {
     flex-grow: 1;
-  }
-  
-  @supports (-webkit-touch-callout: none) {
-    body {
-      position: fixed;
-      width: 100%;
-    }
-  }
-
-  body.keyboard-visible {
-    position: fixed;
-    overflow: hidden;
-    width: 100%;
   }
 }
 
