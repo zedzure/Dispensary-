@@ -116,9 +116,9 @@ export default function LoginPage() {
         <div className="flex flex-col min-h-screen">
             <Header />
             <main className="flex-grow flex items-center justify-center bg-muted">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Loading...</span>
+                <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                    <Leaf className="h-12 w-12 animate-spin text-primary" />
+                    <span>Authenticating...</span>
                 </div>
             </main>
             <Footer />
