@@ -14,31 +14,31 @@ const featuresData = [
     {
         icon: MapPin,
         title: "Find Local Dispensaries",
-        description: "Our platform provides an intuitive map-based search to help you find licensed dispensaries in your area. Filter by services like delivery, in-store pickup, or curbside service. View store hours, contact information, and navigate directly from the app.",
+        description: "With over 5,000 licensed dispensaries listed nationwide, our platform provides an intuitive map-based search to help you find the perfect spot in your area. Filter by services like delivery, in-store pickup, or curbside service, all while supporting local businesses that contribute over $1.8 billion in state tax revenue annually. View store hours, contact information, and navigate directly from the app.",
         slug: "find-local-dispensaries"
     },
     {
         icon: Search,
         title: "Explore Products",
-        description: "Dive into a comprehensive menu of cannabis products. From flower and pre-rolls to edibles and tinctures, you can browse detailed product information including THC/CBD content, strain type, effects, and flavor profiles. Our search and filter options make it easy to find exactly what you're looking for.",
+        description: "Dive into a comprehensive menu of over 25,000 cannabis products from more than 3,000 unique strains. From flower and pre-rolls to edibles and tinctures, you can browse detailed information including THC/CBD content, terpene profiles, effects, and flavors. Our search and filter options make it easy to find exactly what you're looking for among the 100+ known cannabinoids.",
         slug: "explore-products"
     },
     {
         icon: Percent,
         title: "Discover Deals",
-        description: "Stay up-to-date with the latest promotions and discounts from your favorite dispensaries. We aggregate deals to help you save money on your purchases. Get notifications for flash sales and daily specials so you never miss an opportunity.",
+        description: "Unlock an average savings of 25% on your purchases by browsing the latest promotions and discounts from your favorite dispensaries. We aggregate thousands of deals daily to help you save. Get instant notifications for flash sales and daily specials, ensuring you never miss an opportunity to get the best value.",
         slug: "discover-deals"
     },
     {
         icon: Star,
         title: "Read Real Reviews",
-        description: "Make confident choices with insights from our community. Read authentic reviews and ratings from fellow cannabis enthusiasts on products and dispensaries. Share your own experiences to help others in the community make informed decisions.",
+        description: "Make confident choices with insights from our community of over 500,000 users. Read authentic reviews and ratings on products and dispensaries, with an average of 1,200 new reviews submitted daily. Share your own experiences to help others in the community make informed decisions and find the best cannabis for their needs.",
         slug: "read-real-reviews"
     },
     {
         icon: Leaf,
         title: "Learn About Cannabis",
-        description: "Whether you're new to cannabis or a seasoned connoisseur, our learning center is a valuable resource. Deepen your knowledge with educational guides on different strains, consumption methods, potential benefits, and safe usage practices. We're committed to promoting responsible consumption.",
+        description: "Whether you're new to cannabis or a seasoned connoisseur, our learning center is a valuable resource. Did you know the cannabis plant contains over 500 chemical compounds? Deepen your knowledge with educational guides on different strains, consumption methods, and the potential benefits of cannabinoids like THC and CBD. We're committed to promoting safe and responsible consumption.",
         slug: "learn-about-cannabis"
     }
 ];
