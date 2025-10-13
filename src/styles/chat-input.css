@@ -4,19 +4,16 @@
     position: fixed;
     bottom: 0;
     left: 0;
-    width: 100%;
-    background-color: hsla(var(--background) / 0.8);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid hsla(var(--border) / 0.2);
+    right: 0;
+    z-index: 20;
     padding: 0.5rem;
     padding-left: calc(0.5rem + env(safe-area-inset-left));
     padding-right: calc(0.5rem + env(safe-area-inset-right));
     padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
 }
 
-
 .chat-input-container {
-    @apply flex items-start w-full max-w-4xl mx-auto gap-2;
+    @apply relative w-full max-w-4xl mx-auto;
 }
 
 .chat-input-main {
@@ -24,7 +21,7 @@
 }
 
 .chat-input-textarea {
-    @apply w-full bg-transparent border-none rounded-2xl px-4 py-2 text-sm flex-grow;
+    @apply w-full bg-transparent border-none px-4 py-2 text-base flex-grow;
     resize: none;
     min-height: 2.5rem; /* ~40px */
     max-height: 12rem;
@@ -34,15 +31,11 @@
     @apply ring-0 outline-none shadow-none;
 }
 
-.chat-input-textarea[data-placeholder]:empty:before {
-    content: attr(data-placeholder);
-    @apply text-muted-foreground pointer-events-none;
-}
-
 .chat-tools-sheet {
-    @apply bg-muted/80 p-4 rounded-t-2xl mb-2 backdrop-blur-sm;
+    @apply bg-background/80 backdrop-blur-xl p-4 rounded-2xl mb-2 border border-border/20;
 }
 
 .chat-tools-grid {
-    @apply grid grid-cols-5 gap-4;
+    @apply grid grid-cols-4 gap-4;
 }
+

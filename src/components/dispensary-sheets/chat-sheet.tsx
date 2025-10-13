@@ -63,11 +63,6 @@ const formatTimestamp = (timestamp: any) => {
     return date.toLocaleDateString();
 };
 
-const parseMessage = (text: string) => {
-  // Use a safer method to render HTML content
-  return <div dangerouslySetInnerHTML={{ __html: text }} />;
-};
-
 function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: ChatMessageType; onLike: () => void; onReply: () => void; onAvatarClick: (user: ChatUser) => void; onDelete: () => void; }) {
     const { user: currentUser } = useUser();
     const isCurrentUser = msg.user.id === currentUser?.uid;
@@ -88,14 +83,14 @@ function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: C
                 <p className="text-xs text-muted-foreground">{formatTimestamp(msg.timestamp)}</p>
             </div>
 
-            <div className={cn("p-3 rounded-2xl rounded-tl-none mt-1 liquid-glass border-border/20", isCurrentUser && "bg-primary text-primary-foreground")}>
+            <div className={cn("p-3 rounded-2xl rounded-tl-none mt-1 liquid-glass border-border/20", isCurrentUser ? "bg-primary text-primary-foreground" : "bg-card/60 backdrop-blur-sm")}>
                 {msg.replyingTo && (
                     <div className="text-xs text-muted-foreground mb-1">
                         Replying to <strong className="text-primary/90">@{msg.replyingTo.user}</strong>
                     </div>
                 )}
                 
-                <div className="text-sm text-foreground/90 break-words">{parseMessage(msg.text)}</div>
+                <div className="text-sm text-foreground/90 break-words" dangerouslySetInnerHTML={{ __html: msg.text }}/>
 
                 {msg.imageUrl && (
                     <div className="relative w-full max-w-xs h-48 mt-2 rounded-lg overflow-hidden border">
@@ -441,4 +436,3 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
     </>
   );
 }
-
