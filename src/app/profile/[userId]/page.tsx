@@ -16,8 +16,20 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { UserProfileSheets } from '@/components/user-profile-sheets';
 import type { UploadItem } from '@/types/pos';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
+import { realImageUrls } from '@/lib/products';
+import { Timestamp } from 'firebase/firestore';
 
 export type ActiveSheet = 'receipts' | 'uploads' | 'notes' | 'search' | 'music' | 'video' | 'wallet' | 'saved' | 'connections' | null;
+
+
+const mockUploadsData: UploadItem[] = realImageUrls.slice(0, 12).map((url, i) => ({
+    id: `upload-${i}`,
+    name: `My Photo ${i + 1}`,
+    type: 'image/jpeg',
+    size: Math.floor(Math.random() * (5 * 1024 * 1024)) + 1024 * 1024, // 1-5 MB
+    url: url,
+    uploadedAt: Timestamp.fromDate(new Date(Date.now() - (i * 24 * 60 * 60 * 1000))),
+}));
 
 
 function ProfilePageSkeleton() {
@@ -101,6 +113,12 @@ export default function ProfilePage() {
     }
   }, [authUser, userId, profile, profileLoading, authLoading, db]);
 
+  useEffect(() => {
+      if (profile?.displayName === 'Kenya Mccullough') {
+          setUploads(mockUploadsData);
+      }
+  }, [profile]);
+
 
   const handleLogout = async () => {
     if(!auth) return;
@@ -145,11 +163,11 @@ export default function ProfilePage() {
       followersCount: profile.followersCount,
       followingCount: profile.followingCount,
       // Defaulting other fields as they don't exist on the new User model
-      points: 0,
+      points: profile.displayName === 'Kenya Mccullough' ? 2450 : 0,
       followers: [],
       following: [],
-      reviewsToday: 0,
-      receiptsThisWeek: 0,
+      reviewsToday: profile.displayName === 'Kenya Mccullough' ? 7 : 0,
+      receiptsThisWeek: profile.displayName === 'Kenya Mccullough' ? 3 : 0,
   } : null;
 
   if (!adaptedProfile) {

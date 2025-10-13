@@ -4,7 +4,7 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Camera, Receipt, Music, Video, Wallet, Bookmark, MessageSquare, Loader2, UserPlus, UserMinus } from "lucide-react";
+import { Camera, Receipt, Music, Video, Wallet, Bookmark, MessageSquare, Loader2, UserPlus, UserMinus, Star } from "lucide-react";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { ActiveSheet } from "@/app/profile/[userId]/page";
 import type { UploadItem, Receipt as ReceiptType, Chat, UserProfile } from "@/types/pos";
@@ -23,9 +23,11 @@ import { mockCustomers } from "@/lib/mockCustomers";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { MessageSheet } from "./message-sheet";
+import { mockReceiptsData } from "@/lib/mockReceiptsData";
+import { allProductsFlat } from "@/lib/products";
+import { Progress } from "./ui/progress";
+import { Card, CardContent } from "./ui/card";
 
-
-const mockReceiptsData: ReceiptType[] = [];
 
 const getRelativeTime = (timestamp: any): string => {
     if (!timestamp) return '...';
@@ -42,8 +44,9 @@ const getRelativeTime = (timestamp: any): string => {
     return `${diffInDays}d ago`;
 }
 
-const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+const ReceiptsSheet = ({ open, onOpenChange, profile }: { open: boolean, onOpenChange: (open: boolean) => void, profile: UserProfile }) => {
   useMobileViewportFix();
+  const receipts = profile.firstName === 'Kenya' ? mockReceiptsData : [];
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
@@ -51,19 +54,19 @@ const ReceiptsSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (o
           <SheetTitle className="flex items-center text-red-500"><Receipt className="mr-2 h-5 w-5"/>My Receipts</SheetTitle>
         </SheetHeader>
         <ScrollArea className="flex-1">
-            {mockReceiptsData.length > 0 ? (
+            {receipts.length > 0 ? (
               <ul className="p-4 space-y-3 text-red-500">
-                {mockReceiptsData.map(receipt => (
+                {receipts.map(receipt => (
                   <li key={receipt.id} className="p-3 bg-muted/50 rounded-lg flex items-center gap-4">
                     <div className="p-2 rounded-full bg-background">
                     <Receipt className="h-5 w-5 text-primary" />
                     </div>
                     <div className="flex-grow">
-                    <p className="font-semibold">Receipt Submitted</p>
+                    <p className="font-semibold text-foreground">Receipt Submitted</p>
                     <p className="text-xs text-muted-foreground">{new Date(receipt.createdAt).toLocaleString()}</p>
                     </div>
                     <div className="text-right">
-                        <p className="font-bold text-lg">${receipt.totalAmount.toFixed(2)}</p>
+                        <p className="font-bold text-lg text-foreground">${receipt.totalAmount.toFixed(2)}</p>
                         <Badge variant={receipt.status === 'approved' ? 'default' : 'secondary'} className={receipt.status === 'pending' ? 'bg-yellow-500/80 text-white' : ''}>
                         {receipt.status}
                         </Badge>
@@ -151,7 +154,7 @@ const ChatListItem = ({ chat, currentUserId, onClick }: { chat: Chat, currentUse
             </Avatar>
             <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline">
-                    <p className="font-semibold truncate">{recipient.firstName} {recipient.lastName}</p>
+                    <p className="font-semibold truncate text-foreground">{recipient.firstName} {recipient.lastName}</p>
                     <p className="text-xs text-muted-foreground">{getRelativeTime(chat.timestamp)}</p>
                 </div>
                 <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
@@ -251,69 +254,167 @@ const NotesSheet = ({ user, open, onOpenChange }: { user: FirebaseUser, open: bo
     );
 };
 
-const MusicSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+const mockMusic = allProductsFlat.filter(p => p.category === 'Flower').slice(0,5).map(p => ({...p, category: 'Music'}));
+const MusicSheet = ({ open, onOpenChange, profile }: { open: boolean, onOpenChange: (open: boolean) => void, profile: UserProfile }) => {
     useMobileViewportFix();
+    const items = profile.firstName === 'Kenya' ? mockMusic : [];
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
           <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
             <SheetHeader className="p-4 border-b text-red-500">
               <SheetTitle className="flex items-center text-red-500"><Music className="mr-2 h-5 w-5"/>My Music</SheetTitle>
             </SheetHeader>
-            <div className="h-full flex flex-col items-center justify-center text-red-500">
-                <Music className="h-12 w-12 mb-4" />
-                <p>Your uploaded music will appear here.</p>
-            </div>
+            <ScrollArea className="flex-1">
+              {items.length > 0 ? (
+                <ul className="p-4 space-y-3 text-red-500">
+                  {items.map(item => (
+                    <li key={item.id} className="p-3 bg-muted/50 rounded-lg flex items-center gap-4">
+                      <Image src={item.image} alt={item.name} width={48} height={48} className="rounded-md" />
+                      <div className="flex-grow">
+                        <p className="font-semibold text-foreground">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">Artist Name</p>
+                      </div>
+                      <Button variant="ghost" size="icon"><Music className="h-5 w-5 text-primary" /></Button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-red-500">
+                    <Music className="h-12 w-12 mb-4" />
+                    <p>Your uploaded music will appear here.</p>
+                </div>
+              )}
+            </ScrollArea>
           </SheetContent>
         </Sheet>
     );
 };
 
-const VideoSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+const mockVideos = allProductsFlat.filter(p => p.category === 'Edibles').slice(0,5).map(p => ({...p, category: 'Video'}));
+const VideoSheet = ({ open, onOpenChange, profile }: { open: boolean, onOpenChange: (open: boolean) => void, profile: UserProfile }) => {
     useMobileViewportFix();
+    const items = profile.firstName === 'Kenya' ? mockVideos : [];
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
           <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
             <SheetHeader className="p-4 border-b text-red-500">
               <SheetTitle className="flex items-center text-red-500"><Video className="mr-2 h-5 w-5"/>My Videos</SheetTitle>
             </SheetHeader>
-            <div className="h-full flex flex-col items-center justify-center text-red-500">
-                <Video className="h-12 w-12 mb-4" />
-                <p>Your uploaded videos will appear here.</p>
-            </div>
+            <ScrollArea className="flex-1">
+              {items.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4 p-4">
+                  {items.map(item => (
+                    <Card key={item.id} className="bg-muted/50">
+                      <CardContent className="p-0">
+                        <Image src={item.image} alt={item.name} width={200} height={200} className="rounded-t-lg w-full aspect-video object-cover" />
+                        <div className="p-2">
+                           <p className="font-semibold text-foreground text-sm truncate">{item.name}</p>
+                           <p className="text-xs text-muted-foreground">2.3M Views</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-red-500">
+                    <Video className="h-12 w-12 mb-4" />
+                    <p>Your uploaded videos will appear here.</p>
+                </div>
+              )}
+            </ScrollArea>
           </SheetContent>
         </Sheet>
     );
 };
 
-const WalletSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+const WalletSheet = ({ open, onOpenChange, profile }: { open: boolean, onOpenChange: (open: boolean) => void, profile: UserProfile }) => {
     useMobileViewportFix();
+    const hasData = profile.firstName === 'Kenya';
+    const points = profile.points || 0;
+    const nextTierPoints = profile.tier === 'Gold' ? 3000 : 500;
+    const progress = (points / nextTierPoints) * 100;
+
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
           <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
             <SheetHeader className="p-4 border-b text-red-500">
               <SheetTitle className="flex items-center text-red-500"><Wallet className="mr-2 h-5 w-5"/>My Wallet</SheetTitle>
             </SheetHeader>
-            <div className="h-full flex flex-col items-center justify-center text-red-500">
-                <Wallet className="h-12 w-12 mb-4" />
-                <p>Your loyalty points and rewards will be shown here.</p>
-            </div>
+             <ScrollArea className="flex-1">
+              {hasData ? (
+                 <div className="p-6 space-y-6">
+                    <Card className="bg-primary text-primary-foreground">
+                        <CardContent className="p-6">
+                            <p className="text-sm text-primary-foreground/80">Loyalty Points</p>
+                            <p className="text-4xl font-bold">{points.toLocaleString()}</p>
+                        </CardContent>
+                    </Card>
+                    
+                    <div>
+                        <h3 className="font-semibold text-lg text-foreground mb-2">Tier Progress</h3>
+                        <Card className="bg-card/50">
+                            <CardContent className="p-4">
+                                <div className="flex justify-between items-center mb-2">
+                                    <p className="text-sm font-medium text-foreground">{profile.tier} Member</p>
+                                    <p className="text-sm font-medium text-foreground">Next: {profile.nextTier}</p>
+                                </div>
+                                <Progress value={progress} className="w-full" />
+                                <p className="text-xs text-muted-foreground mt-2 text-center">{nextTierPoints - points} points to next tier</p>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    <div>
+                        <h3 className="font-semibold text-lg text-foreground mb-2">Available Rewards</h3>
+                         <div className="space-y-2">
+                            <Card className="bg-card/50"><CardContent className="p-4 flex justify-between items-center"><div><p className="font-medium text-foreground">10% off any edible</p><p className="text-xs text-muted-foreground">Cost: 500 points</p></div><Button size="sm">Redeem</Button></CardContent></Card>
+                            <Card className="bg-card/50"><CardContent className="p-4 flex justify-between items-center"><div><p className="font-medium text-foreground">Free Pre-roll</p><p className="text-xs text-muted-foreground">Cost: 1000 points</p></div><Button size="sm">Redeem</Button></CardContent></Card>
+                        </div>
+                    </div>
+                </div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-red-500">
+                    <Wallet className="h-12 w-12 mb-4" />
+                    <p>Your loyalty points and rewards will be shown here.</p>
+                </div>
+              )}
+            </ScrollArea>
           </SheetContent>
         </Sheet>
     );
 };
 
-const SavedSheet = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
+const mockSavedItems = allProductsFlat.slice(5, 10);
+const SavedSheet = ({ open, onOpenChange, profile }: { open: boolean, onOpenChange: (open: boolean) => void, profile: UserProfile }) => {
     useMobileViewportFix();
+    const items = profile.firstName === 'Kenya' ? mockSavedItems : [];
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
           <SheetContent side="bottom" className="h-[90%] flex flex-col p-0 bg-transparent border-0 shadow-none text-red-500">
             <SheetHeader className="p-4 border-b text-red-500">
               <SheetTitle className="flex items-center text-red-500"><Bookmark className="mr-2 h-5 w-5"/>Saved Items</SheetTitle>
             </SheetHeader>
-            <div className="h-full flex flex-col items-center justify-center text-red-500">
-                <Bookmark className="h-12 w-12 mb-4" />
-                <p>Your saved products and dispensaries will appear here.</p>
-            </div>
+            <ScrollArea className="flex-1">
+              {items.length > 0 ? (
+                <ul className="p-4 space-y-3 text-red-500">
+                  {items.map(item => (
+                    <li key={item.id} className="p-3 bg-muted/50 rounded-lg flex items-center gap-4">
+                      <Image src={item.image} alt={item.name} width={48} height={48} className="rounded-md" />
+                      <div className="flex-grow">
+                        <p className="font-semibold text-foreground">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">{item.category}</p>
+                      </div>
+                      <Button variant="ghost" size="icon"><Star className="h-5 w-5 text-yellow-500 fill-yellow-500" /></Button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-red-500">
+                    <Bookmark className="h-12 w-12 mb-4" />
+                    <p>Your saved products and dispensaries will appear here.</p>
+                </div>
+              )}
+            </ScrollArea>
           </SheetContent>
         </Sheet>
     );
@@ -414,6 +515,7 @@ export function UserProfileSheets({ activeSheet, setActiveSheet, user, profile, 
   return (
     <>
       <ReceiptsSheet 
+        profile={profile}
         open={activeSheet === 'receipts'} 
         onOpenChange={(open) => !open && setActiveSheet(null)} 
       />
@@ -428,18 +530,22 @@ export function UserProfileSheets({ activeSheet, setActiveSheet, user, profile, 
         onOpenChange={(open) => !open && setActiveSheet(null)} 
       />
        <MusicSheet 
+        profile={profile}
         open={activeSheet === 'music'} 
         onOpenChange={(open) => !open && setActiveSheet(null)} 
       />
       <VideoSheet 
+        profile={profile}
         open={activeSheet === 'video'} 
         onOpenChange={(open) => !open && setActiveSheet(null)} 
       />
       <WalletSheet 
+        profile={profile}
         open={activeSheet === 'wallet'} 
         onOpenChange={(open) => !open && setActiveSheet(null)} 
       />
       <SavedSheet 
+        profile={profile}
         open={activeSheet === 'saved'} 
         onOpenChange={(open) => !open && setActiveSheet(null)} 
       />
@@ -452,14 +558,6 @@ export function UserProfileSheets({ activeSheet, setActiveSheet, user, profile, 
         initialTab={connectionsInitialTab}
         open={activeSheet === 'connections'}
         onOpenChange={(open) => !open && setActiveSheet(null)}
-      />
-      <MessageSheet 
-        isOpen={isMessageSheetOpen}
-        onClose={() => {
-            setMessageSheetOpen(false);
-            setMessageRecipient(null);
-        }}
-        recipient={messageRecipient}
       />
     </>
   );

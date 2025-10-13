@@ -67,7 +67,7 @@ const shegoProfile: UserProfile = {
 };
 
 const kenyaProfile: UserProfile = {
-    id: 'CUST-1028',
+    id: 'lUmPteemHpOpawyOoQmMv9w73ql1',
     firstName: 'Kenya',
     lastName: 'Mccullough',
     email: 'kenya.mccullough@example.com',
