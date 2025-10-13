@@ -6,6 +6,7 @@ import { Providers } from "./providers";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CartSheet } from "@/components/cart-sheet";
 import { FirebaseClientProvider } from "@/firebase";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -68,10 +69,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" style={{
-      fontFamily: `var(--font-sans)`,
-    }} suppressHydrationWarning>
-      <body className="font-sans antialiased flex flex-col h-full">
+    <html lang="en" suppressHydrationWarning>
+      <body className={cn("font-sans antialiased flex flex-col h-full", inter.variable)}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <FirebaseClientProvider>
             <Providers>
