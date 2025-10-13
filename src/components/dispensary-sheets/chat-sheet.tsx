@@ -65,7 +65,7 @@ const formatTimestamp = (timestamp: any) => {
 
 function MessageItem({ msg, onLike, onReply, onAvatarClick, onDelete }: { msg: ChatMessageType; onLike: () => void; onReply: () => void; onAvatarClick: (user: ChatUser) => void; onDelete: () => void; }) {
     const { user: currentUser } = useUser();
-    const isCurrentUser = msg.user.id === currentUser?.uid;
+    const isCurrentUser = msg.senderID === currentUser?.uid;
 
   return (
     <div className="w-full group flex items-start gap-3">
@@ -189,6 +189,8 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
                     timestamp: serverTimestamp() as any,
                     likes: 0,
                     isLiked: false,
+                    senderID: randomUser.id,
+                    type: 'text',
                 };
                  addDocumentNonBlocking(collection(firestore, 'dispensaries', dispensary.id, 'messages'), messageToSend);
             }
@@ -250,6 +252,8 @@ export function DispensaryChatSheet({ isOpen, onOpenChange, dispensary }: Dispen
           isLiked: false,
           replyingTo: replyingTo ? { user: replyingTo.user.name, text: replyingTo.text } : undefined,
           imageUrl: imageUrl,
+          senderID: user.uid,
+          type: 'text',
         };
         addDocumentNonBlocking(messagesCol, messageToSend);
         

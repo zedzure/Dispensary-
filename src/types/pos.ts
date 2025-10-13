@@ -205,7 +205,7 @@ export interface Chat {
 
 export interface ChatMessage {
     id: string;
-    user: ChatUser;
+    senderID: string;
     text: string;
     timestamp: number | Timestamp;
     likes: number;
@@ -215,6 +215,8 @@ export interface ChatMessage {
         text: string;
     };
     imageUrl?: string;
+    user: ChatUser;
+    type: 'text' | 'image';
 }
 
 

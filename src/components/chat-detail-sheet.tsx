@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, useCallback, UIEvent } from "react";
@@ -39,7 +40,7 @@ function MessageItem({ msg, sender, isCurrentUser }: { msg: ChatMessageType; sen
                     ? "bg-primary text-primary-foreground rounded-br-none" 
                     : "rounded-bl-none liquid-glass border-border/20"
             )}>
-                <p className="text-sm">{msg.message}</p>
+                <p className="text-sm">{msg.text}</p>
                  <p className={cn("text-xs mt-1", isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground/70")}>{formatTimestamp(msg.timestamp)}</p>
             </div>
         </div>
@@ -87,13 +88,13 @@ export function ChatDetailSheet({ isOpen, onClose, chatId, recipient }: ChatDeta
 
     try {
         const messagesCol = collection(firestore, 'chats', chatId, 'messages');
-        const messageToSend: Omit<ChatMessageType, 'id' | 'user' > = {
+        const messageToSend: Omit<ChatMessageType, 'id' > = {
           senderID: currentUser.uid,
-          message: newMessage,
+          text: newMessage,
           timestamp: serverTimestamp(),
-          type: 'text', // Assuming text type
-          replies: [],
-          reposts: [],
+          type: 'text',
+          likes: 0,
+          isLiked: false,
         };
         await addDocumentNonBlocking(messagesCol, messageToSend);
         
@@ -140,7 +141,7 @@ export function ChatDetailSheet({ isOpen, onClose, chatId, recipient }: ChatDeta
                     messages?.map(msg => (
                         <MessageItem 
                             key={msg.id} 
-                            msg={msg as any}
+                            msg={msg}
                             sender={msg.senderID === currentUser?.uid ? null : recipient}
                             isCurrentUser={msg.senderID === currentUser?.uid}
                         />
